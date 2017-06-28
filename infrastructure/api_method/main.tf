@@ -27,7 +27,7 @@ variable "account_id" {
   description = "The AWS account ID"
 }
 
-# Example: request for GET /hello
+# Example: request for GET /slapalicious
 resource "aws_api_gateway_method" "request_method" {
   rest_api_id   = "${var.rest_api_id}"
   resource_id   = "${var.resource_id}"
@@ -35,7 +35,7 @@ resource "aws_api_gateway_method" "request_method" {
   authorization = "NONE"
 }
 
-# Example: GET /hello => POST lambda
+# Example: GET /slapalicious => POST lambda
 resource "aws_api_gateway_integration" "request_method_integration" {
   rest_api_id = "${var.rest_api_id}"
   resource_id = "${var.resource_id}"
@@ -59,7 +59,7 @@ resource "aws_api_gateway_method_response" "response_method" {
   }
 }
 
-# Response for: GET /hello
+# Response for: GET /slapalicious
 resource "aws_api_gateway_integration_response" "response_method_integration" {
   rest_api_id = "${var.rest_api_id}"
   resource_id = "${var.resource_id}"

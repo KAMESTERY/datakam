@@ -1,5 +1,5 @@
-resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
+resource "aws_iam_role" "iam_for_slapman" {
+  name = "iam_for_slapman"
 
   assume_role_policy = <<EOF
 {
@@ -18,14 +18,14 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-resource "aws_lambda_function" "fn-claws_hello_GET" {
-  filename         = "hello.zip"
-  function_name    = "fn-claws_hello_GET"
-  role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "index.handle"
-  source_code_hash = "${base64sha256(file("hello.zip"))}"
+resource "aws_lambda_function" "slapman_slapalicious_GET" {
+  filename         = "target/slapalicious.jar"
+  function_name    = "slapman_slapalicious_GET"
+  role             = "${aws_iam_role.iam_for_slapman.arn}"
+  handler          = "slapman.lambda::handleRequest"
+  source_code_hash = "${base64sha256(file("target/slapalicious.jar"))}"
   memory_size      = "512"
-  runtime          = "nodejs6.10"
+  runtime          = "java8"
 
   environment {
     variables = {
@@ -34,29 +34,14 @@ resource "aws_lambda_function" "fn-claws_hello_GET" {
   }
 }
 
-resource "aws_lambda_function" "fn-claws_hello_POST" {
-  filename         = "hello.zip"
-  function_name    = "fn-claws_hello_POST"
-  role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "index.handle"
-  source_code_hash = "${base64sha256(file("hello.zip"))}"
+resource "aws_lambda_function" "slapman_slapalicious_POST" {
+  filename         = "target/slapalicious.jar"
+  function_name    = "slapman_slapalicious_POST"
+  role             = "${aws_iam_role.iam_for_slapman.arn}"
+  handler          = "slapman.lambda::handleRequest"
+  source_code_hash = "${base64sha256(file("target/slapalicious.jar"))}"
   memory_size      = "512"
-  runtime          = "nodejs6.10"
-
-  environment {
-    variables = {
-      foo = "bar"
-    }
-  }
-}
-
-resource "aws_lambda_function" "fn-claws_pyfun_GET" {
-  filename         = "pyfun.zip"
-  function_name    = "fn-claws_pyfun_GET"
-  role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "main.handle"
-  source_code_hash = "${base64sha256(file("pyfun.zip"))}"
-  runtime          = "python3.6"
+  runtime          = "java8"
 
   environment {
     variables = {

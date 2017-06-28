@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  ;; [org.clojure/clojure "1.9.0-alpha17"]
                  [org.clojure/core.async "0.3.443"]
+                 [org.clojure/data.json "0.2.6"]
 
                  [io.pedestal/pedestal.service "0.5.2"]
 
@@ -22,7 +23,8 @@
                  ;; [com.walmartlabs/lacinia "0.18.0" :exclusions [clojure-future-spec]]
                  [com.walmartlabs/lacinia "0.18.0"]
                  [com.walmartlabs/lacinia-pedestal "0.2.0"]
-                 [clj-http "3.6.1"]]
+                 [clj-http "3.6.1"]
+                 [com.amazonaws/aws-lambda-java-core "1.1.0"]]
   :plugins [[lein-ancient "0.6.10"]
             [lein-cljfmt "0.5.6"]]
   :min-lein-version "2.0.0"
@@ -31,6 +33,9 @@
   ;:java-agents [[org.mortbay.jetty.alpn/jetty-alpn-agent "2.0.5"]]
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "slapman.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.2"]]}
+             :lambda {:main slapman.lambda
+                      :uberjar-name "slapalicious.jar"
+                      :aot [slapman.lambda]}
              :uberjar {:aot [slapman.server]}}
   :main ^{:skip-aot true} slapman.server)
 

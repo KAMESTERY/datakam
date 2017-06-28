@@ -39,7 +39,14 @@ Once the image it built, it's cached.  To delete the image and build a new one:
 
 1. `capstan rmi slapman; capstan build`
 
-
 ## Links
 * [Other examples](https://github.com/pedestal/samples)
+* [Create multiple uberjars in leiningen](https://stackoverflow.com/questions/19334454/create-multiple-uberjars-in-leiningen)
+
+## GraphQL
+
+Examples using HTTPie
+
+* `http POST localhost:8888/graphql Content-Type:application/graphql < resources/query_hello.graphql`
+* `http POST localhost:8888/graphql Content-Type:application/graphql < resources/query_stuff.graphql`
 

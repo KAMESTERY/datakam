@@ -2,8 +2,7 @@
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
-            [ring.util.response :as ring-resp]
-            [slapman.graphql :as graphql]))
+            [ring.util.response :as ring-resp]))
 
 (defn about-page
   [request]
