@@ -24,7 +24,7 @@ resource "aws_lambda_function" "slapman_slapalicious_GET" {
   role             = "${aws_iam_role.iam_for_slapman.arn}"
   handler          = "slapman.lambda::handleRequest"
   source_code_hash = "${base64sha256(file("target/slapalicious.jar"))}"
-  memory_size      = "512"
+  memory_size      = "1024"
   runtime          = "java8"
 
   environment {
@@ -40,7 +40,7 @@ resource "aws_lambda_function" "slapman_slapalicious_POST" {
   role             = "${aws_iam_role.iam_for_slapman.arn}"
   handler          = "slapman.lambda::handleRequest"
   source_code_hash = "${base64sha256(file("target/slapalicious.jar"))}"
-  memory_size      = "512"
+  memory_size      = "1024"
   runtime          = "java8"
 
   environment {

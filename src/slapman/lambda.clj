@@ -4,7 +4,8 @@
   (:require [clojure.pprint :refer [pprint]]
             [clojure.string :as s]
             [clojure.data.json :as json]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clj-http.client :as http]))
 
 (defn- key->keyword [key-string]
   (-> key-string
@@ -28,7 +29,23 @@
     ))
 
 (defn hello [os event]
-  (respond os {:data {:msg "You have been Officially Slapped!!!!"}}))
+  (let [
+        weather (-> (http/get
+                     ;; "http://api.openweathermap.org/data/2.5/weather?q=~a&APPID=2614bbda39902b0d3c456a9df1792a3f"
+                     "http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1")
+                    :body
+                    (json/read-str :key-fn key->keyword)
+                    :main)
+        ip (-> (http/get "https://api.ipify.org/?format=json")
+               :body
+               (json/read-str :key-fn key->keyword)
+               :ip)
+        data {:data
+              {:msg "You have been Officially Slapped!!:-)"
+               :ip ip
+               :weather weather
+               }}]
+    (respond os data)))
 
 (defn -handleRequest [this is os context]
   (let [event (parse-stream is)]
