@@ -1,0 +1,12 @@
+{
+  "name": "slapman",
+  "version": "1.0.0",
+  "description": "GraphQL Lambda Function",
+  "main": "index.js",
+  "repository": "https://outcastgeek@bitbucket.org/outcastgeek/slapman.git",
+  "author": "outcastgeek <outcastgeek+git@gmail.com>",
+  "license": "proprietary",
+  "dependencies": {
+    "graphiql": "^0.11.2"
+  }
+}
