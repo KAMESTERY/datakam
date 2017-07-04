@@ -19,7 +19,7 @@ prod-url:
 	terraform show | grep invoke_url
 
 build-lambda: deps-deploy
-	cd $(BASEDIR)/lambda && zip -9 -r $(BASEDIR)/infrastructure/slapalicious.zip .
+	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
 # PY3.6
 
