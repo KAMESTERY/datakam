@@ -9,11 +9,13 @@ BASEDIR = $(shell pwd)
 
 # DEVOPS
 
-prod-deploy: clean build-lambda
+prod-deploy: clean build-lambda deploy
+	@echo "Completed Production Deployment! :-)"
+
+deploy:
 	terraform get infrastructure
 	terraform plan infrastructure
 	terraform apply infrastructure
-	@echo "Completed Production Deployment! :-)"
 
 prod-url:
 	terraform show | grep invoke_url

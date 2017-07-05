@@ -57,6 +57,12 @@ resource "aws_api_gateway_method_response" "response_method" {
   response_models = {
     "application/json" = "Empty"
   }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin" = true
+  }
 }
 
 # Response for: GET /slapalicious
@@ -68,6 +74,13 @@ resource "aws_api_gateway_integration_response" "response_method_integration" {
 
   response_templates = {
     "application/json" = ""
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS,GET,PUT,PATCH,DELETE'",
+    #"method.response.header.Access-Control-Allow-Origin" = "'http://localhost:1818'"
+    "method.response.header.Access-Control-Allow-Origin" = "'*'"
   }
 }
 

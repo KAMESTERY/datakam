@@ -27,8 +27,9 @@
       If you do not want to rely on a CDN, you can host these files locally or
       include them directly in your favored resource bunder.
     -->
-    <script src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
-    <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>-->
+    <!--<script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/jquery/3.2.1/jquery.min.js"></script>
     <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
     <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
 
@@ -106,26 +107,39 @@
       // Defines a GraphQL fetcher using the fetch API. You're not required to
       // use fetch, and could instead implement graphQLFetcher however you like,
       // as long as it returns a Promise or Observable.
+//      function graphQLFetcher(graphQLParams) {
+//        // This example expects a GraphQL server at the path /graphql.
+//        // Change this to point wherever you host your GraphQL server.
+//        return fetch('https://9wvf5hhru0.execute-api.us-east-1.amazonaws.com/production/slapalicious', {
+////        return fetch('/graphql', {
+//          method: 'post',
+//          mode: 'no-cors',
+//          headers: {
+//            'Accept': 'application/json',
+//            'Content-Type': 'application/json',
+//          },
+//          body: JSON.stringify(graphQLParams),
+//          credentials: 'include',
+//        }).then(function (response) {
+//          return response.text();
+//        }).then(function (responseBody) {
+//          try {
+//            return JSON.parse(responseBody);
+//          } catch (error) {
+//            return responseBody;
+//          }
+//        });
+//      }
+
       function graphQLFetcher(graphQLParams) {
         // This example expects a GraphQL server at the path /graphql.
         // Change this to point wherever you host your GraphQL server.
-        return fetch('https://j1im8ukoub.execute-api.us-east-1.amazonaws.com/production/slapalicious', {
-//        return fetch('/graphql', {
-          method: 'post',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(graphQLParams),
-          credentials: 'include',
-        }).then(function (response) {
-          return response.text();
-        }).then(function (responseBody) {
-          try {
-            return JSON.parse(responseBody);
-          } catch (error) {
-            return responseBody;
-          }
+        return $.post({
+          url: 'https://9wvf5hhru0.execute-api.us-east-1.amazonaws.com/production/slapalicious',
+          data: JSON.stringify(graphQLParams),
+          contentType: 'application/json'
+        }).done(function(response) {
+          return response;
         });
       }
 
@@ -139,6 +153,8 @@
           query: parameters.query,
           variables: parameters.variables,
           operationName: parameters.operationName,
+          isWaitingForResponse: true,
+          editorTheme: 'solarized',
           onEditQuery: onEditQuery,
           onEditVariables: onEditVariables,
           onEditOperationName: onEditOperationName
