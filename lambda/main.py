@@ -19,12 +19,14 @@ logger.setLevel(logging.INFO)
 from datagql.data import setup
 from datagql.schema import schema
 
+
 async def fetch(url):
     logger.info("Fetching: %s", url)
     raw = requests.get(url)
     logger.info("%s", raw)
     response = raw.json()
     return response
+
 
 async def execute_query(query):
     setup()
@@ -34,11 +36,13 @@ async def execute_query(query):
     logger.info("Response: %s", response)
     return response
 
+
 def process(*tasks):
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(asyncio.gather(*tasks))
-    #loop.close()
+    # loop.close()
     return results
+
 
 def handle(event, context):
     """
@@ -46,12 +50,11 @@ def handle(event, context):
     """
     logger.info("%s - %s", event, context)
 
-
     metadata = None
     data = None
     if 'query' in event:
         tasks = [execute_query(event['query'])]
-        data = process(*tasks)
+        [data] = process(*tasks)
     else:
         ipurl = "https://api.ipify.org/?format=json"
         weatherurl = "http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1"
