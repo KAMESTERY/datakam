@@ -47,11 +47,11 @@ case $1 in
         ;;
     deps.install)
         activate_env
-        pip install -r $2/requirements.txt --upgrade
+        pip install -r $2/requirements.txt -q --upgrade
         ;;
     deps.deploy)
         activate_env
-        pip install -r $2/requirements.txt -t $2/lib
+        pip install -r $2/requirements.txt -q -t $2/lib
         ;;
     clean)
         clean_all

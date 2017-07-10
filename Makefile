@@ -7,9 +7,27 @@ UNAME_S := $(shell uname -s)
 
 BASEDIR = $(shell pwd)
 
+CGO_ENABLED=0
+WORKER=slapman_worker
+
+# TOOLING
+tools:
+	go get -u github.com/kardianos/govendor
+	ln -s $(BASEDIR)/$(WORKER) $(GOPATH)/src/
+	cd $(GOPATH)/src/$(WORKER); govendor sync
+
+vendor-status:
+	cd $(GOPATH)/src/$(WORKER); govendor status
+
+build-worker:
+	cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
+
+prod-build-worker:
+	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
+
 # DEVOPS
 
-prod-deploy: clean build-lambda deploy
+prod-deploy: clean tools prod-build-worker build-lambda deploy
 	@echo "Completed Production Deployment! :-)"
 
 deploy:
@@ -45,5 +63,5 @@ deps-freeze:
 # CLEAN
 
 clean:
-	@rm -rf infrastructure/*.zip lambda/lib
+	@rm -rf infrastructure/*.zip lambda/lib $(GOPATH)/src/$(WORKER)
 
