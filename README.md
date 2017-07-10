@@ -13,3 +13,4 @@ Examples using HTTPie
 
 * [Enable CORS for an API Gateway Resource](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html)
 * [How to use GraphQL with jQuery](https://www.graph.cool/docs/tutorials/graphql-and-jquery-kohj2aengo/#graphql-vs-rest)
+* [Supported AWS Services](https://www.rusoto.org/supported-aws-services.html)
