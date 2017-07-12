@@ -3,6 +3,35 @@
 	"ignore": "test",
 	"package": [
 		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "6W+gcGsw56lMtEcltLvC75A224I=",
+			"path": "github.com/aws/aws-sdk-go",
+			"revision": "ae53883b2478fd8e2bdca2748367d5b5fa27ca22",
+			"revisionTime": "2017-07-07T20:46:13Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "9fadf46324c4cfc36cc82310ca92ded38af91249",
+			"revisionTime": "2016-11-23T20:24:26Z"
+		},
+		{
+			"checksumSHA1": "Ecn0UexWoWRG6Di0wdWvIfms/jc=",
+			"path": "github.com/go-ini/ini",
+			"revision": "3d73f4b845efdf9989fffd4b4e562727744a34ba",
+			"revisionTime": "2017-06-27T23:12:24Z"
+		},
+		{
+			"checksumSHA1": "VCKsz7001qwfA2bHLo/AOn0xos0=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "bf7f34fef176d890dfcc6e94319ac747291bc09a",
+			"revisionTime": "2017-07-03T06:14:36Z"
+		},
+		{
 			"checksumSHA1": "LG7lyDwRYjY7QT6BfNHXc15FYk4=",
 			"path": "github.com/graphql-go/graphql",
 			"revision": "3e619b6dbbf36bcf26dc7f7ee8e04e87bec5828d",
@@ -69,10 +98,82 @@
 			"revisionTime": "2017-07-10T00:42:24Z"
 		},
 		{
+			"checksumSHA1": "xAa0VdpPC5Fc0mcrB1FiICrKgRs=",
+			"path": "github.com/gucumber/gucumber",
+			"revision": "71608e2f6e76fd4da5b09a376aeec7a5c0b5edbc",
+			"revisionTime": "2016-07-15T01:59:14Z"
+		},
+		{
+			"checksumSHA1": "mTDYFrIKPm7wgUXfB9UEvCxk2Rw=",
+			"path": "github.com/gucumber/gucumber/gherkin",
+			"revision": "71608e2f6e76fd4da5b09a376aeec7a5c0b5edbc",
+			"revisionTime": "2016-07-15T01:59:14Z"
+		},
+		{
+			"checksumSHA1": "0ZrwvB6KoGPj2PoDNSEJwxQ6Mog=",
+			"path": "github.com/jmespath/go-jmespath",
+			"revision": "bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d",
+			"revisionTime": "2016-08-03T19:07:31Z"
+		},
+		{
+			"checksumSHA1": "rJab1YdNhQooDiBWNnt7TLWPyBU=",
+			"path": "github.com/pkg/errors",
+			"revision": "c605e284fe17294bda444b34710735b29d1a9d90",
+			"revisionTime": "2017-05-05T04:36:39Z"
+		},
+		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
+			"checksumSHA1": "v5CCEZdC63TIkIL8TUeURBcZzNc=",
+			"path": "github.com/shiena/ansicolor",
+			"revision": "a422bbe96644373c5753384a59d678f7d261ff10",
+			"revisionTime": "2015-11-19T15:19:21Z"
+		},
+		{
+			"checksumSHA1": "5NBHAe3S15q3L9hOLThnMZjIZRE=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
 			"path": "golang.org/x/net/context",
 			"revision": "054b33e6527139ad5b1ec2f6232c3b175bd9a30c",
 			"revisionTime": "2017-07-05T22:25:54Z"
+		},
+		{
+			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
+			"path": "golang.org/x/net/html",
+			"revision": "f01ecb60fe3835d80d9a0b7b2bf24b228c89260e",
+			"revisionTime": "2017-07-11T11:58:19Z"
+		},
+		{
+			"checksumSHA1": "z79z5msRzgU48FCZxSuxfU8b4rs=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "f01ecb60fe3835d80d9a0b7b2bf24b228c89260e",
+			"revisionTime": "2017-07-11T11:58:19Z"
+		},
+		{
+			"checksumSHA1": "p3gWsy4fQOSXGRMUHr3TnmVFias=",
+			"path": "golang.org/x/tools/go/ast/astutil",
+			"revision": "bce9606b3f617bc6280aab6abbf25962c23f398d",
+			"revisionTime": "2017-06-09T12:59:18Z"
+		},
+		{
+			"checksumSHA1": "AnXFEvmaJ7w2Q7hWPcLUmCbPgq0=",
+			"path": "golang.org/x/tools/go/buildutil",
+			"revision": "bce9606b3f617bc6280aab6abbf25962c23f398d",
+			"revisionTime": "2017-06-09T12:59:18Z"
+		},
+		{
+			"checksumSHA1": "ZpAR2KupZto/mWf9zu5e6IKDWt0=",
+			"path": "golang.org/x/tools/go/loader",
+			"revision": "bce9606b3f617bc6280aab6abbf25962c23f398d",
+			"revisionTime": "2017-06-09T12:59:18Z"
 		}
 	],
 	"rootPath": "slapman_worker"

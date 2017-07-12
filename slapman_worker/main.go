@@ -34,7 +34,8 @@ var (
 		Name: "Weather",
 		Fields: graphql.Fields{
 			"location": &graphql.Field{
-				Type: graphql.String,
+				Type: graphql.NewNonNull(graphql.String),
+				Description: "The location for which to retrieve the Weather information",
 			},
 			"description": &graphql.Field{
 				Type: graphql.String,
