@@ -19,6 +19,13 @@ tools:
 vendor-status:
 	cd $(GOPATH)/src/$(WORKER); govendor status
 
+vendor-fetch:
+	cd $(GOPATH)/src/$(WORKER); govendor fetch -tree github.com/graphql-go/graphql
+	cd $(GOPATH)/src/$(WORKER); govendor fetch -tree github.com/aws/aws-sdk-go
+
+vendor-init:
+	cd $(GOPATH)/src/$(WORKER); govendor init
+
 build-worker:
 	cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
 
