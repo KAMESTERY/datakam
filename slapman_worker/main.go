@@ -10,8 +10,6 @@ import (
 	"net/http"
 	"time"
 	"io/ioutil"
-	"runtime"
-	"os/exec"
 )
 
 type Weather struct {
@@ -64,6 +62,7 @@ var (
 	fields = graphql.Fields{
 		"hello": &graphql.Field{
 			Type: graphql.String,
+			Description: "Greeting or Salutation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				return "world", nil
 			},
@@ -151,6 +150,19 @@ func init() {
 		log.Fatalf("failed to create new schema, error: %v", err)
 	}
 }
+
+////export ExecuteQuery
+//func ExecuteQuery(query string) (jsonString string) {
+//	params := graphql.Params{Schema: schema, RequestString: query}
+//	r := graphql.Do(params)
+//	if len(r.Errors) > 0 {
+//		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
+//	}
+//	rJSON, _ := json.Marshal(r)
+//	fmt.Printf("%s \n", rJSON)
+//	jsonString = string(rJSON)
+//	return
+//}
 
 //export ExecuteQuery
 func ExecuteQuery(query *C.char) (jsonString *C.char) {

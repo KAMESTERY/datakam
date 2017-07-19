@@ -7,7 +7,7 @@ UNAME_S := $(shell uname -s)
 
 BASEDIR = $(shell pwd)
 
-CGO_ENABLED=0
+CGO_ENABLED=1
 WORKER=slapman_worker
 
 # TOOLING
@@ -30,7 +30,9 @@ build-worker:
 	cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
 
 prod-build-worker:
-	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
+	docker run --rm -v $(BASEDIR):/usr/src -w /usr/src -e GOPATH=/usr -e GOOS=linux -e GOARCH=amd64 golang:1.8.3 go build -v -buildmode=c-shared -o /usr/src/lambda/worker/worker.so $(WORKER)
+#	docker run --rm -v $(BASEDIR):/usr/src -w /usr/src/$(WORKER) -e GOPATH=/usr -e GOOS=linux -e GOARCH=amd64 golang:1.8.3 go build -v -buildmode=c-shared -o /usr/src/lambda/worker/worker.so
+#	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER); go build -buildmode=c-shared -o $(BASEDIR)/lambda/worker/worker.so $(WORKER)
 
 # DEVOPS
 
