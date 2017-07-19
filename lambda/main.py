@@ -16,9 +16,8 @@ import asyncio
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# from datagql.data import setup
-# from datagql.schema import schema
-from worker import executeQuery
+from datagql.data import setup
+from datagql.schema import schema
 
 
 async def fetch(url):
@@ -30,11 +29,10 @@ async def fetch(url):
 
 
 async def execute_query(query):
-    response = executeQuery(query)
-    # setup()
-    # result = schema.execute(query)
-    # logger.info("Result: %s", result)
-    # response = result.data
+    setup()
+    result = schema.execute(query)
+    logger.info("Result: %s", result)
+    response = result.data
     logger.info("Response: %s", response)
     return response
 
