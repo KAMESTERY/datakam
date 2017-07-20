@@ -42,6 +42,9 @@ deps-install:
 deps-freeze:
 	$(CMD) deps.freeze lambda
 
+deps-upgrade:
+	$(CMD) deps.upgrade
+
 # CLEAN
 
 clean:

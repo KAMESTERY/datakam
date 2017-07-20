@@ -12,6 +12,7 @@ Lambda example with external dependency
 import logging
 import requests
 import asyncio
+import uvloop
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -37,6 +38,7 @@ async def execute_query(query: str):
 
 
 def process(*tasks):
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(asyncio.gather(*tasks))
     # loop.close()
@@ -49,29 +51,32 @@ def handle(event, context):
     """
     logger.info("%s - %s", event, context)
 
-    metadata = None
-    data = None
-    if 'query' in event:
-        tasks = [execute_query(event['query'])]
-        [data] = process(*tasks)
-    else:
-        ipurl = "https://api.ipify.org/?format=json"
-        weatherurl = "http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1"
-        tasks = fetch(ipurl), fetch(weatherurl)
-        ipresult, weatherresult = process(*tasks)
-
-        ip = ipresult['ip']
-        weather = weatherresult['weather']
-
-        logger.info("Lambda IP: %s", ip)
-        logger.info("Lambda Weather: %s", weather)
-
-        metadata = dict(
-            event=event,
-            msg='You have been Officially Slapped by a Py!!:-)',
-            ip=ip,
-            weather=weather
-        )
+    tasks = [
+        execute_query("""
+                        query CollectMetadata {
+                            currentip
+                            weather {
+                                location
+                                description
+                                temp
+                                pressure
+                                humidity
+                                speed
+                                deg
+                            }
+                        }
+                        """),
+        execute_query(event.get('query', None))
+    ]
+    [m, data] = process(*tasks)
+    metadata = dict(
+        event=event,
+        msg='You have been Officially Slapped by a Py!!:-)',
+        ip=m['currentip'],
+        weather=m['weather']
+    )
+    logger.info("Collected Metadata: %s", metadata)
+    logger.info("Collected Data: %s", data)
 
     response = dict(
         metadata=metadata,

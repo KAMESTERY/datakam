@@ -10,6 +10,10 @@ respString = executeQuery("{hello}")
 
 print("Cool Response: ", respString)
 
+currentipString = executeQuery("{currentip}")
+
+print("Current IP Response: ", currentipString)
+
 weatherString = executeQuery(
     """
     query CurrentWeather {
@@ -40,3 +44,22 @@ heroString = executeQuery(
 )
 
 print("Hero Response: ", heroString)
+
+bunchString = executeQuery(
+    """
+    query CollectMetadata {
+        currentip
+        weather(location: 'London') {
+            location
+            description
+            temp
+            pressure
+            humidity
+            speed
+            deg
+        }
+    }
+    """
+)
+
+print("Bunch Response: ", bunchString)

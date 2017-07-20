@@ -216,3 +216,12 @@ def get_weather(location):
         deg=response['wind']['deg']
     )
     return weather
+
+def get_currentip():
+    import requests
+
+    url = "https://api.ipify.org/?format=json"
+    raw = requests.get(url)
+    response = raw.json()
+    currentip = response['ip']
+    return currentip

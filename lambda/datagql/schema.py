@@ -1,13 +1,19 @@
 import asyncio
+import uvloop
 import graphene
 
-from graphene import relay, resolve_only_args
+from graphene import (
+    relay,
+    resolve_only_args
+)
 from graphql.execution.executors.asyncio import AsyncioExecutor
 
 from .data import (
-    get_character, get_droid, get_hero, get_human,
-    create_ship, get_empire, get_faction, get_rebels,
-    get_ship, get_weather
+    get_character, get_droid,
+    get_hero, get_human,
+    create_ship, get_empire,
+    get_faction, get_rebels, get_ship,
+    get_weather, get_currentip
 )
 
 
@@ -102,6 +108,12 @@ class Weather(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
+    currentip = graphene.String(description='The Current IP of the Lambda Function')
+
+    @resolve_only_args
+    def resolve_currentip(self):
+        return get_currentip()
+
     hello = graphene.String()
 
     # def resolve_hello(self, args, context, info):
@@ -110,6 +122,7 @@ class Query(graphene.ObjectType):
         return 'World'
 
     weather = graphene.Field(Weather,
+                             location=graphene.Argument(graphene.String, default_value='London'),
                              description='The Weather'
                              )
 
@@ -163,6 +176,7 @@ schema = graphene.Schema(
 
 
 async def execute_query_async(query: str):
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     loop = asyncio.get_event_loop()
     executor = AsyncioExecutor(loop=loop)
     result = schema.execute(query, executor=executor)
