@@ -39,7 +39,6 @@ async def execute_query(query: str):
 def process(*tasks):
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(asyncio.gather(*tasks))
-    # results = loop.run_until_complete(asyncio.gather(*tasks))
     # loop.close()
     return results
 

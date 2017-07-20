@@ -198,3 +198,21 @@ def get_rebels():
 
 def get_empire():
     return get_faction('2')
+
+def get_weather(location):
+    import requests
+    from .schema import Weather
+
+    url = "http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1"
+    raw = requests.get(url)
+    response = raw.json()
+    weather = Weather(
+        location=location,
+        description=response['weather'][0]['description'],
+        temp=response['main']['temp'],
+        pressure=response['main']['pressure'],
+        humidity=response['main']['humidity'],
+        speed=response['wind']['speed'],
+        deg=response['wind']['deg']
+    )
+    return weather

@@ -12,29 +12,18 @@ print("Cool Response: ", respString)
 
 weatherString = executeQuery(
     """
-    weather {
-        location
-        description
-        temp
-        pressure
-        humidity
-        speed
-        deg
-      }
+    query CurrentWeather {
+        weather {
+            location
+            description
+            temp
+            pressure
+            humidity
+            speed
+            deg
+          }
+    }
     """
-    # """
-    # {
-    #     weather(location: "lambert") {
-    #         pressure
-    #         humidity
-    #         speed
-    #         deg
-    #         location
-    #         description
-    #         temp
-    #       }
-    # }
-    # """
 )
 
 print("Weather Response: ", weatherString)
