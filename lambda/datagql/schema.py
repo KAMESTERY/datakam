@@ -1,5 +1,8 @@
+import asyncio
 import graphene
+import requests
 from graphene import relay, resolve_only_args
+from graphql.execution.executors.asyncio import AsyncioExecutor
 
 from .data import (
     get_character, get_droid, get_hero, get_human,
@@ -86,8 +89,18 @@ class IntroduceShip(relay.ClientIDMutation):
         faction = get_faction(faction_id)
         return IntroduceShip(ship=ship, faction=faction)
 
+class Weather(graphene.ObjectType):
+    location = graphene.String(description='The Location')
+    description = graphene.String(description='The Description')
+    temp = graphene.String(description='The Temperature')
+    pressure = graphene.String(description='The Pressure')
+    humidity = graphene.String(description='The Humidity')
+    speed = graphene.String(description='The Speed')
+    deg = graphene.String(description='The Degrees')
 
 class Query(graphene.ObjectType):
+    weather = graphene.Field(Weather)
+
     hero = graphene.Field(Character,
                           episode=Episode()
                           )
@@ -97,6 +110,21 @@ class Query(graphene.ObjectType):
     droid = graphene.Field(Droid,
                            id=graphene.String()
                            )
+
+    @resolve_only_args
+    def resolve_weather(self, location=None):
+        url = "http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1"
+        raw = requests.get(url)
+        response = raw.json()
+        return Weather(
+            location=location,
+            description=response.weather[0].description,
+            temp=response.main.temp,
+            pressure=response.main.pressure,
+            humidity=response.main.humidity,
+            speed=response.wind.speed,
+            deg=response.wind.deg
+        )
 
     @resolve_only_args
     def resolve_hero(self, episode=None):
@@ -127,4 +155,13 @@ class Mutation(graphene.ObjectType):
     introduce_ship = IntroduceShip.Field()
 
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(
+    query=Query,
+    mutation=Mutation
+)
+
+async def execute_query_async(query: str):
+    loop = asyncio.get_event_loop()
+    executor = AsyncioExecutor(loop=loop)
+    result = schema.execute(query, executor=executor)
+    return result
