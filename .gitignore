@@ -1,5 +1,6 @@
 # Project related
 .idea
+conan_cargo_build.rs
 
 # Java related
 pom.xml
