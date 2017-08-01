@@ -19,3 +19,4 @@ Examples using HTTPie
 * [Supported AWS Services](https://www.rusoto.org/supported-aws-services.html)
 * [Govendor CheatSheet](https://github.com/kardianos/govendor/wiki/Govendor-CheatSheet)
 * [Build Script Support](http://doc.crates.io/build-script.html)
+* [Cross-compile and link a static binary on macOS for Linux with cargo and rust](https://chr4.org/blog/2017/03/15/cross-compile-and-link-a-static-binary-on-macos-for-linux-with-cargo-and-rust/)

@@ -1,6 +1,7 @@
 # Project related
 .idea
 conan_cargo_build.rs
+conaninfo.txt
 
 # Java related
 pom.xml
