@@ -7,7 +7,8 @@ build = "conan_cargo_build.rs"
 
 [lib]
 name = "slapman"
-crate-type = ["dylib"]
+crate-type = ["staticlib"]
+#crate-type = ["dylib"]
 
 [dependencies]
 hyper = "0.11"

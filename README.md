@@ -11,6 +11,7 @@ Examples using HTTPie
 * `nm -D lambda/worker/worker.so | grep "T ExecuteQuery"`
 * `govendor fetch -tree github.com/aws/aws-sdk-go`
 * `PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl`
+* `nim c -r -d:release --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim`
 
 ## Miscellaneous
 

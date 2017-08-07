@@ -2,6 +2,7 @@
 .idea
 conan_cargo_build.rs
 conaninfo.txt
+nimcache
 
 # Java related
 pom.xml
