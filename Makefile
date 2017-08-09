@@ -45,8 +45,23 @@ deps-freeze:
 deps-upgrade:
 	$(CMD) deps.upgrade
 
+# Nim and Rust
+
+OSARCH = x86_64-unknown-linux-musl
+
+test-lib: build-lib
+	docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test
+	#nim c -r -d:release --passL:target/$(OSARCH)/release/libslapman.a test.nim
+
+build-lib: conan-install
+	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
+
+conan-install:
+	conan install .
+
 # CLEAN
 
 clean:
-	@rm -rf infrastructure/*.zip lambda/lib
+	cargo clean
+	@rm -rf infrastructure/*.zip lambda/lib test nimcache
 

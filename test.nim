@@ -1,13 +1,33 @@
 
+import unittest
+
 proc printf(formatstr: cstring) {.importc: "printf", varargs, header: "<stdio.h>".}
 
 proc is_leap_year(year: cint): bool {.importc}
 
-let
-    year: cint = 2017
-    ly: bool = is_leap_year(year)
-    ly_str = if ly: "true" else: "false"
+suite "Check Lib Slapman":
+  echo "suite setup: run once before the tests"
 
-printf("Is %d a leap year? %s\n", year, ly_str)
-# discard printf("Is %d a leap year? %s\n", year, ly_str)
+  setup:
+    echo "Run before each Test"
+
+  teardown:
+    echo "Run after each Test"
+
+  test "Check is_leap_year":
+
+    let verify = proc(year: cint): auto =
+      let
+        ly: bool = is_leap_year(year)
+        ly_str = if ly: "true" else: "false"
+      printf("Is %d a leap year? %s\n", year, ly_str)
+      return ly
+
+    var ly = verify(2016)
+
+    check ly == true
+
+    ly = verify(2017)
+
+    check ly == false
 

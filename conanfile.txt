@@ -2,6 +2,10 @@
 [requires]
 ConanCargoWrapper/0.1@lasote/testing
 OpenSSL/1.0.2j@lasote/stable
+libzmq/4.1.5@memsharded/stable 
+
+[imports]
+lib, *.a -> lib
 
 [generators]
 ConanCargoWrapper

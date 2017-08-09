@@ -2,6 +2,7 @@
 //// extern crate env_logger;
 //extern crate rusoto_core;
 //extern crate rusoto_s3;
+// extern crate zmq;
 
 #[no_mangle]
 pub extern fn is_leap_year(year: i64) -> bool {

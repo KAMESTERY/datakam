@@ -12,6 +12,7 @@ Examples using HTTPie
 * `govendor fetch -tree github.com/aws/aws-sdk-go`
 * `PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl`
 * `nim c -r -d:release --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim`
+* `docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test`
 
 ## Miscellaneous
 
@@ -21,3 +22,5 @@ Examples using HTTPie
 * [Govendor CheatSheet](https://github.com/kardianos/govendor/wiki/Govendor-CheatSheet)
 * [Build Script Support](http://doc.crates.io/build-script.html)
 * [Cross-compile and link a static binary on macOS for Linux with cargo and rust](https://chr4.org/blog/2017/03/15/cross-compile-and-link-a-static-binary-on-macos-for-linux-with-cargo-and-rust/)
+* [Nim binary size from 160 KB to 150 Bytes](https://hookrace.net/blog/nim-binary-size/)
+* [A Whirlwind Tutorial on Creating Really Teensy ELF Executables for Linux ](http://www.muppetlabs.com/~breadbox/software/tiny/teensy.html)

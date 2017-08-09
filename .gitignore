@@ -2,6 +2,7 @@
 .idea
 conan_cargo_build.rs
 conaninfo.txt
+conan_imports_manifest.txt
 nimcache
 
 # Java related
