@@ -1,4 +1,5 @@
 
+import strutils
 import unittest
 
 proc printf(formatstr: cstring) {.importc: "printf", varargs, header: "<stdio.h>".}
@@ -20,7 +21,8 @@ suite "Check Lib Slapman":
       let
         ly: bool = is_leap_year(year)
         ly_str = if ly: "true" else: "false"
-      printf("Is %d a leap year? %s\n", year, ly_str)
+      printf("PRNT: Is %d a leap year? %s\n", year, ly_str)
+      echo "ECHO: Is $1 a leap year? $2".format(year, ly_str)
       return ly
 
     var ly = verify(2016)

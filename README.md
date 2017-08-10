@@ -8,6 +8,9 @@ Examples using HTTPie
 * `http POST localhost:8888/graphql Content-Type:application/graphql < resources/query_stuff.graphql`
 * `http POST https://9wvf5hhru0.execute-api.us-east-1.amazonaws.com/production/slapalicious query="'cat resources/query_introspection.graphql'"`
 * `http POST https://9wvf5hhru0.execute-api.us-east-1.amazonaws.com/production/slapalicious query="'cat resources/query_hello_name_and_friend.graphql'"`
+
+Native development with Nim and Rust
+
 * `nm -D lambda/worker/worker.so | grep "T ExecuteQuery"`
 * `govendor fetch -tree github.com/aws/aws-sdk-go`
 * `PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl`
@@ -24,3 +27,4 @@ Examples using HTTPie
 * [Cross-compile and link a static binary on macOS for Linux with cargo and rust](https://chr4.org/blog/2017/03/15/cross-compile-and-link-a-static-binary-on-macos-for-linux-with-cargo-and-rust/)
 * [Nim binary size from 160 KB to 150 Bytes](https://hookrace.net/blog/nim-binary-size/)
 * [A Whirlwind Tutorial on Creating Really Teensy ELF Executables for Linux ](http://www.muppetlabs.com/~breadbox/software/tiny/teensy.html)
+* [String Functions: Nim vs Python](https://scripter.co/notes/string-functions-nim-vs-python/)
