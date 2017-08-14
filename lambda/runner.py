@@ -8,11 +8,11 @@ def executeQuery(query :str):
 
 respString = executeQuery("{hello}")
 
-print("Cool Response: ", respString)
+print(f"Cool Response: {respString}")
 
 currentipString = executeQuery("{currentip}")
 
-print("Current IP Response: ", currentipString)
+print(f"Current IP Response: {currentipString}")
 
 weatherString = executeQuery(
     """
@@ -30,7 +30,7 @@ weatherString = executeQuery(
     """
 )
 
-print("Weather Response: ", weatherString)
+print(f"Weather Response: {weatherString}")
 
 heroString = executeQuery(
     """
@@ -43,13 +43,13 @@ heroString = executeQuery(
     """
 )
 
-print("Hero Response: ", heroString)
+print(f"Hero Response: {heroString}")
 
 bunchString = executeQuery(
     """
     query CollectMetadata {
-        currentip
-        weather(location: 'London') {
+        fibo(number: 24)
+        weather(location: "London") {
             location
             description
             temp
@@ -62,4 +62,4 @@ bunchString = executeQuery(
     """
 )
 
-print("Bunch Response: ", bunchString)
+print(f"Bunch Response: {bunchString}")

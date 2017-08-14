@@ -2,6 +2,8 @@ import asyncio
 import uvloop
 import graphene
 
+from worker import fibo
+
 from graphene import (
     relay,
     resolve_only_args
@@ -129,6 +131,15 @@ class Query(graphene.ObjectType):
     @resolve_only_args
     def resolve_weather(self, location=None):
         return get_weather(location)
+
+    fibo = graphene.Int(
+        number=graphene.Argument(graphene.Int, default_value=3),
+        description='Fibonacci Calculation'
+    )
+
+    @resolve_only_args
+    def resolve_fibo(self, number):
+        return fibo(number)
 
     hero = graphene.Field(Character,
                           episode=Episode()

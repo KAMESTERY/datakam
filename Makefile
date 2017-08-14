@@ -20,7 +20,7 @@ deploy:
 prod-url:
 	terraform show | grep invoke_url
 
-build-lambda: deps-deploy
+build-lambda: deps-deploy build-lib-prod
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
 # PY3.6
@@ -45,23 +45,24 @@ deps-freeze:
 deps-upgrade:
 	$(CMD) deps.upgrade
 
-# Nim and Rust
+# Rust
 
-OSARCH = x86_64-unknown-linux-musl
+RUST_VERSION = 1.19.0
 
-test-lib: build-lib
-	docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test
-	#nim c -r -d:release --passL:target/$(OSARCH)/release/libslapman.a test.nim
+build-lib-prod:
+	docker run --rm --user `id -u`:`id -g` -v `pwd`:/usr/src/myapp -w /usr/src/myapp rust:$(RUST_VERSION) cargo build --release
+	cp target/release/libslapman.so lambda/worker/slapman.so
 
-build-lib: conan-install
-	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
+build-lib-macos:
+	cargo build --release
+	cp target/release/libslapman.dylib lambda/worker/slapman.so
 
-conan-install:
-	conan install .
+build-lib-linux:
+	cargo build --release
+	cp target/release/libslapman.so lambda/worker/slapman.so
 
 # CLEAN
 
 clean:
 	cargo clean
-	@rm -rf infrastructure/*.zip lambda/lib test nimcache
-
+	@rm -rf infrastructure/*.zip lambda/lib
