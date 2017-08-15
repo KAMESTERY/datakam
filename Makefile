@@ -20,7 +20,7 @@ deploy:
 prod-url:
 	terraform show | grep invoke_url
 
-build-lambda: deps-deploy build-lib-prod
+build-lambda: deps-deploy #build-lib-prod
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
 # PY3.6
@@ -50,8 +50,9 @@ deps-upgrade:
 RUST_VERSION = 1.19.0
 
 build-lib-prod:
-	docker run --rm --user `id -u`:`id -g` -v `pwd`:/usr/src/myapp -w /usr/src/myapp rust:$(RUST_VERSION) cargo build --release
-	cp target/release/libslapman.so lambda/worker/slapman.so
+	docker run --rm --user `id -u`:`id -g` -v `pwd`:/usr/src/myapp -w /usr/src/myapp rust:$(RUST_VERSION) cargo build --release && \
+cp target/release/libslapman.so lambda/worker/slapman.so && \
+cp /lib64/libc.so.6 lambda/worker/libc.so.6
 
 build-lib-macos:
 	cargo build --release

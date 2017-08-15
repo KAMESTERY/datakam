@@ -16,6 +16,7 @@ Native development with Nim and Rust
 * `PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl`
 * `nim c -r -d:release --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim`
 * `docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test`
+* `curl --unix-socket /tmp/some.sock http:/cmd.sh`
 
 ## Miscellaneous
 
@@ -28,3 +29,4 @@ Native development with Nim and Rust
 * [Nim binary size from 160 KB to 150 Bytes](https://hookrace.net/blog/nim-binary-size/)
 * [A Whirlwind Tutorial on Creating Really Teensy ELF Executables for Linux ](http://www.muppetlabs.com/~breadbox/software/tiny/teensy.html)
 * [String Functions: Nim vs Python](https://scripter.co/notes/string-functions-nim-vs-python/)
+* [HTTP over Unix domain sockets in golang](https://gist.github.com/teknoraver/5ffacb8757330715bcbcc90e6d46ac74)
