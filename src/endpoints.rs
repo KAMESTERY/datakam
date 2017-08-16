@@ -1,23 +1,10 @@
 
-#![feature(plugin)]
-#![plugin(rocket_codegen)]
-extern crate rocket;
-extern crate rocket_contrib;
-
-#[macro_use] extern crate log;
-
-#[macro_use] extern crate log;
-
-#[macro_use] extern crate serde_derive;
-
 extern crate rayon;
-
-extern crate serde_json;
-
-use rocket_contrib::Json;
 //use rayon::prelude::*;
 
-mod operations;
+use rocket::{Route};
+use rocket_contrib::Json;
+
 use operations::{fibo, is_leap_year};
 
 #[get("/")]
@@ -54,4 +41,9 @@ fn run_operations(fib_n: u64, year: i64) -> Json<Ops> {
             is_leap: is_leap
         }
     )
+}
+
+pub fn get_endpoints() -> Vec<Route> {
+    info!("Setting up Endpoints...");
+    routes![index, run_operations]
 }
