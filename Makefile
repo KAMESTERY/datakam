@@ -49,18 +49,13 @@ deps-upgrade:
 
 RUST_VERSION = 1.19.0
 
-build-lib-prod:
-	docker run --rm --user `id -u`:`id -g` -v `pwd`:/usr/src/myapp -w /usr/src/myapp rust:$(RUST_VERSION) cargo build --release && \
-cp target/release/libslapman.so lambda/worker/slapman.so && \
-cp /lib64/libc.so.6 lambda/worker/libc.so.6
+OSARCH = x86_64-unknown-linux-musl
 
-build-lib-macos:
-	cargo build --release
-	cp target/release/libslapman.dylib lambda/worker/slapman.so
+build-worker: conan-install
+	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
 
-build-lib-linux:
-	cargo build --release
-	cp target/release/libslapman.so lambda/worker/slapman.so
+conan-install:
+	conan install .
 
 # CLEAN
 

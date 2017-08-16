@@ -3,10 +3,8 @@ name = "slapman"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 
-#[lib]
-#name = "slapman"
-#crate-type = ["staticlib"]
-##crate-type = ["dylib"]
+##links = "openssl"
+#build = "conan_cargo_build.rs"
 
 [dependencies]
 rayon = "0.8.2"
