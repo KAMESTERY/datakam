@@ -3,10 +3,10 @@ name = "slapman"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 
-[lib]
-name = "slapman"
+#[lib]
+#name = "slapman"
 #crate-type = ["staticlib"]
-crate-type = ["dylib"]
+##crate-type = ["dylib"]
 
 [dependencies]
 rayon = "0.8.2"
@@ -21,3 +21,9 @@ rusoto_dynamodbstreams = "0.27.0"
 rusoto_logs = "0.27.0"
 #nix = "0.9.0"
 #zmq = "0.8.2"
+serde = "1.0.11"
+serde_derive = "1.0.11"
+serde_json = "1.0.2"
+rocket = "0.3.2"
+rocket_codegen = "0.3.2"
+rocket_contrib = "0.3.2"

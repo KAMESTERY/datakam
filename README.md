@@ -17,6 +17,7 @@ Native development with Nim and Rust
 * `nim c -r -d:release --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim`
 * `docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test`
 * `curl --unix-socket /tmp/some.sock http:/cmd.sh`
+* `ROCKET_ENV=stage cargo run`
 
 ## Miscellaneous
 
@@ -30,3 +31,4 @@ Native development with Nim and Rust
 * [A Whirlwind Tutorial on Creating Really Teensy ELF Executables for Linux ](http://www.muppetlabs.com/~breadbox/software/tiny/teensy.html)
 * [String Functions: Nim vs Python](https://scripter.co/notes/string-functions-nim-vs-python/)
 * [HTTP over Unix domain sockets in golang](https://gist.github.com/teknoraver/5ffacb8757330715bcbcc90e6d46ac74)
+* [A brief look at what makes Rocket special.](https://rocket.rs/overview/)
