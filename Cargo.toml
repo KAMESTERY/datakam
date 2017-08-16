@@ -25,3 +25,13 @@ serde_json = "1.0.2"
 rocket = "0.3.2"
 rocket_codegen = "0.3.2"
 rocket_contrib = "0.3.2"
+dotenv = "0.9.0"
+time = "0.1.38"
+r2d2 = "0.7.3"
+r2d2_postgres = "0.13.0"
+r2d2_mysql = "7.1.0"
+#r2d2_mysql = "8.0.0"
+r2d2_sqlite = "0.2.1"
+[dependencies.rusqlite]
+version = "0.12.0"
+features = ["bundled"]

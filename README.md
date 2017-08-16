@@ -18,6 +18,7 @@ Native development with Nim and Rust
 * `docker run --rm -v `pwd`:/usr/src/app -w /usr/src/app nimlang/nim:alpine nim c -r -d:release --passL:-static --passL:target/x86_64-unknown-linux-musl/release/libslapman.a test.nim && strip test`
 * `curl --unix-socket /tmp/some.sock http:/cmd.sh`
 * `ROCKET_ENV=stage cargo run`
+* `RUST_LOG=debug cargo test`
 
 ## Miscellaneous
 
