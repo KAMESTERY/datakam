@@ -5,8 +5,6 @@ UNAME_S := $(shell uname -s)
 
 .PHONY: prod-deploy prod-url
 
-BASEDIR = $(shell pwd)
-
 # DEVOPS
 
 prod-deploy: clean build-lambda deploy
@@ -20,7 +18,7 @@ deploy:
 prod-url:
 	terraform show | grep invoke_url
 
-build-lambda: deps-deploy #build-lib-prod
+build-lambda: deps-deploy build-worker
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
 # PY3.6
@@ -48,11 +46,12 @@ deps-upgrade:
 # Rust
 
 RUST_VERSION = 1.19.0
-
 OSARCH = x86_64-unknown-linux-musl
+WORKER = slapman
 
 build-worker: conan-install
-	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
+	OPENSSL_DIR=`pwd` PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
+	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
 
 conan-install:
 	conan install .

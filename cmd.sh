@@ -19,6 +19,16 @@ activate_env() {
     source activate $ENV_NAME
 }
 
+install_openssl_dev() {
+    curl -O https://www.openssl.org/source/openssl-1.1.0e.tar.gz
+    tar xf openssl-1.1.0e.tar.gz
+    cd openssl-1.1.0e
+    export CC=gcc
+    ./Configure --prefix=`pwd` linux-x86_64 -fPIC
+    make -j$(nproc)
+    sudo make install
+}
+
 case $1 in
     py3.create)
         create_py3env
@@ -55,6 +65,10 @@ case $1 in
         ;;
     clean)
         clean_all
+        ;;
+
+    install_openssl_dev)
+        install_openssl_dev
         ;;
     esac
 exit 0

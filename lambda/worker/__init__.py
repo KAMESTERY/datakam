@@ -1,14 +1,18 @@
-import json
+
 import os
-from cffi import FFI
+import subprocess
 
-ffi = FFI()
+from subprocess import Popen
 
-slapman = ffi.dlopen(os.path.join(os.path.dirname(__file__), 'slapman.so'))
+PORT = 8000
 
-ffi.cdef("""
-    int fibo(int n);
-""")
+EXE = os.path.join(os.path.dirname(__file__), 'slapman')
 
-def fibo(n: int):
-    return slapman.fibo(n)
+def launch():
+    proc = Popen(EXE, shell=True)
+    pid = proc.pid
+    print(f"Process started: {pid}")
+
+def terminate():
+    subprocess.call(f"killall {EXE}", shell=True)
+    print("Process terminated")

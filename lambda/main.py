@@ -17,6 +17,11 @@ import uvloop
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+from worker import (
+    launch,
+    terminate
+)
+
 from datagql.data import setup
 from datagql.schema import execute_query_async
 
@@ -25,6 +30,7 @@ async def fetch(url):
     raw = requests.get(url)
     logger.info("%s", raw)
     response = raw.json()
+    logger.info("%s", response)
     return response
 
 
@@ -51,6 +57,8 @@ def handle(event, context):
     """
     logger.info("%s - %s", event, context)
 
+    launch()
+
     tasks = [
         execute_query("""
                         query CollectMetadata {
@@ -66,9 +74,10 @@ def handle(event, context):
                             }
                         }
                         """),
-        execute_query(event.get('query', None))
+        execute_query(event.get('query', None)),
+        fetch("http://localhost:8000/operations/19/7924")
     ]
-    [m, data] = process(*tasks)
+    [m, data, slap] = process(*tasks)
     metadata = dict(
         event=event,
         msg='You have been Officially Slapped by a Py!!:-)',
@@ -77,10 +86,14 @@ def handle(event, context):
     )
     logger.info("Collected Metadata: %s", metadata)
     logger.info("Collected Data: %s", data)
+    logger.info("Collected Slap: %s", slap)
 
     response = dict(
         metadata=metadata,
-        data=data
+        data=data,
+        slap=slap
     )
+
+    terminate()
 
     return response

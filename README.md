@@ -33,3 +33,4 @@ Native development with Nim and Rust
 * [String Functions: Nim vs Python](https://scripter.co/notes/string-functions-nim-vs-python/)
 * [HTTP over Unix domain sockets in golang](https://gist.github.com/teknoraver/5ffacb8757330715bcbcc90e6d46ac74)
 * [A brief look at what makes Rocket special.](https://rocket.rs/overview/)
+* [Connecting a webservice to a database in Rust](http://hermanradtke.com/2016/05/23/connecting-webservice-database-rust.html)

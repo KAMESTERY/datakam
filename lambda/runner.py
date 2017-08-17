@@ -48,7 +48,6 @@ print(f"Hero Response: {heroString}")
 bunchString = executeQuery(
     """
     query CollectMetadata {
-        fibo(number: 24)
         weather(location: "London") {
             location
             description
@@ -63,3 +62,14 @@ bunchString = executeQuery(
 )
 
 print(f"Bunch Response: {bunchString}")
+
+import time
+
+from worker import launch, terminate
+
+launch()
+
+# Wait for 5 seconds
+time.sleep(5)
+
+terminate()

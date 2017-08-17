@@ -4,6 +4,9 @@ conan_cargo_build.rs
 conaninfo.txt
 conan_imports_manifest.txt
 nimcache
+include
+lib
+lambda/worker/slapman
 
 # Java related
 pom.xml
