@@ -53,14 +53,17 @@ build-worker: conan-install
 	OPENSSL_DIR=`pwd` PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
 	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
 
-conan-install:
-	conan install .
+local-worker: conan-install
+	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo build --release
 
-run-worker:
+run-worker: conan-install
 	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo run
 
-test-worker:
+test-worker: conan-install
 	 OPENSSL_DIR=`pwd` RUST_LOG=info cargo test
+
+conan-install:
+	conan install .
 
 # CLEAN
 

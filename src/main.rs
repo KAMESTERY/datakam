@@ -15,14 +15,18 @@ extern crate r2d2_postgres;
 extern crate r2d2_sqlite;
 extern crate r2d2;
 
+use rocket::fairing::{AdHoc};
+
 mod dal;
 mod operations;
 mod endpoints;
 use endpoints::{get_endpoints};
 
 fn rocket() -> rocket::Rocket {
-    info!("Rocket Launching...");
     rocket::ignite().
+        attach(AdHoc::on_launch(|_| {
+            info!("Rocket Launching...");
+        })).
         mount("/",
               get_endpoints())
 }
