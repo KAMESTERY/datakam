@@ -56,6 +56,12 @@ build-worker: conan-install
 conan-install:
 	conan install .
 
+run-worker:
+	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo run
+
+test-worker:
+	 OPENSSL_DIR=`pwd` RUST_LOG=info cargo test
+
 # CLEAN
 
 clean:
