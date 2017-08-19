@@ -50,17 +50,17 @@ OSARCH = x86_64-unknown-linux-musl
 WORKER = slapman
 
 build-worker: conan-install
-	OPENSSL_DIR=`pwd` PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
+	OPENSSL_DIR=`pwd` PKG_CONFIG_ALLOW_CROSS=1 cargo build -j 1 --release --target=$(OSARCH)
 	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
 
 local-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo build --release
+	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo build -j 1 --release
 
 run-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo run
+	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo -j 1 run
 
 test-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=info cargo test
+	 OPENSSL_DIR=`pwd` RUST_LOG=info cargo -j 1 test
 
 conan-install:
 	conan install .
@@ -69,4 +69,4 @@ conan-install:
 
 clean:
 	cargo clean
-	@rm -rf infrastructure/*.zip lambda/lib
+	@rm -rf infrastructure/*.zip lambda/lib lib include

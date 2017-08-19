@@ -15,6 +15,9 @@ extern crate r2d2_postgres;
 extern crate r2d2_sqlite;
 extern crate r2d2;
 
+extern crate rusoto_core;
+extern crate rusoto_s3;
+
 use rocket::fairing::{AdHoc};
 
 mod dal;
