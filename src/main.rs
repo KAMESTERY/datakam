@@ -9,6 +9,8 @@ extern crate rocket_contrib;
 #[macro_use] extern crate log;
 
 extern crate time;
+extern crate curl;
+extern crate hyper;
 
 extern crate r2d2_mysql;
 extern crate r2d2_postgres;

@@ -51,13 +51,13 @@ def process(*tasks):
     return results
 
 
+launch()
+
 def handle(event, context):
     """
     Lambda handler
     """
     logger.info("%s - %s", event, context)
-
-    launch()
 
     tasks = [
         execute_query("""
@@ -94,6 +94,6 @@ def handle(event, context):
         slap=slap
     )
 
-    terminate()
+    # terminate()
 
     return response

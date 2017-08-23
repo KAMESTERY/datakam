@@ -6,6 +6,7 @@ authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 [dependencies]
 rayon = "0.8.2"
 hyper = "0.11"
+curl = "0.4.8"
 log = "0.3.8"
 env_logger = "0.4.3"
 #tensorflow = "0.4.0"

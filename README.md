@@ -34,3 +34,4 @@ Native development with Nim and Rust
 * [HTTP over Unix domain sockets in golang](https://gist.github.com/teknoraver/5ffacb8757330715bcbcc90e6d46ac74)
 * [A brief look at what makes Rocket special.](https://rocket.rs/overview/)
 * [Connecting a webservice to a database in Rust](http://hermanradtke.com/2016/05/23/connecting-webservice-database-rust.html)
+* [Final Project: Building a Multithreaded Web Server](https://doc.rust-lang.org/book/second-edition/ch20-00-final-project-a-web-server.html)

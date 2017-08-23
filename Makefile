@@ -57,10 +57,10 @@ local-worker: conan-install
 	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo build -j 1 --release
 
 run-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo -j 1 run
+	 OPENSSL_DIR=`pwd` RUST_LOG=debug cargo run
 
 test-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=info cargo -j 1 test
+	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo test
 
 conan-install:
 	conan install .

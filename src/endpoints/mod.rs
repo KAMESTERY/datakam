@@ -5,6 +5,8 @@ extern crate rayon;
 use rocket::{Route};
 use rocket_contrib::Json;
 
+use curl::easy::{Easy};
+
 use operations::{fibo, is_leap_year};
 
 #[get("/")]
@@ -43,7 +45,26 @@ fn run_operations(fib_n: u64, year: i64) -> Json<Ops> {
     )
 }
 
+macro_rules! t {
+    ($e:expr) => (match $e {
+        Ok(e) => e,
+        Err(e) => panic!("{} failed with {:?}", stringify!($e), e),
+    })
+}
+
+//fn fetch(url: &str) -> String {
+//
+//    let mut easy = Easy::new();
+//    easy.url(url);
+//    easy.get(true).unwrap();
+//
+//    easy.perform().unwrap();
+//    String::from("adsfasfa")
+//}
+
 pub fn get_endpoints() -> Vec<Route> {
     info!("Setting up Endpoints...");
     routes![index, run_operations]
 }
+
+#[cfg(test)] mod tests;
