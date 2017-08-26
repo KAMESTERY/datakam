@@ -5,7 +5,10 @@ extern crate rayon;
 use rocket::{Route};
 use rocket_contrib::Json;
 
-use curl::easy::{Easy};
+use log::LogLevelFilter;
+
+use config::Config;
+use api::{Api, ApiResponse};
 
 use operations::{fibo, is_leap_year};
 
@@ -52,19 +55,24 @@ macro_rules! t {
     })
 }
 
-//fn fetch(url: &str) -> String {
-//
-//    let mut easy = Easy::new();
-//    easy.url(url);
-//    easy.get(true).unwrap();
-//
-//    easy.perform().unwrap();
-//    String::from("adsfasfa")
-//}
+#[get("/fetch/<baseurl>/<path>")]
+fn fetch(baseurl: String, path: String) -> Option<Json<ApiResponse>> {
+
+    let config = Config::new(baseurl);
+    info!("Fetching with Config: {:?}", config);
+    let api = Api::new(&config);
+    match api.get(&path) {
+        Ok(res) => Some(Json(res)),
+        Err(e) => {
+            error!("ERROR:::: {}", e);
+            Option::None
+        }
+    }
+}
 
 pub fn get_endpoints() -> Vec<Route> {
     info!("Setting up Endpoints...");
-    routes![index, run_operations]
+    routes![index, run_operations, fetch]
 }
 
 #[cfg(test)] mod tests;
