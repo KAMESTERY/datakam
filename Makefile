@@ -18,7 +18,10 @@ deploy:
 prod-url:
 	terraform show | grep invoke_url
 
-build-lambda: deps-deploy build-worker
+build-lambda: deps-deploy build-worker package-lambda
+	@echo "Completed Building Lambda"
+
+package-lambda:
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
 # PY3.6
@@ -50,20 +53,20 @@ OSARCH = x86_64-unknown-linux-musl
 WORKER = slapman
 
 build-worker: conan-install
-	LIBZMQ_PREFIX=`pwd` OPENSSL_DIR=`pwd` PKG_CONFIG_ALLOW_CROSS=1 cargo build -j 1 --release --target=$(OSARCH)
+	OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 PKG_CONFIG_ALLOW_CROSS=1 cargo build -j 1 --release --target=$(OSARCH)
 	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
 
 local-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo build -j 1 --release
+	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo build -j 1 --release
 
 run-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo run
+	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo run
 
 test-worker: conan-install
-	 OPENSSL_DIR=`pwd` RUST_LOG=warn cargo test
+	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo test
 
 conan-install:
-	conan install .
+	conan install . --build OpenSSL
 
 # CLEAN
 

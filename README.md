@@ -36,3 +36,4 @@ Native development with Nim and Rust
 * [Connecting a webservice to a database in Rust](http://hermanradtke.com/2016/05/23/connecting-webservice-database-rust.html)
 * [Final Project: Building a Multithreaded Web Server](https://doc.rust-lang.org/book/second-edition/ch20-00-final-project-a-web-server.html)
 * [Rust and Rest](http://lucumr.pocoo.org/2016/7/10/rust-rest/)
+* [Conan Search for OpenSSL](https://www.conan.io/search?q=OpenSSL)

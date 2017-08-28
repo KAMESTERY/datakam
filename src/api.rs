@@ -5,7 +5,7 @@ use config::{Config, Auth};
 use constants::{VERSION};
 use curl;
 use indicatif::ProgressBar;
-use openssl_probe;
+//use openssl_probe;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde_json;

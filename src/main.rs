@@ -22,7 +22,7 @@ extern crate time;
 extern crate curl;
 extern crate url;
 extern crate hyper;
-extern crate openssl_probe;
+//extern crate openssl_probe;
 
 extern crate r2d2_mysql;
 extern crate r2d2_postgres;

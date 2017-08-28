@@ -1,6 +1,11 @@
 
 [requires]
-OpenSSL/1.0.2j@lasote/stable
+#ConanCargoWrapper/0.1@lasote/testing
+OpenSSL/1.1.0c@madduci/stable
+#OpenSSL/1.0.2j@lasote/stable
+
+#[generators]
+#ConanCargoWrapper
 
 [imports]
 include, * -> ./include

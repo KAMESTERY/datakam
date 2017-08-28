@@ -2,6 +2,8 @@
 name = "slapman"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
+#links = "openssl"
+#build = "conan_cargo_build.rs"
 
 [dependencies]
 dotenv = "0.10.1"
@@ -43,5 +45,9 @@ features = ["bundled"]
 [dependencies.chrono]
 features = ["serde"]
 version = "^0.4.0"
-[target."cfg(not(windows))".dependencies]
-openssl-probe = "0.1.1"
+#[target."cfg(not(windows))".dependencies]
+#openssl-probe = "0.1.1"
+#[dependencies.curl]
+#version = "0.4.8"
+#links = "openssl"
+#build = "conan_cargo_build.rs"
