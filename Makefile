@@ -52,9 +52,12 @@ RUST_VERSION = 1.19.0
 OSARCH = x86_64-unknown-linux-musl
 WORKER = slapman
 
-build-worker: conan-install
-	OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 PKG_CONFIG_ALLOW_CROSS=1 cargo build -j 1 --release --target=$(OSARCH)
+build-worker: prod-conan-install
+	OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
 	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
+
+prod-conan-install:
+	conan install . --build OpenSSL --profile dev_to_prod
 
 local-worker: conan-install
 	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo build -j 1 --release

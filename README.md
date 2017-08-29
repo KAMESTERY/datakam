@@ -19,6 +19,7 @@ Native development with Nim and Rust
 * `curl --unix-socket /tmp/some.sock http:/cmd.sh`
 * `ROCKET_ENV=stage cargo run`
 * `RUST_LOG=debug cargo test`
+* `readelf -a /path/to/some/binary | less`
 
 ## Miscellaneous
 
