@@ -1,0 +1,30 @@
+phpmyadmin:
+  image: phpmyadmin/phpmyadmin:latest
+  links:
+    - mysql:db
+  ports:
+    - 8181:80
+  environment:
+    - PMA_USER=root
+    - PMA_PASSWORD=MySQL2016!!
+
+mysql:
+  image: mysql:latest
+  restart: always
+  ports:
+  - "3306:3306"
+  environment:
+  - MYSQL_DATABASE=Slapman_DEV
+  - MYSQL_ROOT_PASSWORD=MySQL2016!!
+  - MYSQL_USER=ogsols
+  - MYSQL_PASSWORD=ogsols@16!!
+
+postgresql:
+  restart: always
+  image: postgres:latest
+  ports:
+    - "5432:5432"
+  environment:
+  - POSTGRES_DB: Slapman_DEV
+  - POSTGRES_USER: postgres
+  - POSTGRES_PASSWORD: PgSQL@2015!!
