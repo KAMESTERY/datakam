@@ -70,5 +70,9 @@ case $1 in
     install_openssl_dev)
         install_openssl_dev
         ;;
+
+    worker.build.prod)
+        cd $GOPATH/src/slapman/cmd/web && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o $BASEDIR/lambda/worker/slapman
+        ;;
     esac
 exit 0

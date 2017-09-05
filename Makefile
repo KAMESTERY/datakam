@@ -46,33 +46,40 @@ deps-freeze:
 deps-upgrade:
 	$(CMD) deps.upgrade
 
-# Rust
+# Golang
 
-RUST_VERSION = 1.19.0
-OSARCH = x86_64-unknown-linux-musl
-WORKER = slapman
+WORKER=slapman
 
-build-worker: prod-conan-install
-	OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=$(OSARCH)
-	cp $(BASEDIR)/target/$(OSARCH)/release/$(WORKER) $(BASEDIR)/lambda/worker
+build-worker: worker-link
+	cd $(GOPATH)/src/cmd/slapman && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER) $(WORKER)
 
-prod-conan-install:
-	conan install . --build OpenSSL --profile dev_to_prod
+prod-build-worker: worker-link
+	$(BASEDIR)/cmd.sh worker.build.prod
 
-local-worker: conan-install
-	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo build -j 1 --release
+#LDFLAGS=-linkmode external -extldflags -static
+#prod-build-worker: worker-link
+#	docker run --rm -v $(BASEDIR)/$(WORKER):/go/src/$(WORKER) -w /go/src golang:1.9.0 go build -ldflags="$(LDFLAGS)" -v -x -o /go/src/$(WORKER)/$(WORKER) $(WORKER)
+#	mv $(BASEDIR)/$(WORKER)/$(WORKER) $(BASEDIR)/lambda/worker/$(WORKER)
 
-run-worker: conan-install
-	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo run
+worker-link:
+	rm -rf $(GOPATH)/src/$(WORKER)
+	ln -s $(BASEDIR)/$(WORKER) $(GOPATH)/src/
 
-test-worker: conan-install
-	 OPENSSL_DIR=`pwd` OPENSSL_STATIC=1 RUST_LOG=warn cargo test
+# TOOLING
+tools: worker-link
+	go get -u github.com/golang/dep/cmd/dep
+	go get -u github.com/mitchellh/gox
 
-conan-install:
-	conan install . --build OpenSSL
+vendor-status:
+	cd $(GOPATH)/src/$(WORKER); dep status
+
+vendor-update:
+	cd $(GOPATH)/src/$(WORKER); dep ensure -update
+
+vendor-init:
+	cd $(GOPATH)/src/$(WORKER); dep init
 
 # CLEAN
 
 clean:
-	cargo clean
-	@rm -rf infrastructure/*.zip lambda/lib lib include
+	@rm -rf infrastructure/*.zip lambda/lib $(GOPATH)/src/$(WORKER)
