@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"slapman/cmd"
-	"slapman/handlers"
-	"slapman/routes"
-	"slapman/utils"
 	"net/http"
 	"net/http/fcgi"
 	"os"
 	"runtime"
+	"slapman/cmd"
+	"slapman/handlers"
+	"slapman/routes"
+	"slapman/utils"
 
 	"os/signal"
 

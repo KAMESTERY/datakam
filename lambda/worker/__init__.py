@@ -1,4 +1,5 @@
 
+import time
 import logging
 import os
 import subprocess
@@ -14,6 +15,10 @@ EXE = os.path.join(os.path.dirname(__file__), 'slapman')
 
 def launch():
     proc = Popen(EXE, shell=True)
+
+    # Wait for 1 seconds
+    time.sleep(1)
+
     pid = proc.pid
     logger.info(f"Process started: {pid}")
 

@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"net/http"
 	"slapman/middleware"
 	"slapman/utils/alice"
-	"net/http"
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/handlers"

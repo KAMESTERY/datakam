@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"slapman/utils"
 	"net/http"
+	"slapman/utils"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {

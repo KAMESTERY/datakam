@@ -2,8 +2,8 @@ package utils
 
 import (
 	"google.golang.org/appengine/memcache"
-	"slapman/utils/cache"
 	"net/http"
+	"slapman/utils/cache"
 	"time"
 )
 

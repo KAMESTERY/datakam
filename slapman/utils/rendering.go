@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-
 // Rendering START
 
 func RenderCsv(lst []string) string {
@@ -28,7 +27,6 @@ func RenderJsonString(data interface{}) (jsonString string) {
 	jsonString = string(jsonBytes)
 	return
 }
-
 
 // RenderJSON Renders Data as JSON with HTTP Ok
 func RenderJSON(w http.ResponseWriter, r *http.Request, data interface{}) {

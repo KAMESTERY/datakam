@@ -1,9 +1,9 @@
 package model
 
 import (
-	"slapman/utils"
 	"net/http"
 	"os"
+	"slapman/utils"
 
 	"github.com/gorilla/context"
 	"github.com/jinzhu/gorm"

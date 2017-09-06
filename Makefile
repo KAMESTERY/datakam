@@ -57,12 +57,11 @@ OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -linkmode "internal" -extldflags "-static"'
 
-build-worker: worker-link
+build-worker: worker-link worker-fmt
 	cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
-prod-build-worker: worker-link
+prod-build-worker: worker-link worker-fmt
 	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
-
 
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
@@ -92,6 +91,9 @@ vendor-update: worker-link
 
 vendor-init: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep init
+
+worker-fmt:
+	gofmt -l -s -w $(BASEDIR)/$(WORKER)
 
 # CLEAN
 

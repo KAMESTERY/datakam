@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"slapman/model"
 	"net/http"
+	"slapman/model"
 )
 
 // WithDB adds Database Connection to Context

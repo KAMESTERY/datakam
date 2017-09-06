@@ -1,9 +1,9 @@
 package model
 
 import (
+	"net/http"
 	"slapman/utils"
 	kscrypto "slapman/utils/crypto"
-	"net/http"
 )
 
 var userTblsMap = make(map[string]string)

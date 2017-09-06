@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"slapman/utils"
 	"net/http"
+	"slapman/utils"
 )
 
 // Home serves home page

@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"slapman/utils"
 	"net/http"
+	"slapman/utils"
 )
 
 // ClientIP Adds client IP to Context

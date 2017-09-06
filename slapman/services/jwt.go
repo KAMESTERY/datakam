@@ -2,9 +2,9 @@ package services
 
 import (
 	"encoding/json"
+	"net/http"
 	"slapman/model"
 	"slapman/utils"
-	"net/http"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"

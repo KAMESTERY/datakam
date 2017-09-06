@@ -1,8 +1,8 @@
 package services
 
 import (
-	"slapman/utils"
 	"net/http"
+	"slapman/utils"
 
 	"github.com/gorilla/mux"
 )

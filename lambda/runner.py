@@ -63,13 +63,8 @@ bunchString = executeQuery(
 
 print(f"Bunch Response: {bunchString}")
 
-import time
-
 from worker import launch, terminate
 
 launch()
-
-# Wait for 5 seconds
-time.sleep(5)
 
 terminate()

@@ -3,10 +3,10 @@ package handlers
 import (
 	"fmt"
 	//	"slapman/sql"
-	"slapman/utils"
 	"net/http"
 	"os"
 	"runtime"
+	"slapman/utils"
 )
 
 func Hellofcgi(w http.ResponseWriter, r *http.Request) {

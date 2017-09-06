@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"slapman/utils"
 	"net/http"
+	"slapman/utils"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"

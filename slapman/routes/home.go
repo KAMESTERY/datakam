@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"net/http"
 	"slapman/handlers"
 	"slapman/utils"
-	"net/http"
 
 	"github.com/gorilla/mux"
 )
