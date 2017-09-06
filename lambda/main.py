@@ -9,6 +9,7 @@ site.addsitedir(os.path.join(os.path.dirname(__file__), 'lib'))
 Lambda example with external dependency
 """
 
+import json
 import logging
 import requests
 import asyncio
@@ -26,7 +27,7 @@ from datagql.data import setup
 from datagql.schema import execute_query_async
 
 async def fetch(url):
-    logger.info("Fetching: %s", url)
+    logger.info(f"Fetching: {url}")
     raw = requests.get(url)
     logger.info("%s", raw)
     response = raw.json()
@@ -35,8 +36,8 @@ async def fetch(url):
 
 
 async def post(url, data):
-    logger.info(f"Posting: %s", url, data)
-    raw = requests.post(url, data=data)
+    logger.info(f"Posting to: {url} with data: {data}")
+    raw = requests.post(url, data=json.dumps(data))
     logger.info("%s", raw)
     response = raw.json()
     logger.info("%s", response)
@@ -66,44 +67,48 @@ def handle(event, context):
     """
     Lambda handler
     """
+
     logger.info("%s - %s", event, context)
 
-    query = event.get('query', None)
+    query = event.get('query', '{hello}')
+    #query = event.get('query', None)
 
     tasks = [
-        execute_query("""
-                        query CollectMetadata {
-                            currentip
-                            weather {
-                                location
-                                description
-                                temp
-                                pressure
-                                humidity
-                                speed
-                                deg
-                            }
-                        }
-                        """),
-        execute_query(query),
-        post("http://localhost:1112/graphql", dict(query=query))
+        # execute_query("""
+        #                 query CollectMetadata {
+        #                     currentip
+        #                     weather {
+        #                         location
+        #                         description
+        #                         temp
+        #                         pressure
+        #                         humidity
+        #                         speed
+        #                         deg
+        #                     }
+        #                 }
+        #                 """),
+        # execute_query(query),
+        post("http://localhost:1112/api/graphql", dict(query=query))
         #fetch("http://localhost:8000/operations/19/7924")
     ]
-    [m, data, slap] = process(*tasks)
+    [resp] = process(*tasks)
+    data = resp.get('data', {})
+    #[m, data, slap] = process(*tasks)
     metadata = dict(
         event=event,
         msg='You have been Officially Slapped by a Py!!:-)',
-        ip=m['currentip'],
-        weather=m['weather']
+        # ip=m['currentip'],
+        # weather=m['weather']
     )
     logger.info("Collected Metadata: %s", metadata)
     logger.info("Collected Data: %s", data)
-    logger.info("Collected Slap: %s", slap)
+    #logger.info("Collected Slap: %s", slap)
 
     response = dict(
         metadata=metadata,
         data=data,
-        slap=slap
+        #slap=slap
     )
 
     # terminate()
