@@ -33,20 +33,6 @@ func PublicRoutes() *mux.Router {
 			handlers.Hellofcgi,
 		},
 		Route{
-			"DBSelect",
-			"GET",
-			"/dbselect",
-			make([]string, 0),
-			handlers.DbSelect,
-		},
-		Route{
-			"Markdown",
-			"GET",
-			"/markdown/{pageName}",
-			make([]string, 0),
-			handlers.SampleMD,
-		},
-		Route{
 			"Hello",
 			"GET",
 			"/hello",

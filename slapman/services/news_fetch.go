@@ -23,24 +23,11 @@ func Fetch(w http.ResponseWriter, r *http.Request) {
 			"#ff485e",
 			http.StatusText(http.StatusBadRequest),
 		}
-		utils.RenderTemplate(w, r, "error.html", errorData)
+		utils.RenderJSONWithCode(w, r, errorData, http.StatusBadRequest)
 		return
 	}
 
 	utils.Debugf(r, "Fetched URL: %s", url)
 
-	p := struct {
-		Title string
-		Body  string
-		Tmpl  map[string]string
-	}{
-		"HTTP Request",
-		resp,
-		map[string]string{
-			"NavTmpl":     "navigation",
-			"ContentTmpl": "markdown",
-		},
-	}
-
-	utils.RenderTemplate(w, r, "base_material.html", p)
+	utils.RenderJSON(w, r, resp)
 }

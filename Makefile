@@ -3,6 +3,10 @@
 BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
 
+# These are the values we want to pass for VERSION and BUILD
+VERSION=0.0.1
+REVISION=$(shell echo `git rev-parse HEAD`)
+
 .PHONY: prod-deploy prod-url
 
 # DEVOPS
@@ -49,12 +53,19 @@ deps-upgrade:
 # Golang
 
 WORKER=slapman
+OS := $(shell uname)
+# Setup the -ldflags option for go build here, interpolate the variable values
+LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -linkmode "internal" -extldflags "-static"'
 
 build-worker: worker-link
-	cd $(GOPATH)/src/cmd/slapman && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER) $(WORKER)
+	cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 prod-build-worker: worker-link
-	$(BASEDIR)/cmd.sh worker.build.prod
+	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
+
+
+# prod-build-worker: worker-link
+# 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 #LDFLAGS=-linkmode external -extldflags -static
 #prod-build-worker: worker-link
@@ -70,13 +81,16 @@ tools: worker-link
 	go get -u github.com/golang/dep/cmd/dep
 	go get -u github.com/mitchellh/gox
 
-vendor-status:
+vendor-status: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep status
 
-vendor-update:
+vendor-fetch: worker-link
+	cd $(GOPATH)/src/$(WORKER); dep ensure
+
+vendor-update: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep ensure -update
 
-vendor-init:
+vendor-init: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep init
 
 # CLEAN

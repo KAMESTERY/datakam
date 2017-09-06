@@ -22,7 +22,7 @@ var (
 
 // ConvertToMarkdown Converts Markdown to HTML
 func ConvertToMarkdown(mdBytes []byte, trust bool) (body string) {
-	unsafeHTML := blackfriday.MarkdownCommon(mdBytes)
+	unsafeHTML := blackfriday.Run(mdBytes)
 	if trust {
 		body = string(unsafeHTML)
 	} else {

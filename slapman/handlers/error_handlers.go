@@ -15,5 +15,5 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 		"#ff7709",
 		http.StatusText(http.StatusNotFound),
 	}
-	utils.RenderTemplate(w, r, "error.html", errorData)
+	utils.RenderJSONWithCode(w, r, errorData, http.StatusNotFound)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/justinas/nosurf"
+	//"github.com/justinas/nosurf"
 )
 
 // Route Type for Route
@@ -30,7 +30,7 @@ func SetupWeb() http.Handler {
 
 	publicRoutes := wrapCommonMiddlewares(
 		baseRoutes,
-		nosurf.NewPure, // CSRF Protection
+		//nosurf.NewPure, // CSRF Protection
 	)
 
 	return publicRoutes
@@ -43,7 +43,7 @@ func SetupAPI() http.Handler {
 
 	servicesRoutes := wrapCommonMiddlewares(
 		baseRoutes,
-		middleware.JWTMiddleware,
+		//middleware.JWTMiddleware,
 	)
 
 	return servicesRoutes

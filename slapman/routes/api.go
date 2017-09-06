@@ -26,18 +26,25 @@ func NewServicesRouter() *mux.Router {
 			services.RegisterHandler,
 		},
 		Route{
-			"Translate",
-			"POST",
-			"/translate",
-			make([]string, 0),
-			services.Translate,
-		},
-		Route{
 			"Fetch",
 			"GET",
 			"/tasks/fetch/{url}",
 			make([]string, 0),
 			services.Fetch,
+		},
+		Route{
+			"GqlGET",
+			"GET",
+			"/graphql",
+			make([]string, 0),
+			services.HandleGqlRequest,
+		},
+		Route{
+			"GqlPOST",
+			"POST",
+			"/graphql",
+			make([]string, 0),
+			services.HandleGqlRequest,
 		},
 	}
 

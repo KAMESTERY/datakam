@@ -34,6 +34,15 @@ async def fetch(url):
     return response
 
 
+async def post(url, data):
+    logger.info(f"Posting: %s", url, data)
+    raw = requests.post(url, data=data)
+    logger.info("%s", raw)
+    response = raw.json()
+    logger.info("%s", response)
+    return response
+
+
 async def execute_query(query: str):
     setup()
     result = await execute_query_async(query)
@@ -59,6 +68,8 @@ def handle(event, context):
     """
     logger.info("%s - %s", event, context)
 
+    query = event.get('query', None)
+
     tasks = [
         execute_query("""
                         query CollectMetadata {
@@ -74,8 +85,9 @@ def handle(event, context):
                             }
                         }
                         """),
-        execute_query(event.get('query', None)),
-        fetch("http://localhost:8000/operations/19/7924")
+        execute_query(query),
+        post("http://localhost:1112/graphql", dict(query=query))
+        #fetch("http://localhost:8000/operations/19/7924")
     ]
     [m, data, slap] = process(*tasks)
     metadata = dict(
