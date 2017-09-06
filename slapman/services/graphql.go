@@ -19,8 +19,9 @@ var (
 
 	// Schema
 	fields = graphql.Fields{
-		"hello":   &model.HelloFields,
-		"weather": &model.WeatherFields,
+		"hello":    &model.HelloFields,
+		"weather":  &model.WeatherFields,
+		"serverip": &model.ServerIPFields,
 	}
 
 	rootQuery    = graphql.ObjectConfig{Name: "RootQuery", Fields: fields}

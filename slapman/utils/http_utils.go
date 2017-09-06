@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -116,4 +117,18 @@ func SetClientIP(r *http.Request) {
 	// get client ip address
 	clientIP := getClientIP(r)
 	gcontext.Set(r, UserIpCtxKey, clientIP)
+}
+
+func GetJson(url string, target interface{}) error {
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	res, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+
+	return json.NewDecoder(res.Body).Decode(target)
 }

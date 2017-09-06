@@ -23,9 +23,6 @@ from worker import (
     terminate
 )
 
-from datagql.data import setup
-from datagql.schema import execute_query_async
-
 async def fetch(url):
     logger.info(f"Fetching: {url}")
     raw = requests.get(url)
@@ -45,12 +42,9 @@ async def post(url, data):
 
 
 async def execute_query(query: str):
-    setup()
-    result = await execute_query_async(query)
-    logger.info("Result: %s", result)
-    response = result.data
-    logger.info("Response: %s", response)
-    return response
+    resp = await post("http://localhost:1112/api/graphql", dict(query=query))
+    data = resp.get('data', {})
+    return data
 
 
 def process(*tasks):
@@ -61,6 +55,7 @@ def process(*tasks):
     return results
 
 
+# Launch Worker in the Background
 launch()
 
 def handle(event, context):
@@ -70,45 +65,23 @@ def handle(event, context):
 
     logger.info("%s - %s", event, context)
 
-    query = event.get('query', '{hello}')
+    query = event.get('query', '{serverip}')
     #query = event.get('query', None)
 
     tasks = [
-        # execute_query("""
-        #                 query CollectMetadata {
-        #                     currentip
-        #                     weather {
-        #                         location
-        #                         description
-        #                         temp
-        #                         pressure
-        #                         humidity
-        #                         speed
-        #                         deg
-        #                     }
-        #                 }
-        #                 """),
-        # execute_query(query),
-        post("http://localhost:1112/api/graphql", dict(query=query))
-        #fetch("http://localhost:8000/operations/19/7924")
+        execute_query(query)
     ]
-    [resp] = process(*tasks)
-    data = resp.get('data', {})
-    #[m, data, slap] = process(*tasks)
+    [data] = process(*tasks)
     metadata = dict(
         event=event,
         msg='You have been Officially Slapped by a Py!!:-)',
-        # ip=m['currentip'],
-        # weather=m['weather']
     )
     logger.info("Collected Metadata: %s", metadata)
     logger.info("Collected Data: %s", data)
-    #logger.info("Collected Slap: %s", slap)
 
     response = dict(
         metadata=metadata,
         data=data,
-        #slap=slap
     )
 
     # terminate()

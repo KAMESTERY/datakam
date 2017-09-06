@@ -1,11 +1,7 @@
 package model
 
 import (
-	"encoding/json"
 	"github.com/graphql-go/graphql"
-	"io/ioutil"
-	"net/http"
-	"time"
 
 	"slapman/utils"
 )
@@ -75,19 +71,6 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 		utils.Debugf(nil, "Is OK: %+v\n", isOk)
 	}
 
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
-	responseRaw, err := client.Get("http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1")
-	if err != nil {
-		return nil, err
-	}
-
-	respBytes, err := ioutil.ReadAll(responseRaw.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	var response struct {
 		Weather []struct {
 			Main        string `json:"main"`
@@ -106,7 +89,13 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 		} `json:"wind"`
 	}
 
-	json.Unmarshal(respBytes, &response)
+	err := utils.GetJson(
+		"http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1",
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	utils.Debugf(nil, "Response: %+v\n", response)
 
