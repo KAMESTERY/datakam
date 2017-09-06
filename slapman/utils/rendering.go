@@ -37,7 +37,7 @@ func RenderJSON(w http.ResponseWriter, r *http.Request, data interface{}) {
 func RenderJSONWithCode(w http.ResponseWriter, r *http.Request, data interface{}, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	defer w.WriteHeader(code)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
+	if err := EncodeJson(w, data); err != nil {
 		Errorf(r, "ERROR:::: %+v", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

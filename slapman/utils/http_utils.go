@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -130,5 +129,5 @@ func GetJson(url string, target interface{}) error {
 
 	defer res.Body.Close()
 
-	return json.NewDecoder(res.Body).Decode(target)
+	return DecodeJson(res.Body, target)
 }
