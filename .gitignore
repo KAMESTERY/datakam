@@ -1,5 +1,6 @@
 # Project related
 .idea
+.terraform/plugins/linux_amd64/terraform-provider-aws*
 conan_cargo_build.rs
 conaninfo.txt
 conan_imports_manifest.txt
