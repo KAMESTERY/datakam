@@ -70,7 +70,7 @@ prod-build-worker: worker-link worker-fmt
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 test-worker: worker-link worker-fmt
-	cd $(GOPATH)/src/$(WORKER) && go test -v ./...
+	cd $(GOPATH)/src/$(WORKER) && go test -v -cover ./...
 
 #LDFLAGS=-linkmode external -extldflags -static
 #prod-build-worker: worker-link

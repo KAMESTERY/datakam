@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/aws/aws-sdk-go"
+  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/sts"]
+  revision = "452caf156d7a643d59e81af90f09a2f9814f2833"
+  version = "v1.10.39"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -18,6 +24,12 @@
   name = "github.com/facebookgo/stack"
   packages = ["."]
   revision = "751773369052141c013c6e827a71e8f35c07879c"
+
+[[projects]]
+  name = "github.com/go-ini/ini"
+  packages = ["."]
+  revision = "20b96f641a5ea98f2f8619ff4f3e061cff4833bd"
+  version = "v1.28.2"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -86,10 +98,10 @@
   revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
 
 [[projects]]
-  name = "github.com/justinas/nosurf"
+  name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "7245927c2cec58a9ae6a33179cc7c76363fbb88f"
-  version = "0.1"
+  revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
+  version = "0.2.2"
 
 [[projects]]
   name = "github.com/lox/httpcache"
@@ -160,6 +172,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "58a87121e28ef754c0f35717ea56c1fd52678b0953821952ce47e20abb2a9968"
+  inputs-digest = "127e45c683cbef9cf020f47026e0459c270c19c5de53e7d0dccfd8ab8afec5cb"
   solver-name = "gps-cdcl"
   solver-version = 1
