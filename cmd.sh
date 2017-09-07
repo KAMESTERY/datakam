@@ -66,9 +66,14 @@ case $1 in
     clean)
         clean_all
         ;;
-
     install_openssl_dev)
         install_openssl_dev
+        ;;
+    dyna.tbl.create)
+        aws dynamodb create-table --table-name $2 --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url $3
+        ;;
+    dyna.tbl.list)
+        aws dynamodb list-tables --endpoint-url $2 --output json
         ;;
     esac
 exit 0

@@ -40,7 +40,7 @@ func executeQuery(w http.ResponseWriter, r *http.Request, query string) {
 		utils.RenderJSONWithCode(w, r, response.Errors, http.StatusInternalServerError)
 		return
 	}
-	utils.Debugf(nil, "%s \n", response)
+	utils.Debugf(r, "%s \n", response)
 	utils.RenderJSON(w, r, response)
 }
 

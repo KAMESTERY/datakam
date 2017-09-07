@@ -20,6 +20,8 @@ Native development with Nim and Rust
 * `ROCKET_ENV=stage cargo run`
 * `RUST_LOG=debug cargo test`
 * `readelf -a /path/to/some/binary | less`
+* `aws dynamodb create-table --table-name myTable --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url http://0.0.0.0:8000`
+* `aws dynamodb list-tables --endpoint-url http://0.0.0.0:8000 --output json`
 
 ## Miscellaneous
 
