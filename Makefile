@@ -25,7 +25,7 @@ deploy:
 prod-url:
 	terraform show | grep invoke_url
 
-build-lambda: deps-deploy build-worker package-lambda
+build-lambda: deps-deploy prod-build-worker package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:
@@ -64,7 +64,7 @@ build-worker: worker-link worker-fmt
 	cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 prod-build-worker: worker-link worker-fmt
-	GOOS=linux GOARCH=amd64 cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
+	cd $(GOPATH)/src/$(WORKER)/cmd/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)

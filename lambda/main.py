@@ -13,7 +13,7 @@ import json
 import logging
 import requests
 import asyncio
-import uvloop
+#import uvloop
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -48,7 +48,7 @@ async def execute_query(query: str):
 
 
 def process(*tasks):
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    #asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(asyncio.gather(*tasks))
     # loop.close()
