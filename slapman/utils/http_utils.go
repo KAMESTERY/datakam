@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	"time"
 
 	gcontext "github.com/gorilla/context"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/context"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 )
@@ -118,7 +119,7 @@ func SetClientIP(r *http.Request) {
 	gcontext.Set(r, UserIpCtxKey, clientIP)
 }
 
-func GetJson(url string, target interface{}) error {
+func GetJson(ctx context.Context, url string, target interface{}) error {
 
 	client := &http.Client{Timeout: 10 * time.Second}
 

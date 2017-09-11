@@ -1,8 +1,10 @@
 package services
 
 import (
+	"context"
 	"github.com/graphql-go/graphql"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -32,19 +34,33 @@ func init() {
 	}
 }
 
-func executeQuery(w http.ResponseWriter, r *http.Request, query string) {
-	params := graphql.Params{Schema: schema, RequestString: query}
-	response := graphql.Do(params)
-	if len(response.Errors) > 0 {
-		utils.Fatalf(nil, "failed to execute graphql operation, errors: %+v", response.Errors)
-		utils.RenderJSONWithCode(w, r, response.Errors, http.StatusInternalServerError)
-		return
+func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, query string) {
+	respChan := make(chan interface{}, 1)
+	go func() {
+		params := graphql.Params{Schema: schema, RequestString: query}
+		response := graphql.Do(params)
+		if len(response.Errors) > 0 {
+			utils.Fatalf(nil, "failed to execute graphql operation, errors: %+v", response.Errors)
+			respChan <- response.Errors
+		} else {
+			utils.Debugf(r, "%s \n", response)
+			respChan <- response
+		}
+	}()
+	select {
+	case resp := <-respChan:
+		utils.Debugf(r, "%s \n", resp)
+		utils.RenderJSON(w, r, resp)
+	case <-ctx.Done():
+		utils.Fatalf(nil, "ERROR:::: %+v", ctx.Err())
+		utils.RenderJSONWithCode(w, r, ctx.Err(), http.StatusInternalServerError)
 	}
-	utils.Debugf(r, "%s \n", response)
-	utils.RenderJSON(w, r, response)
 }
 
 func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	defer cancel()
 
 	switch r.Method {
 	case "GET":
@@ -52,7 +68,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
 		utils.Debugf(r, "Query: %+v", query)
 
-		executeQuery(w, r, query)
+		executeQuery(ctx, w, r, query)
 	case "POST":
 		var gqlReq struct {
 			Query string `json:"query"`
@@ -67,7 +83,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
 		utils.Debugf(r, "Query: %+v", gqlReq.Query)
 
-		executeQuery(w, r, gqlReq.Query)
+		executeQuery(ctx, w, r, gqlReq.Query)
 	default:
 		warnStruct := struct {
 			Msg string
