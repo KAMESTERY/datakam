@@ -37,7 +37,11 @@ func init() {
 func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, query string) {
 	respChan := make(chan interface{}, 1)
 	go func() {
-		params := graphql.Params{Schema: schema, RequestString: query}
+		params := graphql.Params{
+			Schema:        schema,
+			RequestString: query,
+			Context:       ctx,
+		}
 		response := graphql.Do(params)
 		if len(response.Errors) > 0 {
 			utils.Fatalf(nil, "failed to execute graphql operation, errors: %+v", response.Errors)

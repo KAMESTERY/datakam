@@ -121,9 +121,14 @@ func SetClientIP(r *http.Request) {
 
 func GetJson(ctx context.Context, url string, target interface{}) error {
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
 
-	res, err := client.Get(url)
+	req = req.WithContext(ctx)
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}

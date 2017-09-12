@@ -1,10 +1,8 @@
 package model
 
 import (
-	"context"
 	"github.com/graphql-go/graphql"
 	"slapman/utils"
-	"time"
 )
 
 var (
@@ -17,15 +15,13 @@ var (
 
 func GetServerIP(p graphql.ResolveParams) (interface{}, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
 	var response struct {
 		Ip string `json:"ip"`
 	}
 
+	//TODO: Eventually Check Authentication from Context
 	err := utils.GetJson(
-		ctx,
+		p.Context,
 		"https://api.ipify.org/?format=json",
 		&response,
 	)

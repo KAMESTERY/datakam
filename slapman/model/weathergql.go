@@ -1,9 +1,7 @@
 package model
 
 import (
-	"context"
 	"github.com/graphql-go/graphql"
-	"time"
 
 	"slapman/utils"
 )
@@ -67,9 +65,6 @@ var (
 
 func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
 	locationQuery, isOk := params.Args["location"].(string)
 
 	if isOk {
@@ -94,8 +89,9 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 		} `json:"wind"`
 	}
 
+	//TODO: Eventually Check Authentication from Context
 	err := utils.GetJson(
-		ctx,
+		params.Context,
 		"http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b1b15e88fa797225412429c1c50c122a1",
 		&response,
 	)
