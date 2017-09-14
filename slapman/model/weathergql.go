@@ -51,12 +51,24 @@ var (
 		},
 	})
 
+	// locationType = graphql.NewInputObject(
+	// 	graphql.InputObjectConfig{
+	// 		Name: "LocationType",
+	// 		Fields: graphql.InputObjectConfigFieldMap{
+	// 			"location": &graphql.InputObjectFieldConfig{
+	// 				Type: graphql.NewNonNull(graphql.String),
+	// 			},
+	// 		},
+	// 	},
+	// )
+
 	WeatherFields = graphql.Field{
 		Type:        WeatherType,
 		Description: "The Weather",
 		Args: graphql.FieldConfigArgument{
 			"location": &graphql.ArgumentConfig{
-				Type: graphql.String,
+				//Type: locationType,
+				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
 		Resolve: FetchWeather,

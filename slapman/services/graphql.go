@@ -21,6 +21,7 @@ var (
 		"hello":    &model.HelloFields,
 		"weather":  &model.WeatherFields,
 		"serverip": &model.ServerIPFields,
+		"dynamodb": &model.DyDbFields,
 	}
 
 	rootQuery    = graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
@@ -69,6 +70,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		query := mux.Vars(r)["query"]
+		//query := r.URL.Query().Get("query")
 
 		utils.Debugf(r, "Query: %+v", query)
 
