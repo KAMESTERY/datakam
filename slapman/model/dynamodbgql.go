@@ -129,17 +129,17 @@ func NewAwsSession(region string) (sess *session.Session) {
 	// Create the config specifying the Region for the DynamoDB table.
 	// If config.Region is not set the region must come from the shared
 	// config or AWS_REGION
-	// awsCfg := &aws.Config{}
-	// if len(region) > 0 {
-	// 	awsCfg.WithRegion(region)
-	// }
-	// utils.Debugf(nil, "AWS Config: %+v", awsCfg)
+	awsCfg := &aws.Config{}
+	if len(region) > 0 {
+		awsCfg.WithRegion(region)
+	}
+	utils.Debugf(nil, "AWS Config: %+v", awsCfg)
 
 	// // Create the session that an Aws Service will use
-	// sess = session.Must(session.NewSession(awsCfg))
-	sess = session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
+	sess = session.Must(session.NewSession(awsCfg))
+	// sess = session.Must(session.NewSessionWithOptions(session.Options{
+	// 	SharedConfigState: session.SharedConfigEnable,
+	// }))
 	utils.Debugf(nil, "AWS Session: %+v", sess)
 
 	return
