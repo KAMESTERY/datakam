@@ -6,9 +6,12 @@ import (
 	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+
+	"github.com/guregu/dynamo"
 
 	"github.com/graphql-go/graphql"
 
@@ -16,8 +19,8 @@ import (
 )
 
 const (
-	regionKey    = 17
-	defaultLimit = 24
+	defaultRegion = endpoints.UsEast1RegionID
+	defaultLimit  = 24
 )
 
 var (
@@ -52,7 +55,8 @@ var (
 				Description: "The Description of the Current Item",
 			},
 			"data": &graphql.Field{
-				Type:        new(DyDbItemData),
+				//Type:        new(DyDbItemData),
+				Type:        graphql.String,
 				Description: "The Data of the Current Item",
 			},
 		},
@@ -76,6 +80,9 @@ var (
 			"table": &graphql.ArgumentConfig{
 				//Type: tableType,
 				Type: graphql.NewNonNull(graphql.String),
+			},
+			"region": &graphql.ArgumentConfig{
+				Type: graphql.String,
 			},
 			"limit": &graphql.ArgumentConfig{
 				Type: graphql.Int,
@@ -122,39 +129,48 @@ func NewAwsSession(region string) (sess *session.Session) {
 	// Create the config specifying the Region for the DynamoDB table.
 	// If config.Region is not set the region must come from the shared
 	// config or AWS_REGION
-	awsCfg := &aws.Config{}
-	if len(region) > 0 {
-		awsCfg.WithRegion(region)
-	}
+	// awsCfg := &aws.Config{}
+	// if len(region) > 0 {
+	// 	awsCfg.WithRegion(region)
+	// }
+	// utils.Debugf(nil, "AWS Config: %+v", awsCfg)
 
-	// Create the session that an Aws Service will use
-	sess = session.Must(session.NewSession(awsCfg))
+	// // Create the session that an Aws Service will use
+	// sess = session.Must(session.NewSession(awsCfg))
+	sess = session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	utils.Debugf(nil, "AWS Session: %+v", sess)
+
 	return
 }
 
 // ScanItems: Scan DynamoDB Items
 func ScanItems(p graphql.ResolveParams) (interface{}, error) {
 
+	dynamo.New(session.New(), &aws.Config{Region: aws.String("us-west-2")})
+
 	// Retrieve the Current Context
 	ctx := p.Context
 
-	table, ok := p.Args["location"].(string)
+	table, ok := p.Args["table"].(string)
 	if !ok {
 		tblError := errors.New("No Tables have been specified")
 		utils.Errorf(nil, "ERROR:::: %+v", tblError)
 		return nil, tblError
 	}
 
-	limit, ok := p.Args["location"].(int64)
+	limit, ok := p.Args["limit"].(int64)
 	if !ok {
 		utils.Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
 		limit = defaultLimit
 	}
 
 	// Grab Region from Context
-	region, ok := ctx.Value(regionKey).(string)
+	region, ok := p.Args["region"].(string)
 	if !ok {
-		utils.Warnf(nil, "WARNING:::: No Region has been set in the current Context @ Key: +%v", regionKey)
+		utils.Warnf(nil, "WARNING:::: Using Default AWS Region: +%v", defaultRegion)
+		region = defaultRegion
 	}
 
 	// Create the session that the DynamoDB service will use
@@ -170,6 +186,7 @@ func ScanItems(p graphql.ResolveParams) (interface{}, error) {
 	if limit > 0 {
 		params.Limit = aws.Int64(limit)
 	}
+	utils.Debugf(nil, "Params: %+v", params)
 
 	// Make the DynamoDB Query API call
 	result, err := svc.ScanWithContext(ctx, params)
@@ -195,21 +212,3 @@ func ScanItems(p graphql.ResolveParams) (interface{}, error) {
 
 	return content, nil
 }
-
-// import (
-// 	"github.com/graphql-go/graphql"
-// )
-
-// var (
-// 	HelloFields = graphql.Field{
-// 		Type:        graphql.String,
-// 		Description: "Greeting or Salutation",
-// 		Resolve:     Greet,
-// 	}
-// )
-
-// func Greet(p graphql.ResolveParams) (interface{}, error) {
-// 	return "world", nil
-// }
-
-// locationQuery, isOk := params.Args["location"].(string)

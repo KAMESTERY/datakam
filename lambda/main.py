@@ -43,8 +43,12 @@ async def post(url, data):
 
 async def execute_query(query: str):
     resp = await post("http://localhost:1112/api/graphql", dict(query=query))
-    data = resp.get('data', {})
-    return data
+    if isinstance(resp, dict):
+        data = resp.get('data', {})
+        return data
+    elif isinstance(resp, list):
+        data = resp
+        return data
 
 
 def process(*tasks):
