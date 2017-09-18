@@ -19,10 +19,10 @@ var (
 
 	// Schema
 	fields = graphql.Fields{
-		"hello":    &model.HelloFields,
-		"weather":  &model.WeatherFields,
-		"serverip": &model.ServerIPFields,
-		"dynamodb": &model.DyDbFields,
+		"hello":          &model.HelloFields,
+		"weather":        &model.WeatherFields,
+		"serverip":       &model.ServerIPFields,
+		"scanGameScores": &model.GameScoreFields,
 	}
 
 	rootQuery    = graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
@@ -65,7 +65,7 @@ func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, q
 
 func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
 	switch r.Method {
