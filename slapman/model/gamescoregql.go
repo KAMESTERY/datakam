@@ -38,7 +38,7 @@ var (
 		},
 	})
 
-	GameScoreFields = graphql.Field{
+	GameScoreScanFields = graphql.Field{
 		Type:        GameScoreType,
 		Description: "The DynamoDB Table Items",
 		Args: graphql.FieldConfigArgument{
