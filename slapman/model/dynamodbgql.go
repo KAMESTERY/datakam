@@ -210,5 +210,7 @@ func ScanItems(p graphql.ResolveParams) (interface{}, error) {
 		items,
 	}
 
+	utils.Debugf(nil, "Content: %+v", content)
+
 	return content, nil
 }

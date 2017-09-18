@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
-	"github.com/graphql-go/graphql"
 	"net/http"
 	"time"
+
+	"github.com/graphql-go/graphql"
 
 	"github.com/gorilla/mux"
 
@@ -68,14 +69,24 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	switch r.Method {
+	case "OPTIONS":
+		// CORS Headers
+		utils.CorsHeaders(w)
+		utils.RenderJSON(w, r, struct{}{})
 	case "GET":
 		query := mux.Vars(r)["query"]
 		//query := r.URL.Query().Get("query")
 
 		utils.Debugf(r, "Query: %+v", query)
 
+		// CORS Headers
+		utils.CorsHeaders(w)
+
 		executeQuery(ctx, w, r, query)
 	case "POST":
+		// CORS Headers
+		utils.CorsHeaders(w)
+
 		var gqlReq struct {
 			Query string `json:"query"`
 		}

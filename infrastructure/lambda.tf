@@ -1,30 +1,3 @@
-resource "aws_iam_role" "iam_for_slapman" {
-  name = "iam_for_slapman"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    },
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "dynamodb.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
 
 resource "aws_lambda_function" "slapman_slapalicious_OPTIONS" {
   filename         = "infrastructure/slapalicious.zip"

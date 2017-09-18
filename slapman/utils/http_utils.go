@@ -137,3 +137,10 @@ func GetJson(ctx context.Context, url string, target interface{}) error {
 
 	return DecodeJson(res.Body, target)
 }
+
+func CorsHeaders(w http.ResponseWriter) {
+	// CORS Headers
+	w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "POST,OPTIONS,GET,PUT,PATCH,DELETE")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+}

@@ -33,6 +33,13 @@ func NewServicesRouter() *mux.Router {
 			services.Fetch,
 		},
 		Route{
+			"GqlOPTIONS",
+			"OPTIONS",
+			"/graphql",
+			make([]string, 0),
+			services.HandleGqlRequest,
+		},
+		Route{
 			"GqlGET",
 			"GET",
 			"/graphql",
