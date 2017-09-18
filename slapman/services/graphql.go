@@ -65,7 +65,7 @@ func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, q
 
 func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
-	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
 	defer cancel()
 
 	switch r.Method {

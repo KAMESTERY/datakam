@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
-  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/dynamodb/dynamodbiface","service/sts"]
+  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/sts"]
   revision = "af01be3e6edf79e6f07b5816cfe0d2c6717e5c7f"
   version = "v1.10.41"
 
@@ -84,12 +84,6 @@
   packages = [".","gqlerrors","language/ast","language/kinds","language/lexer","language/location","language/parser","language/printer","language/source","language/typeInfo","language/visitor"]
   revision = "105a6c24e6fdaf4008e56d947115a1a13dc46430"
   version = "v0.7.2"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/guregu/dynamo"
-  packages = [".","internal/exprs"]
-  revision = "713283dccf03c07ed49995e8d2db017f152a9ff8"
 
 [[projects]]
   branch = "master"
@@ -184,6 +178,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3899d4f31d3fcdb808cdf8e75efda6635b7556ff092460ca5742004143ad57ec"
+  inputs-digest = "22e65d28cd2b350ccc88beb9a233be03d0b82106b51357465a0f0d5631bb5db7"
   solver-name = "gps-cdcl"
   solver-version = 1

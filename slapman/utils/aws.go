@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -18,6 +19,7 @@ const (
 	defaultLimit  = 24
 	regionKey     = 16
 	limitKey      = 16
+	maxGoroutines = 20
 )
 
 type DynaScanResult struct {
@@ -79,7 +81,7 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{
 
 	content.Rows = rows
 
-	Debugf(nil, "GameScores: %+v", content)
+	Debugf(nil, "Content: %+v", content)
 
 	return content, nil
 }
@@ -130,4 +132,62 @@ func DynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 	Debugf(nil, "Rows: %+v", rows)
 
 	return rows, nil
+}
+
+// PutItem: Scan DynamoDB Items
+func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interface{}) (interface{}, error) {
+
+	// Set the current context
+	ctx := p.Context
+	region, ok := p.Args["region"].(string)
+	if ok {
+		ctx = context.WithValue(ctx, regionKey, region)
+	}
+
+	// gameScore := struct{
+	// 	UserId int64 `json:"UserId"`
+	// 	GameTitle string `json:"GameTitle"`
+	// 	TopScore int64 `json:"TopScore"`
+	// }{}
+	// userId, ok := p.Args["UserId"].(string)
+	// if ok {
+	// 	ctx = context.WithValue(ctx, limitKey, limit)
+	// }
+
+	return DynaPutItem(ctx, tableName, data)
+}
+
+// PutItem: Put DynamoDB Item
+func DynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
+
+	// Create the session that the DynamoDB service will use
+	sess := NewAwsSession(ctx)
+
+	// Create the DynamoDB service client to make the query request with.
+	svc := dynamodb.New(sess)
+
+	dataItem, err := dynamodbattribute.MarshalMap(data)
+	if err != nil {
+		// Build the query input parameters
+		params := &dynamodb.PutItemInput{
+			Item:      dataItem,
+			TableName: aws.String(tableName),
+		}
+		Debugf(nil, "Params: %+v", params)
+
+		// Now put the data item, either logging or discarding the result
+		success, err = svc.PutItemWithContext(ctx, params)
+		if err != nil {
+			if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
+				return
+			}
+			// TODO: Special case...
+			Errorf(nil, "Error inserting %v (%v)", data, err)
+		}
+	} else {
+		Errorf(nil, "ERROR:::: %+v", err)
+		return
+	}
+
+	return
 }
