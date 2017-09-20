@@ -1,15 +1,14 @@
 package model
 
 import (
-	"errors"
 	"slapman/utils"
 
 	"github.com/graphql-go/graphql"
 )
 
 var (
-	GameScoreType = graphql.NewObject(graphql.ObjectConfig{
-		Name: "GameScore",
+	GameScoreScanType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "GameScoreScan",
 		Fields: graphql.Fields{
 			"table": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
@@ -39,8 +38,21 @@ var (
 		},
 	})
 
+	GameScoreUpdateType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "GameScoreUpdate",
+		Fields: graphql.Fields{
+			"table": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Table to Scan",
+			},
+			"update": &graphql.Field{
+				Type: GameScoreRowType,
+			},
+		},
+	})
+
 	GameScoreScanFields = graphql.Field{
-		Type:        GameScoreType,
+		Type:        GameScoreScanType,
 		Description: "The DynamoDB Table Items",
 		Args: graphql.FieldConfigArgument{
 			"region": &graphql.ArgumentConfig{
@@ -51,7 +63,17 @@ var (
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return utils.DynaResolveScanItems(p, "GameScores")
+			rows, err := utils.DynaResolveScanItems(p, "GameScores")
+			if err != nil {
+				return nil, err
+			}
+			return struct {
+				Table string      `json:"table"`
+				Rows  interface{} `json:"rows"`
+			}{
+				"GameScores",
+				rows,
+			}, nil
 		},
 	}
 
@@ -104,11 +126,11 @@ var (
 	}
 
 	GameScoreUpdateFields = graphql.Field{
-		Type:        GameScoreType,
+		Type:        GameScoreUpdateType,
 		Description: "The DynamoDB Table Items",
 		Args: graphql.FieldConfigArgument{
 			"userId": &graphql.ArgumentConfig{
-				Type: graphql.String,
+				Type: graphql.NewNonNull(graphql.String),
 			},
 			"gameTitle": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -121,16 +143,16 @@ var (
 
 			utils.Debugf(nil, "Put Args: %+v", p.Args)
 
-			var data map[string]interface{}
+			keyData := make(map[string]interface{})
+			data := make(map[string]interface{})
 
-			userId, _ := p.Args["userId"].(string)
-			if len(userId) == 0 {
-				return nil, errors.New("An existing UserId needs to be provided")
+			if userId, ok := p.Args["userId"].(string); ok {
+				keyData["UserId"] = userId
+				utils.Debugf(nil, "Updating GameScore with UserId: %+v", userId)
 			}
-			utils.Debugf(nil, "Updating GameScore with UserId: %+v", userId)
 
 			if gameTitle, ok := p.Args["gameTitle"].(string); ok {
-				data["GameTitle"] = gameTitle
+				keyData["GameTitle"] = gameTitle
 				utils.Debugf(nil, "Updating GameScore with GameTitle: %+v", gameTitle)
 			}
 
@@ -140,7 +162,17 @@ var (
 				utils.Debugf(nil, "Updating GameScore with TopScore: %+v", topScore)
 			}
 
-			return utils.DynaResolveUpdateItem(p, "GameScores", "UserId", userId, data)
+			updatedItem, err := utils.DynaResolveUpdateItem(p, "GameScores", keyData, data)
+			if err != nil {
+				return nil, err
+			}
+			return struct {
+				Table  string      `json:"table"`
+				Update interface{} `json:"update"`
+			}{
+				"GameScore",
+				updatedItem,
+			}, nil
 		},
 	}
 )

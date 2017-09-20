@@ -3,6 +3,8 @@ package utils
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -21,11 +23,6 @@ const (
 	limitKey      = 16
 	maxGoroutines = 20
 )
-
-type DynaScanResult struct {
-	Table string                   `json:"table"`
-	Rows  []map[string]interface{} `json:"rows"`
-}
 
 //NewAwsSession: Creates a new Session for an AWS Service
 func NewAwsSession(ctx context.Context) (sess *session.Session) {
@@ -61,11 +58,6 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 // ScanItems: Scan DynamoDB Items
 func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{}, error) {
 
-	// Initialize Content
-	content := DynaScanResult{}
-
-	content.Table = tableName
-
 	// Set the current context
 	ctx := p.Context
 	region, ok := p.Args["region"].(string)
@@ -82,11 +74,9 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{
 		return nil, err
 	}
 
-	content.Rows = rows
+	Debugf(nil, "Rows: %+v", rows)
 
-	Debugf(nil, "Content: %+v", content)
-
-	return content, nil
+	return rows, nil
 }
 
 // ScanItems: Scan DynamoDB Items
@@ -193,7 +183,7 @@ func DynaPutItem(ctx context.Context, tableName string, data interface{}) (succe
 ///////////////////////////////////// UPDATING AWS DYNAMODB
 
 // UpdateItem: Update DynamoDB Items
-func DynaResolveUpdateItem(p graphql.ResolveParams, tableName, keyName, keyValue string, data map[string]interface{}) (interface{}, error) {
+func DynaResolveUpdateItem(p graphql.ResolveParams, tableName string, keyData, data map[string]interface{}) (interface{}, error) {
 
 	// Set the current context
 	ctx := p.Context
@@ -202,22 +192,45 @@ func DynaResolveUpdateItem(p graphql.ResolveParams, tableName, keyName, keyValue
 		ctx = context.WithValue(ctx, regionKey, region)
 	}
 
-	return DynaUpdateItem(ctx, tableName, keyName, keyValue, data)
+	return DynaUpdateItem(ctx, tableName, keyData, data)
 }
 
 // UpdateItem: Update DynamoDB Item
-func DynaUpdateItem(ctx context.Context, tableName, keyName, keyValue string, data map[string]interface{}) (success interface{}, err error) {
+func DynaUpdateItem(ctx context.Context, tableName string, keyData, data map[string]interface{}) (success interface{}, err error) {
 
 	var (
-		attributeNames   map[string]*string
-		attributeValues  map[string]*dynamodb.AttributeValue
+		keyMap           = make(map[string]*dynamodb.AttributeValue)
+		attributeNames   = make(map[string]*string)
+		attributeValues  = make(map[string]*dynamodb.AttributeValue)
+		upExpChunks      []string
 		updateExpression *string
 	)
 
-	// Populate the Attribute Names as well as the Attribute Values and then Generate the Update Expression
-	// for k, v = range data {
+	for key, val := range keyData {
+		keyAttr, marshalErr := dynamodbattribute.Marshal(val)
+		if marshalErr != nil {
+			Errorf(nil, "ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
+			return nil, marshalErr
+		}
+		keyMap[key] = keyAttr
+	}
 
-	// }
+	// Populate the Attribute Names as well as the Attribute Values and then Generate the Update Expression
+	for k, v := range data {
+		kName := "#" + k
+		kVal := ":" + k + "_value"
+
+		attributeNames[kName] = aws.String(k)
+		upExpChunks = append(upExpChunks, fmt.Sprintf("%+v = %+v", kName, kVal))
+
+		attrVal, marshalErr := dynamodbattribute.Marshal(v)
+		if marshalErr != nil {
+			Errorf(nil, "ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
+			return nil, marshalErr
+		}
+		attributeValues[kVal] = attrVal
+	}
+	updateExpression = aws.String("SET " + strings.Join(upExpChunks, ", "))
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -228,11 +241,7 @@ func DynaUpdateItem(ctx context.Context, tableName, keyName, keyValue string, da
 	params := &dynamodb.UpdateItemInput{
 		TableName: aws.String(tableName),
 
-		Key: map[string]*dynamodb.AttributeValue{
-			keyName: {
-				S: aws.String(keyValue),
-			},
-		},
+		Key: keyMap,
 
 		ExpressionAttributeNames:  attributeNames,
 		ExpressionAttributeValues: attributeValues,
@@ -240,13 +249,13 @@ func DynaUpdateItem(ctx context.Context, tableName, keyName, keyValue string, da
 
 		ReturnConsumedCapacity:      aws.String("NONE"),
 		ReturnItemCollectionMetrics: aws.String("NONE"),
-		ReturnValues:                aws.String("NONE"),
+		ReturnValues:                aws.String("ALL_NEW"),
 	}
 
 	Debugf(nil, "Params: %+v", params)
 
 	// Now put the data item, either logging or discarding the result
-	success, err = svc.UpdateItemWithContext(ctx, params)
+	result, err := svc.UpdateItemWithContext(ctx, params)
 	if err != nil {
 		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
 			Warn(nil, "WARNING:::: The provisioned Throughput has been Exceeded")
@@ -254,7 +263,24 @@ func DynaUpdateItem(ctx context.Context, tableName, keyName, keyValue string, da
 		Errorf(nil, "Error inserting %v (%v)", params, err)
 		return
 	}
-	Debugf(nil, "UPDATE ITEM SUCCESS:::: %+v", success)
+	Debugf(nil, "UPDATE ITEM SUCCESS:::: %+v", result)
+
+	updatedItem := make(map[string]interface{})
+	// Unmarshal the Updated Item field in the result value to the Item Go type.
+	for upKey, upAttr := range result.Attributes {
+		var upVal interface{}
+		err = dynamodbattribute.Unmarshal(upAttr, &upVal)
+		if err != nil {
+			unmarshalError := errors.New("Failed to unmarshal Update result items")
+			Errorf(nil, "ERROR:::: %+v", unmarshalError)
+			return nil, unmarshalError
+		}
+		Debugf(nil, "UPVAL: %+v", upVal)
+		updatedItem[upKey] = upVal
+	}
+
+	success = updatedItem
+	Debugf(nil, "Updated Item: %+v", success)
 
 	return
 }
