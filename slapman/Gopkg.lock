@@ -8,12 +8,6 @@
   version = "v1.10.41"
 
 [[projects]]
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -141,6 +135,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/segmentio/ksuid"
+  packages = ["."]
+  revision = "1c9d746aad27142a443654fba83c3b7578dbeba0"
+
+[[projects]]
+  branch = "master"
   name = "github.com/shurcooL/sanitized_anchor_name"
   packages = ["."]
   revision = "541ff5ee47f1dddf6a5281af78307d921524bcb5"
@@ -178,6 +178,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "22e65d28cd2b350ccc88beb9a233be03d0b82106b51357465a0f0d5631bb5db7"
+  inputs-digest = "b63b07015cd959feac1aa9e0cc7f21dffe0fe2e79df0f0fbe5a6213bfb208f4e"
   solver-name = "gps-cdcl"
   solver-version = 1

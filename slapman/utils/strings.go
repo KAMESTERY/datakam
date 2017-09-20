@@ -4,11 +4,16 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/hex"
+	"errors"
+	"fmt"
+	"strconv"
 	"strings"
 	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/pbkdf2"
+
+	"github.com/segmentio/ksuid"
 )
 
 const (
@@ -73,4 +78,20 @@ func GenerateSlug(str string) string {
 			return -1
 		}
 	}, strings.ToLower(strings.TrimSpace(str)))
+}
+
+func ParseInt64(d interface{}) (i64 int64, err error) {
+	i64str, ok := d.(string)
+	if !ok {
+		errMsg := fmt.Sprintf("Input is not a valid String: +%v", d)
+		err = errors.New(errMsg)
+		return
+	}
+	i64, err = strconv.ParseInt(i64str, 10, 64)
+	return
+}
+
+func GenerateUUID() string {
+	uuid := ksuid.New()
+	return uuid.String()
 }

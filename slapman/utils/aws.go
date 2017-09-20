@@ -27,6 +27,7 @@ type DynaScanResult struct {
 	Rows  []map[string]interface{} `json:"rows"`
 }
 
+//NewAwsSession: Creates a new Session for an AWS Service
 func NewAwsSession(ctx context.Context) (sess *session.Session) {
 
 	// Grab Region from Context
@@ -54,6 +55,8 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 
 	return
 }
+
+///////////////////////////////////// SCANNING AWS DYNAMODB
 
 // ScanItems: Scan DynamoDB Items
 func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{}, error) {
@@ -134,7 +137,9 @@ func DynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 	return rows, nil
 }
 
-// PutItem: Scan DynamoDB Items
+///////////////////////////////////// PUTTING AWS DYNAMODB
+
+// PutItem: Put DynamoDB Items
 func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interface{}) (interface{}, error) {
 
 	// Set the current context
@@ -144,21 +149,13 @@ func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interfac
 		ctx = context.WithValue(ctx, regionKey, region)
 	}
 
-	// gameScore := struct{
-	// 	UserId int64 `json:"UserId"`
-	// 	GameTitle string `json:"GameTitle"`
-	// 	TopScore int64 `json:"TopScore"`
-	// }{}
-	// userId, ok := p.Args["UserId"].(string)
-	// if ok {
-	// 	ctx = context.WithValue(ctx, limitKey, limit)
-	// }
-
 	return DynaPutItem(ctx, tableName, data)
 }
 
 // PutItem: Put DynamoDB Item
 func DynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
+
+	Debugf(nil, "Putting Data: %+v", data)
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -168,26 +165,96 @@ func DynaPutItem(ctx context.Context, tableName string, data interface{}) (succe
 
 	dataItem, err := dynamodbattribute.MarshalMap(data)
 	if err != nil {
-		// Build the query input parameters
-		params := &dynamodb.PutItemInput{
-			Item:      dataItem,
-			TableName: aws.String(tableName),
-		}
-		Debugf(nil, "Params: %+v", params)
-
-		// Now put the data item, either logging or discarding the result
-		success, err = svc.PutItemWithContext(ctx, params)
-		if err != nil {
-			if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
-				return
-			}
-			// TODO: Special case...
-			Errorf(nil, "Error inserting %v (%v)", data, err)
-		}
-	} else {
-		Errorf(nil, "ERROR:::: %+v", err)
+		Errorf(nil, "ERROR:::: %+v \nCould not put %+v", err, data)
 		return
 	}
+
+	// Build the query input parameters
+	params := &dynamodb.PutItemInput{
+		Item:      dataItem,
+		TableName: aws.String(tableName),
+	}
+	Debugf(nil, "Params: %+v", params)
+
+	// Now put the data item, either logging or discarding the result
+	success, err = svc.PutItemWithContext(ctx, params)
+	if err != nil {
+		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
+			Warn(nil, "WARNING:::: The provisioned Throughput has been Exceeded")
+		}
+		Errorf(nil, "Error inserting %v (%v)", data, err)
+		return
+	}
+	Debugf(nil, "PUT ITEM SUCCESS:::: %+v", success)
+
+	return
+}
+
+///////////////////////////////////// UPDATING AWS DYNAMODB
+
+// UpdateItem: Update DynamoDB Items
+func DynaResolveUpdateItem(p graphql.ResolveParams, tableName, keyName, keyValue string, data map[string]interface{}) (interface{}, error) {
+
+	// Set the current context
+	ctx := p.Context
+	region, ok := p.Args["region"].(string)
+	if ok {
+		ctx = context.WithValue(ctx, regionKey, region)
+	}
+
+	return DynaUpdateItem(ctx, tableName, keyName, keyValue, data)
+}
+
+// UpdateItem: Update DynamoDB Item
+func DynaUpdateItem(ctx context.Context, tableName, keyName, keyValue string, data map[string]interface{}) (success interface{}, err error) {
+
+	var (
+		attributeNames   map[string]*string
+		attributeValues  map[string]*dynamodb.AttributeValue
+		updateExpression *string
+	)
+
+	// Populate the Attribute Names as well as the Attribute Values and then Generate the Update Expression
+	// for k, v = range data {
+
+	// }
+
+	// Create the session that the DynamoDB service will use
+	sess := NewAwsSession(ctx)
+
+	// Create the DynamoDB service client to make the query request with.
+	svc := dynamodb.New(sess)
+
+	params := &dynamodb.UpdateItemInput{
+		TableName: aws.String(tableName),
+
+		Key: map[string]*dynamodb.AttributeValue{
+			keyName: {
+				S: aws.String(keyValue),
+			},
+		},
+
+		ExpressionAttributeNames:  attributeNames,
+		ExpressionAttributeValues: attributeValues,
+		UpdateExpression:          updateExpression,
+
+		ReturnConsumedCapacity:      aws.String("NONE"),
+		ReturnItemCollectionMetrics: aws.String("NONE"),
+		ReturnValues:                aws.String("NONE"),
+	}
+
+	Debugf(nil, "Params: %+v", params)
+
+	// Now put the data item, either logging or discarding the result
+	success, err = svc.UpdateItemWithContext(ctx, params)
+	if err != nil {
+		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
+			Warn(nil, "WARNING:::: The provisioned Throughput has been Exceeded")
+		}
+		Errorf(nil, "Error inserting %v (%v)", params, err)
+		return
+	}
+	Debugf(nil, "UPDATE ITEM SUCCESS:::: %+v", success)
 
 	return
 }

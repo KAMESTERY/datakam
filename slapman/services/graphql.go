@@ -18,15 +18,25 @@ var (
 	err    error
 
 	// Schema
-	fields = graphql.Fields{
+
+	queryFields = graphql.Fields{
 		"hello":         &model.HelloFields,
 		"weather":       &model.WeatherFields,
 		"serverip":      &model.ServerIPFields,
 		"gameScoreScan": &model.GameScoreScanFields,
 	}
+	rootQuery = graphql.ObjectConfig{Name: "RootQuery", Fields: queryFields}
 
-	rootQuery    = graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
-	schemaConfig = graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
+	mutationFields = graphql.Fields{
+		"gameScorePut":    &model.GameScorePutFields,
+		"gameScoreUpdate": &model.GameScoreUpdateFields,
+	}
+	rootMutation = graphql.ObjectConfig{Name: "RootMutation", Fields: mutationFields}
+
+	schemaConfig = graphql.SchemaConfig{
+		Query:    graphql.NewObject(rootQuery),
+		Mutation: graphql.NewObject(rootMutation),
+	}
 )
 
 func init() {
