@@ -24,6 +24,47 @@ const (
 	maxGoroutines = 20
 )
 
+var (
+	DynaQueryParamType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "DynaQueryParam",
+		Fields: graphql.Fields{
+			"field": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Parameter Field to Query",
+			},
+			"operation": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Parameter Operation to Use",
+			},
+			"value": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Parameter Value to Use",
+			},
+		},
+	})
+
+	DynaQueryArgs = graphql.FieldConfigArgument{
+		"table": &graphql.ArgumentConfig{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "The DynamoDB Table to Query",
+		},
+		"index": &graphql.ArgumentConfig{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "The DynamoDB Table Index to Use",
+		},
+		"parameters": &graphql.ArgumentConfig{
+			Type:        graphql.NewList(DynaQueryParamType),
+			Description: "The DynamoDB Query Parameters to Use",
+		},
+		"region": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+		"limit": &graphql.ArgumentConfig{
+			Type: graphql.Int,
+		},
+	}
+)
+
 //NewAwsSession: Creates a new Session for an AWS Service
 func NewAwsSession(ctx context.Context) (sess *session.Session) {
 
@@ -69,7 +110,7 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{
 		ctx = context.WithValue(ctx, limitKey, limit)
 	}
 
-	rows, err := DynaScanItems(ctx, tableName)
+	rows, err := dynaScanItems(ctx, tableName)
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +120,7 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{
 	return rows, nil
 }
 
-// ScanItems: Scan DynamoDB Items
-func DynaScanItems(ctx context.Context, tableName string) ([]map[string]interface{}, error) {
+func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interface{}, error) {
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -139,11 +179,10 @@ func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interfac
 		ctx = context.WithValue(ctx, regionKey, region)
 	}
 
-	return DynaPutItem(ctx, tableName, data)
+	return dynaPutItem(ctx, tableName, data)
 }
 
-// PutItem: Put DynamoDB Item
-func DynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
+func dynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
 
 	Debugf(nil, "Putting Data: %+v", data)
 
@@ -192,11 +231,10 @@ func DynaResolveUpdateItem(p graphql.ResolveParams, tableName string, keyData, d
 		ctx = context.WithValue(ctx, regionKey, region)
 	}
 
-	return DynaUpdateItem(ctx, tableName, keyData, data)
+	return dynaUpdateItem(ctx, tableName, keyData, data)
 }
 
-// UpdateItem: Update DynamoDB Item
-func DynaUpdateItem(ctx context.Context, tableName string, keyData, data map[string]interface{}) (success interface{}, err error) {
+func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[string]interface{}) (success interface{}, err error) {
 
 	var (
 		keyMap           = make(map[string]*dynamodb.AttributeValue)
@@ -283,4 +321,131 @@ func DynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 	Debugf(nil, "Updated Item: %+v", success)
 
 	return
+}
+
+///////////////////////////////////// QUERYING AWS DYNAMODB
+
+// Query: Query DynamoDB
+func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (interface{}, error) {
+
+	// Set the current context
+	ctx := p.Context
+	region, ok := p.Args["region"].(string)
+	if ok {
+		ctx = context.WithValue(ctx, regionKey, region)
+	}
+
+	return dynaQuery(ctx, queryInput)
+}
+
+func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success interface{}, err error) {
+
+	Debugf(nil, "Query Input: %+v", queryInput)
+
+	// Create the session that the DynamoDB service will use
+	sess := NewAwsSession(ctx)
+
+	// Create the DynamoDB service client to make the query request with.
+	svc := dynamodb.New(sess)
+
+	// Now run the Query
+	result, err := svc.QueryWithContext(ctx, queryInput)
+	if err != nil {
+		queryError := errors.New("Failed to make DynamoDB Query API call")
+		Errorf(nil, "ERROR:::: %+v", err)
+		return nil, queryError
+	}
+
+	Debugf(nil, "Result: %+v", result)
+
+	var rows []map[string]interface{}
+	// Unmarshal the Items field in the result value to the Item Go type.
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &rows)
+	if err != nil {
+		unmarshalError := errors.New("Failed to unmarshal Query result items")
+		Errorf(nil, "ERROR:::: %+v", unmarshalError)
+		return nil, unmarshalError
+	}
+
+	Debugf(nil, "Rows: %+v", rows)
+
+	return rows, nil
+}
+
+// Query Input Extensions and Helpers
+
+type QueryDsl struct {
+	dynamodb.QueryInput
+	Context   context.Context
+	ErrorList []string
+}
+
+type DynaQueryParam struct {
+	Field     string      `json:"field"`
+	Operation string      `json:"operation"`
+	Value     interface{} `json:"value"`
+}
+
+func DynaQueryDsl(ctx context.Context, table, index string) *QueryDsl {
+
+	qi := &QueryDsl{
+		QueryInput: dynamodb.QueryInput{
+			TableName:     aws.String(table),
+			IndexName:     aws.String(index),
+			KeyConditions: make(map[string]*dynamodb.Condition),
+		},
+		Context: ctx,
+	}
+
+	limit, ok := ctx.Value(limitKey).(int64)
+	if ok && limit > 0 {
+		qi.Limit = aws.Int64(limit)
+	} else {
+		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
+		qi.Limit = aws.Int64(defaultLimit)
+	}
+
+	return qi
+}
+
+func (qi *QueryDsl) with(field, operator string, value interface{}) *QueryDsl {
+
+	attrVal, marshalErr := dynamodbattribute.Marshal(value)
+	if marshalErr != nil {
+		marshalErrMsg := fmt.Sprintf("MARSHAL ERROR: %+v", marshalErr.Error())
+		qi.ErrorList = append(qi.ErrorList, marshalErrMsg)
+	}
+
+	condition := &dynamodb.Condition{
+		ComparisonOperator: aws.String(operator),
+	}
+
+	condition.AttributeValueList = append(condition.AttributeValueList, attrVal)
+
+	qi.QueryInput.KeyConditions[field] = condition
+
+	return qi
+}
+
+func (qi *QueryDsl) Build(params []DynaQueryParam) *QueryDsl {
+	for _, param := range params {
+		qi.with(
+			param.Field,
+			param.Operation,
+			param.Value,
+		)
+	}
+	return qi
+}
+
+func (qi *QueryDsl) AsInput() (*dynamodb.QueryInput, error) {
+
+	if len(qi.ErrorList) > 0 {
+		errorMessages := strings.Join(qi.ErrorList, ",\n ")
+		dslError := errors.New(fmt.Sprintf("ERRORS:::: %+v", errorMessages))
+		Errorf(nil, "ERROR:::: QUERY DSL ERROR: %+v", dslError)
+		return nil, dslError
+	}
+
+	return &qi.QueryInput, nil
 }

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"slapman/utils"
 
 	"github.com/graphql-go/graphql"
@@ -50,6 +52,40 @@ var (
 			},
 		},
 	})
+
+	GameQueryFields = graphql.Field{
+		Type:        GameScoreScanType,
+		Description: "The DynamoDB Table Query Items",
+		Args:        utils.DynaQueryArgs,
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			table, _ := p.Args["table"].(string)
+			index, _ := p.Args["index"].(string)
+			params, ok := p.Args["params"].([]utils.DynaQueryParam)
+			if !ok {
+				queryError := errors.New(fmt.Sprintf("Could not Execute the Query with the Provided Arguments: %+v", p.Args))
+				utils.Errorf(nil, "ERROR:::: %+v", queryError)
+				return nil, queryError
+			}
+
+			queryInput, err := utils.DynaQueryDsl(p.Context, table, index).Build(params).AsInput()
+			if err != nil {
+				return nil, err
+			}
+
+			rows, err := utils.DynaResolveQuery(p, queryInput)
+			if err != nil {
+				return nil, err
+			}
+			return struct {
+				Table string      `json:"table"`
+				Rows  interface{} `json:"rows"`
+			}{
+				"GameScores",
+				rows,
+			}, nil
+		},
+	}
 
 	GameScoreScanFields = graphql.Field{
 		Type:        GameScoreScanType,
