@@ -116,6 +116,12 @@
   revision = "68fecaef60268522d2ac3f0123cec9d3bcab7b6e"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "d0303fe809921458f417bcf828397a65db30a7e4"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -178,6 +184,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b63b07015cd959feac1aa9e0cc7f21dffe0fe2e79df0f0fbe5a6213bfb208f4e"
+  inputs-digest = "492a31208d00dbece7e610f5df7ddd846309143605d0b280c39176a35c39f349"
   solver-name = "gps-cdcl"
   solver-version = 1

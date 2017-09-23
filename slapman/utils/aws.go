@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
@@ -25,18 +27,18 @@ const (
 )
 
 var (
-	DynaQueryParamType = graphql.NewObject(graphql.ObjectConfig{
+	DynaQueryParamInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		Name: "DynaQueryParam",
-		Fields: graphql.Fields{
-			"field": &graphql.Field{
+		Fields: graphql.InputObjectConfigFieldMap{
+			"field": &graphql.InputObjectFieldConfig{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The DynamoDB Parameter Field to Query",
 			},
-			"operation": &graphql.Field{
+			"operation": &graphql.InputObjectFieldConfig{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The DynamoDB Parameter Operation to Use",
 			},
-			"value": &graphql.Field{
+			"value": &graphql.InputObjectFieldConfig{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The DynamoDB Parameter Value to Use",
 			},
@@ -53,7 +55,8 @@ var (
 			Description: "The DynamoDB Table Index to Use",
 		},
 		"parameters": &graphql.ArgumentConfig{
-			Type:        graphql.NewList(DynaQueryParamType),
+			Type: graphql.NewList(DynaQueryParamInputType),
+			//Type:        graphql.NewList(graphql.String),
 			Description: "The DynamoDB Query Parameters to Use",
 		},
 		"region": &graphql.ArgumentConfig{
@@ -374,16 +377,29 @@ func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success in
 
 // Query Input Extensions and Helpers
 
+type dynaQueryParam struct {
+	Field     string
+	Operation string // IN, NULL, BETWEEN, LT, NOT_CONTAINS, EQ, GT, NOT_NULL, NE, LE, BEGINS_WITH, GE, CONTAINS
+	Value     interface{}
+}
+
+func asDynaQueryParamList(data []interface{}) (params []dynaQueryParam) {
+
+	for _, m := range data {
+		var param dynaQueryParam
+		mapstructure.Decode(m, &param)
+		params = append(params, param)
+	}
+
+	Debugf(nil, "QUERY PARAMS: %+v", params)
+
+	return
+}
+
 type QueryDsl struct {
 	dynamodb.QueryInput
 	Context   context.Context
 	ErrorList []string
-}
-
-type DynaQueryParam struct {
-	Field     string      `json:"field"`
-	Operation string      `json:"operation"`
-	Value     interface{} `json:"value"`
 }
 
 func DynaQueryDsl(ctx context.Context, table, index string) *QueryDsl {
@@ -427,7 +443,8 @@ func (qi *QueryDsl) with(field, operator string, value interface{}) *QueryDsl {
 	return qi
 }
 
-func (qi *QueryDsl) Build(params []DynaQueryParam) *QueryDsl {
+func (qi *QueryDsl) Build(data []interface{}) *QueryDsl {
+	params := asDynaQueryParamList(data)
 	for _, param := range params {
 		qi.with(
 			param.Field,

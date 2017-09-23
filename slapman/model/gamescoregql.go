@@ -3,14 +3,16 @@ package model
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
 	"slapman/utils"
 
 	"github.com/graphql-go/graphql"
 )
 
 var (
-	GameScoreScanType = graphql.NewObject(graphql.ObjectConfig{
-		Name: "GameScoreScan",
+	GameScoreListType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "GameScoreList",
 		Fields: graphql.Fields{
 			"table": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
@@ -54,19 +56,22 @@ var (
 	})
 
 	GameQueryFields = graphql.Field{
-		Type:        GameScoreScanType,
+		Type:        GameScoreListType,
 		Description: "The DynamoDB Table Query Items",
 		Args:        utils.DynaQueryArgs,
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
 			table, _ := p.Args["table"].(string)
 			index, _ := p.Args["index"].(string)
-			params, ok := p.Args["params"].([]utils.DynaQueryParam)
+			params, ok := p.Args["parameters"].([]interface{})
 			if !ok {
+				utils.Debugf(nil, "PARAMETERS TYPE: %+v", reflect.TypeOf(p.Args["parameters"]))
 				queryError := errors.New(fmt.Sprintf("Could not Execute the Query with the Provided Arguments: %+v", p.Args))
 				utils.Errorf(nil, "ERROR:::: %+v", queryError)
 				return nil, queryError
 			}
+
+			utils.Debugf(nil, "QUERY PARAMS: %+v", params)
 
 			queryInput, err := utils.DynaQueryDsl(p.Context, table, index).Build(params).AsInput()
 			if err != nil {
@@ -88,7 +93,7 @@ var (
 	}
 
 	GameScoreScanFields = graphql.Field{
-		Type:        GameScoreScanType,
+		Type:        GameScoreListType,
 		Description: "The DynamoDB Table Items",
 		Args: graphql.FieldConfigArgument{
 			"region": &graphql.ArgumentConfig{
