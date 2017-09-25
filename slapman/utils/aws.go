@@ -170,6 +170,87 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 	return rows, nil
 }
 
+// ////////// PAGES
+
+// https://www.google.com/search?q=golang+dynamodb+pagination&oq=golang+dynamodb+pagination&aqs=chrome.0.69i59.12933j0j7&sourceid=chrome&ie=UTF-8
+// https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/
+// http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
+// https://github.com/aws/aws-sdk-go/issues/58
+// https://github.com/aws/aws-sdk-go/blob/master/service/dynamodb/api.go
+// http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#FilteringResults
+// http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#Query.FilterExpression
+
+// // ScanPages: Scan DynamoDB Items
+// func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (interface{}, error) {
+
+// 	// Set the current context
+// 	ctx := p.Context
+// 	region, ok := p.Args["region"].(string)
+// 	if ok {
+// 		ctx = context.WithValue(ctx, regionKey, region)
+// 	}
+// 	limit, ok := p.Args["limit"].(string)
+// 	if ok {
+// 		ctx = context.WithValue(ctx, limitKey, limit)
+// 	}
+
+// 	rows, err := dynaScanPages(ctx, tableName)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	Debugf(nil, "Rows: %+v", rows)
+
+// 	return rows, nil
+// }
+
+// func dynaScanPages(ctx context.Context, tableName string) ([]map[string]interface{}, error) {
+
+// 	// Create the session that the DynamoDB service will use
+// 	sess := NewAwsSession(ctx)
+
+// 	// Create the DynamoDB service client to make the query request with.
+// 	svc := dynamodb.New(sess)
+
+// 	// Build the query input parameters
+// 	params := &dynamodb.ScanInput{
+// 		TableName: aws.String(tableName),
+// 	}
+
+// 	limit, ok := ctx.Value(limitKey).(int64)
+// 	if ok && limit > 0 {
+// 		params.Limit = aws.Int64(limit)
+// 	} else {
+// 		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
+// 		params.Limit = aws.Int64(defaultLimit)
+// 	}
+
+// 	Debugf(nil, "Params: %+v", params)
+
+// 	// Make the DynamoDB Query API call
+// 	result, err := svc.ScanWithContext(ctx, params)
+// 	if err != nil {
+// 		scanError := errors.New("Failed to make DynamoDB Query API call")
+// 		Errorf(nil, "ERROR:::: %+v", err)
+// 		return nil, scanError
+// 	}
+
+// 	Debugf(nil, "Result: %+v", result)
+
+// 	var rows []map[string]interface{}
+// 	// Unmarshal the Items field in the result value to the Item Go type.
+// 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &rows)
+// 	if err != nil {
+// 		unmarshalError := errors.New("Failed to unmarshal Query result items")
+// 		Errorf(nil, "ERROR:::: %+v", unmarshalError)
+// 		return nil, unmarshalError
+// 	}
+
+// 	Debugf(nil, "Rows: %+v", rows)
+
+// 	return rows, nil
+// }
+
 ///////////////////////////////////// PUTTING AWS DYNAMODB
 
 // PutItem: Put DynamoDB Items
