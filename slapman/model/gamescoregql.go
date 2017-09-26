@@ -18,8 +18,13 @@ var (
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The DynamoDB Table to Scan",
 			},
+			"count": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.Int),
+				Description: "The DynamoDB Table Rows Count",
+			},
 			"rows": &graphql.Field{
-				Type: graphql.NewList(GameScoreRowType),
+				Type:        graphql.NewList(GameScoreRowType),
+				Description: "The DynamoDB Table Rows",
 			},
 		},
 	})
@@ -78,15 +83,17 @@ var (
 				return nil, err
 			}
 
-			rows, err := utils.DynaResolveQuery(p, queryInput)
+			count, rows, err := utils.DynaResolveQuery(p, queryInput)
 			if err != nil {
 				return nil, err
 			}
 			return struct {
 				Table string      `json:"table"`
+				Count int         `json:"count"`
 				Rows  interface{} `json:"rows"`
 			}{
 				"GameScores",
+				count,
 				rows,
 			}, nil
 		},
@@ -104,15 +111,17 @@ var (
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			rows, err := utils.DynaResolveScanItems(p, "GameScores")
+			count, rows, err := utils.DynaResolveScanItems(p, "GameScores")
 			if err != nil {
 				return nil, err
 			}
 			return struct {
 				Table string      `json:"table"`
+				Count int         `json:"count"`
 				Rows  interface{} `json:"rows"`
 			}{
 				"GameScores",
+				count,
 				rows,
 			}, nil
 		},

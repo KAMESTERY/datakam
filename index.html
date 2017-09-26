@@ -135,8 +135,8 @@
         // This example expects a GraphQL server at the path /graphql.
         // Change this to point wherever you host your GraphQL server.
         return $.post({
-          url: 'https://gq8unuo8h0.execute-api.us-east-1.amazonaws.com/production/slapalicious',
-          //url: 'http://localhost:1112/api/graphql',
+          //url: 'https://gq8unuo8h0.execute-api.us-east-1.amazonaws.com/production/slapalicious',
+          url: 'http://localhost:1112/api/graphql',
           data: JSON.stringify(graphQLParams),
           contentType: 'application/json'
         }).done(function(response) {

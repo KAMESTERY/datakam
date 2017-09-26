@@ -100,7 +100,7 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 ///////////////////////////////////// SCANNING AWS DYNAMODB
 
 // ScanItems: Scan DynamoDB Items
-func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{}, error) {
+func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (int, interface{}, error) {
 
 	// Set the current context
 	ctx := p.Context
@@ -115,12 +115,14 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (interface{
 
 	rows, err := dynaScanItems(ctx, tableName)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	Debugf(nil, "Rows: %+v", rows)
+	count := len(rows)
 
-	return rows, nil
+	Debugf(nil, "%+v Rows: %+v", count, rows)
+
+	return count, rows, nil
 }
 
 func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interface{}, error) {
@@ -410,7 +412,7 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 ///////////////////////////////////// QUERYING AWS DYNAMODB
 
 // Query: Query DynamoDB
-func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (interface{}, error) {
+func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (int, interface{}, error) {
 
 	// Set the current context
 	ctx := p.Context
@@ -419,10 +421,17 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 		ctx = context.WithValue(ctx, regionKey, region)
 	}
 
-	return dynaQuery(ctx, queryInput)
+	rows, err := dynaQuery(ctx, queryInput)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	count := len(rows)
+
+	return count, rows, nil
 }
 
-func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success interface{}, err error) {
+func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []map[string]interface{}, err error) {
 
 	Debugf(nil, "Query Input: %+v", queryInput)
 
