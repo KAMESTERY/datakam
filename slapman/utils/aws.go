@@ -106,14 +106,7 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (int, inter
 
 	// Set the current context
 	ctx := p.Context
-	region, ok := p.Args["region"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, regionKey, region)
-	}
-	limit, ok := p.Args["limit"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, limitKey, limit)
-	}
+	ctx = context.WithValue(ctx, limitKey, p.Args["limit"])
 
 	rows, err := dynaScanItems(ctx, tableName)
 	if err != nil {
@@ -140,13 +133,12 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 		TableName: aws.String(tableName),
 	}
 
-	limit, err := ParseInt64(ctx.Value(limitKey))
-	if err != nil && limit > 0 {
-		params.Limit = aws.Int64(limit)
-	} else {
-		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
-		params.Limit = aws.Int64(defaultLimit)
+	limit, ok := ctx.Value(limitKey).(int)
+	if !ok || limit < 0 {
+		limit = defaultLimit
+		Warnf(nil, "WARNING:::: Using Default Limit of: %+v", defaultLimit)
 	}
+	params.Limit = aws.Int64(int64(limit))
 
 	Debugf(nil, "Params: %+v", params)
 
@@ -189,18 +181,8 @@ func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (int, inter
 
 	// Set the current context
 	ctx := p.Context
-	region, ok := p.Args["region"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, regionKey, region)
-	}
-	limit, ok := p.Args["limit"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, limitKey, limit)
-	}
-	pageNum, ok := p.Args["page"].(int)
-	if ok {
-		ctx = context.WithValue(ctx, pageKey, pageNum)
-	}
+	ctx = context.WithValue(ctx, limitKey, p.Args["limit"])
+	ctx = context.WithValue(ctx, pageKey, p.Args["page"])
 
 	rows, err := dynaScanPages(ctx, tableName)
 	if err != nil {
@@ -215,6 +197,8 @@ func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (int, inter
 
 func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]interface{}, err error) {
 
+	Debugf(nil, "PAGE SCAN CONTEXT: %+v", ctx)
+
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
 
@@ -226,13 +210,12 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 		TableName: aws.String(tableName),
 	}
 
-	limit, err := ParseInt64(ctx.Value(limitKey))
-	if err != nil && limit > 0 {
-		params.Limit = aws.Int64(limit)
-	} else {
+	limit, ok := ctx.Value(limitKey).(int)
+	if !ok || limit < 0 {
+		limit = defaultLimit
 		Warnf(nil, "WARNING:::: Using Default Limit of: %+v", defaultLimit)
-		params.Limit = aws.Int64(defaultLimit)
 	}
+	params.Limit = aws.Int64(int64(limit))
 
 	pageNum, ok := ctx.Value(pageKey).(int)
 	if !ok || pageNum < 0 {
@@ -286,10 +269,6 @@ func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interfac
 
 	// Set the current context
 	ctx := p.Context
-	region, ok := p.Args["region"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, regionKey, region)
-	}
 
 	return dynaPutItem(ctx, tableName, data)
 }
@@ -338,10 +317,6 @@ func DynaResolveUpdateItem(p graphql.ResolveParams, tableName string, keyData, d
 
 	// Set the current context
 	ctx := p.Context
-	region, ok := p.Args["region"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, regionKey, region)
-	}
 
 	return dynaUpdateItem(ctx, tableName, keyData, data)
 }
@@ -442,10 +417,6 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 
 	// Set the current context
 	ctx := p.Context
-	region, ok := p.Args["region"].(string)
-	if ok {
-		ctx = context.WithValue(ctx, regionKey, region)
-	}
 
 	rows, err := dynaQuery(ctx, queryInput)
 	if err != nil {
@@ -568,6 +539,11 @@ func (qi *QueryDsl) Build(data []interface{}) *QueryDsl {
 			param.Value,
 		)
 	}
+	return qi
+}
+
+func (qi *QueryDsl) WithLimit(limit int) *QueryDsl {
+	qi.QueryInput.Limit = aws.Int64(int64(limit))
 	return qi
 }
 

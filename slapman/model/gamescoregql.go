@@ -100,7 +100,15 @@ var (
 
 			utils.Debugf(nil, "QUERY PARAMS: %+v", params)
 
-			queryInput, err := utils.DynaQueryDsl(p.Context, table, index).Build(params).AsInput()
+			queryBuilder := utils.DynaQueryDsl(p.Context, table, index).Build(params)
+
+			limit, ok := p.Args["limit"].(int)
+			if ok && limit > 0 {
+				queryBuilder.WithLimit(limit)
+				utils.Debugf(nil, "Limiting Query Results Count to: %+v", limit)
+			}
+
+			queryInput, err := queryBuilder.AsInput()
 			if err != nil {
 				return nil, err
 			}
