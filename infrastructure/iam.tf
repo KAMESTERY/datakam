@@ -50,7 +50,8 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
         "dynamodb:ListStreams"
       ],
       "Resource": [
-        "${aws_dynamodb_table.game-scores-dynamodb-table.arn}"
+        "${aws_dynamodb_table.game-scores-dynamodb-table.arn}",
+        "${aws_dynamodb_table.game-scores-dynamodb-table.arn}/index/*"
       ],
       "Effect": "Allow",
       "Sid": ""
