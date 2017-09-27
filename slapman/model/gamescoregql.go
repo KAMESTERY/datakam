@@ -29,6 +29,28 @@ var (
 		},
 	})
 
+	GameScorePageListType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "GameScorePageList",
+		Fields: graphql.Fields{
+			"table": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Table to Scan",
+			},
+			"page": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.Int),
+				Description: "The DynamoDB Table Rows Count",
+			},
+			"count": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.Int),
+				Description: "The DynamoDB Table Rows Count",
+			},
+			"rows": &graphql.Field{
+				Type:        graphql.NewList(GameScoreRowType),
+				Description: "The DynamoDB Table Rows",
+			},
+		},
+	})
+
 	GameScoreRowType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScoreRow",
 		Fields: graphql.Fields{
@@ -112,6 +134,37 @@ var (
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			count, rows, err := utils.DynaResolveScanItems(p, "GameScores")
+			if err != nil {
+				return nil, err
+			}
+			return struct {
+				Table string      `json:"table"`
+				Count int         `json:"count"`
+				Rows  interface{} `json:"rows"`
+			}{
+				"GameScores",
+				count,
+				rows,
+			}, nil
+		},
+	}
+
+	GameScoreScanPagesFields = graphql.Field{
+		Type:        GameScorePageListType,
+		Description: "The DynamoDB Table Items",
+		Args: graphql.FieldConfigArgument{
+			"page": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"region": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"limit": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			count, rows, err := utils.DynaResolveScanPages(p, "GameScores")
 			if err != nil {
 				return nil, err
 			}

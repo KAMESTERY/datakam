@@ -19,11 +19,13 @@ import (
 )
 
 const (
-	defaultRegion = endpoints.UsEast1RegionID
-	defaultLimit  = 24
-	regionKey     = 16
-	limitKey      = 16
-	maxGoroutines = 20
+	defaultRegion  = endpoints.UsEast1RegionID
+	defaultLimit   = 24
+	defaultPageNum = 0
+	regionKey      = 16
+	limitKey       = 17
+	pageKey        = 18
+	maxGoroutines  = 20
 )
 
 var (
@@ -138,8 +140,8 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 		TableName: aws.String(tableName),
 	}
 
-	limit, ok := ctx.Value(limitKey).(int64)
-	if ok && limit > 0 {
+	limit, err := ParseInt64(ctx.Value(limitKey))
+	if err != nil && limit > 0 {
 		params.Limit = aws.Int64(limit)
 	} else {
 		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
@@ -182,31 +184,36 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 // http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#FilteringResults
 // http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#Query.FilterExpression
 
-// // ScanPages: Scan DynamoDB Items
-// func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (interface{}, error) {
+// ScanPages: Scan DynamoDB Items
+func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (int, interface{}, error) {
 
-// 	// Set the current context
-// 	ctx := p.Context
-// 	region, ok := p.Args["region"].(string)
-// 	if ok {
-// 		ctx = context.WithValue(ctx, regionKey, region)
-// 	}
-// 	limit, ok := p.Args["limit"].(string)
-// 	if ok {
-// 		ctx = context.WithValue(ctx, limitKey, limit)
-// 	}
+	// Set the current context
+	ctx := p.Context
+	region, ok := p.Args["region"].(string)
+	if ok {
+		ctx = context.WithValue(ctx, regionKey, region)
+	}
+	limit, ok := p.Args["limit"].(string)
+	if ok {
+		ctx = context.WithValue(ctx, limitKey, limit)
+	}
+	pageNum, ok := p.Args["page"].(int)
+	if ok {
+		ctx = context.WithValue(ctx, pageKey, pageNum)
+	}
 
-// 	rows, err := dynaScanPages(ctx, tableName)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	rows, err := dynaScanPages(ctx, tableName)
+	if err != nil {
+		return 0, nil, err
+	}
+	count := len(rows)
 
-// 	Debugf(nil, "Rows: %+v", rows)
+	Debugf(nil, "%+v Rows: %+v", count, rows)
 
-// 	return rows, nil
-// }
+	return count, rows, nil
+}
 
-func dynaScanPages(ctx context.Context, tableName string, pageNum int) (rows []map[string]interface{}, err error) {
+func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]interface{}, err error) {
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -219,35 +226,48 @@ func dynaScanPages(ctx context.Context, tableName string, pageNum int) (rows []m
 		TableName: aws.String(tableName),
 	}
 
-	limit, ok := ctx.Value(limitKey).(int64)
-	if ok && limit > 0 {
+	limit, err := ParseInt64(ctx.Value(limitKey))
+	if err != nil && limit > 0 {
 		params.Limit = aws.Int64(limit)
 	} else {
-		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
+		Warnf(nil, "WARNING:::: Using Default Limit of: %+v", defaultLimit)
 		params.Limit = aws.Int64(defaultLimit)
+	}
+
+	pageNum, ok := ctx.Value(pageKey).(int)
+	if !ok || pageNum < 0 {
+		pageNum = defaultPageNum
+		Warnf(nil, "WARNING:::: Retrieving Default Page #%+v", defaultPageNum)
 	}
 
 	Debugf(nil, "Params: %+v", params)
 
+	currentPage := 0
 	// Make the DynamoDB Query API call
 	err = svc.ScanPagesWithContext(
 		ctx,
 		params,
 		func(page *dynamodb.ScanOutput, lastPage bool) bool {
 
-			Debugf(nil, "Page #%+v Result: %+v", pageNum, page)
+			if currentPage == pageNum {
+				Debugf(nil, "Page #%+v Result: %+v", pageNum, page)
 
-			// Unmarshal the Items field in the result value to the Item Go type.
-			err = dynamodbattribute.UnmarshalListOfMaps(page.Items, &rows)
-			if err != nil {
-				err = errors.New("Failed to unmarshal Query result items")
-				Errorf(nil, "ERROR:::: %+v", err)
-				return true
+				// Unmarshal the Items field in the result value to the Item Go type.
+				err = dynamodbattribute.UnmarshalListOfMaps(page.Items, &rows)
+				if err != nil {
+					err = errors.New("Failed to unmarshal Query result items")
+					Errorf(nil, "ERROR:::: %+v", err)
+					return false // stop paging
+				}
+
+				Debugf(nil, "Page #%+v Rows: %+v", pageNum, rows)
+
+				return false // stop paging
 			}
 
-			Debugf(nil, "Page #%+v Rows: %+v", pageNum, rows)
+			currentPage++
 
-			return pageNum <= 3
+			return true // keep paging
 		},
 	)
 	if err != nil {
