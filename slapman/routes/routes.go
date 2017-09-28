@@ -54,7 +54,7 @@ func wrapCommonMiddlewares(routes *mux.Router, extras ...alice.Constructor) http
 		context.ClearHandler,
 		handlers.HTTPMethodOverrideHandler,
 		middleware.CustomHeaders,
-		middleware.ClientIP,
+		//middleware.ClientIP,
 		middleware.RequestCaching,
 		//middleware.RequestLogger(os.Stdout),
 		// middleware.WithDB,
