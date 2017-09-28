@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"net/http/fcgi"
 	"os"
-	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -69,23 +68,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-	utils.Infof(nil, "Version: %+v", Version)
-	utils.Infof(nil, "Git commit hash: %+v", Revision)
-	utils.Infof(nil, "OS: %s -- Architecture: %s", runtime.GOOS, runtime.GOARCH)
-
-	mode := os.Getenv("MODE")
-	if len(mode) == 0 {
-		mode = "prod"
-	} else {
-		mode = "dev"
-	}
-	os.Setenv("MODE", mode)
-	utils.Infof(nil, "Mode: %+v", mode)
-
-	// Adjust Go Routines
-	//	runtime.GOMAXPROCS(runtime.NumCPU())
-	runtime.GOMAXPROCS(runtime.NumCPU() * 5)
 
 	http.Handle("/", routes.SetupWeb())
 	http.Handle("/api/", routes.SetupAPI())

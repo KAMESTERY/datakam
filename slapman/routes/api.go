@@ -2,7 +2,6 @@ package routes
 
 import (
 	"slapman/services"
-	"slapman/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -62,6 +61,5 @@ func NewServicesRouter() *mux.Router {
 			router.HandleFunc(route.Pattern, route.HandlerFunc).Queries(route.Queries...).Methods(route.Method).Name(route.Name)
 		}
 	}
-	utils.Infof(nil, "Mux Entries %+v", router)
 	return router
 }

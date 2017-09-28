@@ -63,6 +63,5 @@ func PublicRoutes() *mux.Router {
 		}
 	}
 
-	utils.Infof(nil, "Mux Entries %+v", router)
 	return router
 }
