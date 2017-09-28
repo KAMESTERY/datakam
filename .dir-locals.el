@@ -10,5 +10,10 @@
          (eval . (setq pyhome "~/miniconda3/envs/SLAPENV"))
          (eval . (pythonic-activate pyhome))
          (eval . (setq hy-mode-inferior-lisp-command (concat pyhome "/bin/hy")))
+         ;; (eval . (setenv "GOPATH"
+         ;;                 (concat
+         ;;                  (getenv "GOPATH") ":"
+         ;;                  projectile-project-root "slapman/vendor:"
+         ;;                  projectile-project-root)))
          )))
 

@@ -85,6 +85,13 @@ worker-link:
 tools: worker-link
 	go get -u github.com/golang/dep/cmd/dep
 	go get -u github.com/mitchellh/gox
+	go get -u github.com/nsf/gocode
+	go get -u github.com/rogpeppe/godef
+	go get -u golang.org/x/tools/cmd/guru
+	go get -u golang.org/x/tools/cmd/gorename
+	go get -u golang.org/x/tools/cmd/goimports
+	go get -u github.com/alecthomas/gometalinter
+	gometalinter --install --update
 
 vendor-status: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep status
