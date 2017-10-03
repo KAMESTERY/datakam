@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/sts"]
-  revision = "6198197eabb9bb93346ae204d79ac2225e44cf05"
-  version = "v1.12.2"
+  revision = "8b344ddb7a49daf794928d1db484ad9a81499858"
+  version = "v1.12.3"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -151,16 +151,10 @@
   revision = "d0303fe809921458f417bcf828397a65db30a7e4"
 
 [[projects]]
-  name = "github.com/pelletier/go-buffruneio"
-  packages = ["."]
-  revision = "c37440a7cf42ac63b919c752ca73a85067e05992"
-  version = "v0.2.0"
-
-[[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "5ccdfb18c776b740aecaf085c4d9a2779199c279"
-  version = "v1.0.0"
+  revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -208,7 +202,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "e5f66de850af3302fbe378c8acded2b0fa55472c"
+  revision = "0dacccfbaabc71b872087c1719c5380d3e185173"
 
 [[projects]]
   branch = "master"
@@ -238,7 +232,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish","nacl/secretbox","pbkdf2","poly1305","salsa20/salsa"]
-  revision = "76eec36fa14229c4b25bb894c2d0e591527af429"
+  revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
   branch = "master"

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 
@@ -93,7 +92,7 @@ var (
 			params, ok := p.Args["parameters"].([]interface{})
 			if !ok {
 				utils.Debugf(nil, "PARAMETERS TYPE: %+v", reflect.TypeOf(p.Args["parameters"]))
-				queryError := errors.New(fmt.Sprintf("Could not Execute the Query with the Provided Arguments: %+v", p.Args))
+				queryError := fmt.Errorf("Could not Execute the Query with the Provided Arguments: %+v", p.Args)
 				utils.Errorf(nil, "ERROR:::: %+v", queryError)
 				return nil, queryError
 			}

@@ -70,7 +70,7 @@ var (
 	}
 )
 
-//NewAwsSession: Creates a new Session for an AWS Service
+//NewAwsSession creates a new Session for an AWS Service
 func NewAwsSession(ctx context.Context) (sess *session.Session) {
 
 	// Grab Region from Context
@@ -101,7 +101,7 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 
 ///////////////////////////////////// SCANNING AWS DYNAMODB
 
-// ScanItems: Scan DynamoDB Items
+// DynaResolveScanItems scans DynamoDB Items
 func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (int, interface{}, error) {
 
 	// Set the current context
@@ -176,7 +176,7 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 // http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#FilteringResults
 // http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html#Query.FilterExpression
 
-// ScanPages: Scan DynamoDB Items
+// DynaResolveScanPages scans DynamoDB Items
 func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (int, interface{}, error) {
 
 	// Set the current context
@@ -264,7 +264,7 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 
 ///////////////////////////////////// PUTTING AWS DYNAMODB
 
-// PutItem: Put DynamoDB Items
+// DynaResolvePutItem puts DynamoDB Items
 func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interface{}) (interface{}, error) {
 
 	// Set the current context
@@ -312,7 +312,7 @@ func dynaPutItem(ctx context.Context, tableName string, data interface{}) (succe
 
 ///////////////////////////////////// UPDATING AWS DYNAMODB
 
-// UpdateItem: Update DynamoDB Items
+// DynaResolveUpdateItem updates DynamoDB Items
 func DynaResolveUpdateItem(p graphql.ResolveParams, tableName string, keyData, data map[string]interface{}) (interface{}, error) {
 
 	// Set the current context
@@ -412,7 +412,7 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 
 ///////////////////////////////////// QUERYING AWS DYNAMODB
 
-// Query: Query DynamoDB
+// DynaResolveQuery queries DynamoDB
 func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (int, interface{}, error) {
 
 	// Set the current context
@@ -483,12 +483,16 @@ func asDynaQueryParamList(data []interface{}) (params []dynaQueryParam) {
 	return
 }
 
+// https://aws.amazon.com/blogs/developer/category/go/
+
+// QueryDsl builds Query Parameters for DynamoDB
 type QueryDsl struct {
 	dynamodb.QueryInput
 	Context   context.Context
 	ErrorList []string
 }
 
+// DynaQueryDsl instantiate a QueryDsl
 func DynaQueryDsl(ctx context.Context, table, index string) *QueryDsl {
 
 	qi := &QueryDsl{
@@ -530,6 +534,7 @@ func (qi *QueryDsl) with(field, operator string, value interface{}) *QueryDsl {
 	return qi
 }
 
+// Build builds a QueryDsl from the input data
 func (qi *QueryDsl) Build(data []interface{}) *QueryDsl {
 	params := asDynaQueryParamList(data)
 	for _, param := range params {
@@ -542,16 +547,18 @@ func (qi *QueryDsl) Build(data []interface{}) *QueryDsl {
 	return qi
 }
 
+// WithLimit sets the limit for the query being built
 func (qi *QueryDsl) WithLimit(limit int) *QueryDsl {
 	qi.QueryInput.Limit = aws.Int64(int64(limit))
 	return qi
 }
 
+// AsInput converts the QueryDsl into a QueryInput
 func (qi *QueryDsl) AsInput() (*dynamodb.QueryInput, error) {
 
 	if len(qi.ErrorList) > 0 {
 		errorMessages := strings.Join(qi.ErrorList, ",\n ")
-		dslError := errors.New(fmt.Sprintf("ERRORS:::: %+v", errorMessages))
+		dslError := fmt.Errorf("ERRORS:::: %+v", errorMessages)
 		Errorf(nil, "ERROR:::: QUERY DSL ERROR: %+v", dslError)
 		return nil, dslError
 	}
