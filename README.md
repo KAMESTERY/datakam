@@ -40,3 +40,4 @@ Native development with Nim and Rust
 * [Final Project: Building a Multithreaded Web Server](https://doc.rust-lang.org/book/second-edition/ch20-00-final-project-a-web-server.html)
 * [Rust and Rest](http://lucumr.pocoo.org/2016/7/10/rust-rest/)
 * [Conan Search for OpenSSL](https://www.conan.io/search?q=OpenSSL)
+* [Cobra is both a library for creating powerful modern CLI applications](go get -u github.com/spf13/cobra/cobra)
