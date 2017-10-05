@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/dynamodb","service/dynamodb/dynamodbattribute","service/sts"]
-  revision = "8b344ddb7a49daf794928d1db484ad9a81499858"
-  version = "v1.12.3"
+  revision = "0bac5578f9a18b467487ee2dda67fedb328e9452"
+  version = "v1.12.4"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -178,7 +178,7 @@
   branch = "master"
   name = "github.com/segmentio/ksuid"
   packages = ["."]
-  revision = "1c9d746aad27142a443654fba83c3b7578dbeba0"
+  revision = "f9908e88e41ba9449018974316c8aa7633d71af5"
 
 [[projects]]
   branch = "master"
@@ -190,7 +190,7 @@
   branch = "master"
   name = "github.com/spf13/afero"
   packages = [".","mem"]
-  revision = "ee1bd8ee15a1306d1f9201acc41ef39cd9f99a1b"
+  revision = "3de492c3cda9570c77bc1f495857bfbf4b760efd"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -202,7 +202,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "0dacccfbaabc71b872087c1719c5380d3e185173"
+  revision = "d5bde60e022436203e377c47806e001418c16af3"
 
 [[projects]]
   branch = "master"
@@ -238,7 +238,7 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","html","html/atom"]
-  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
+  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
 
 [[projects]]
   branch = "master"
