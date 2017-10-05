@@ -60,16 +60,16 @@ OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -linkmode "internal" -extldflags "-static"'
 
-build-worker: worker-link worker-fmt
+build-worker: worker-link go-fmt
 	cd $(GOPATH)/src/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
-prod-build-worker: worker-link worker-fmt
+prod-build-worker: worker-link go-fmt go-lint
 	cd $(GOPATH)/src/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
-test-worker: worker-link worker-fmt
+test-worker: worker-link go-fmt
 	cd $(GOPATH)/src/$(WORKER) && go test -v -cover ./...
 
 #LDFLAGS=-linkmode external -extldflags -static
@@ -105,8 +105,11 @@ vendor-update: worker-link
 vendor-init: worker-link
 	cd $(GOPATH)/src/$(WORKER); dep init
 
-worker-fmt:
+go-fmt:
 	gofmt -l -s -w $(BASEDIR)/$(WORKER)
+
+go-lint:
+	gometalinter --vendored-linters $(WORKER)
 
 # CLEAN
 

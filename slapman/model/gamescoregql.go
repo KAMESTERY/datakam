@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	// GameScoreListType represents a list of GameScores
 	GameScoreListType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScoreList",
 		Fields: graphql.Fields{

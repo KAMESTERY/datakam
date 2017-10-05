@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"slapman/cmd"
 )
@@ -17,15 +16,6 @@ func main() {
 	fmt.Printf("Version: %+v\n", Version)
 	fmt.Printf("Git commit hash: %+v\n", Revision)
 	fmt.Printf("OS: %s -- Architecture: %s\n", runtime.GOOS, runtime.GOARCH)
-
-	mode := os.Getenv("MODE")
-	if len(mode) == 0 {
-		mode = "prod"
-	} else {
-		mode = "dev"
-	}
-	os.Setenv("MODE", mode)
-	fmt.Printf("Mode: %+v\n", mode)
 
 	// Adjust Go Routines
 	//	runtime.GOMAXPROCS(runtime.NumCPU())

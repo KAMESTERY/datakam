@@ -33,27 +33,21 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Variables to identiy the build
-var (
-	Version  string
-	Revision string
-
-	// serveCmd represents the serve command
-	serveCmd = &cobra.Command{
-		Use:   "serve",
-		Short: "A brief description of your command",
-		Long: `A longer description that spans multiple lines and likely contains examples
+// serveCmd represents the serve command
+var serveCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("serve called")
-			serve()
-		},
-	}
-)
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("serve called")
+		serve()
+	},
+}
 
 // App Init
 func init() {
@@ -83,14 +77,23 @@ func init() {
 
 // Serve: Serve the Application on HTTP or FCGI
 func serve() {
-	errs := make(chan error)
+	stop := make(chan os.Signal)
+	signal.Notify(stop, utils.SIGINT, utils.SIGTERM)
 	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, utils.SIGINT, utils.SIGTERM)
-		errs <- fmt.Errorf("%s", <-c)
-	}()
 
-	go func() {
+		mode := os.Getenv("MODE")
+		if len(mode) == 0 {
+			mode = "prod"
+		} else {
+			mode = "dev"
+		}
+		err := os.Setenv("MODE", mode)
+		if err != nil {
+			utils.Errorf(nil, "ERROR:::: %+v", err)
+			return
+		}
+		fmt.Printf("Mode: %+v\n", mode)
+
 		if fcgi_enabled := os.Getenv("FCGI"); len(fcgi_enabled) == 0 {
 			port := os.Getenv("PORT")
 			if len(port) == 0 {
@@ -98,16 +101,24 @@ func serve() {
 			}
 			host := os.Getenv("HOST")
 			utils.Infof(nil, "Routes created, now serving on  %+v: %+v", host, port)
-			errs <- http.ListenAndServe(host+":"+port, nil)
+			err = http.ListenAndServe(host+":"+port, nil)
+			if err != nil {
+				utils.Errorf(nil, "ERROR:::: %+v", err)
+				return
+			}
 		} else {
 			utils.Infof(nil, "Serving on FCGI")
-			errs <- fcgi.Serve(nil, nil)
-			//		errs <- fcgi.Serve(nil, )
+			err = fcgi.Serve(nil, nil)
+			if err != nil {
+				utils.Errorf(nil, "ERROR:::: %+v", err)
+				return
+			}
 		}
 	}()
 
 	// Wait
-	utils.Errorf(nil, "%+v", <-errs)
+	<-stop
+	utils.Info(nil, "Shutdown")
 }
 
 // Got it from here: https://gist.github.com/hyg/9c4afcd91fe24316cbf0
