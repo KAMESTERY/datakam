@@ -56,6 +56,7 @@ deps-upgrade:
 # Golang
 
 WORKER=slapman
+PROJ_GOPATH = $(BASEDIR)/build
 OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -linkmode "internal" -extldflags "-static"'
@@ -80,6 +81,15 @@ test-worker: worker-link go-fmt
 worker-link:
 	rm -rf $(GOPATH)/src/$(WORKER)
 	ln -s $(BASEDIR)/$(WORKER) $(GOPATH)/src/
+
+vendor-link:
+	rm -rf $(PROJ_GOPATH)
+	mkdir -p $(PROJ_GOPATH)/src
+	for d in $(BASEDIR)/$(WORKER)/vendor/*; do echo "Linking $$d" && ln -fs $$d $(PROJ_GOPATH)/src/; done
+
+#ln -s $(BASEDIR)/$(WORKER)/vendor/* $(GOPATH)/src/
+
+#for d in $(BASEDIR)/$(WORKER)/vendor; do cd $$d && mkdir foo && cd ..; done
 
 # TOOLING
 tools: worker-link

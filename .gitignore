@@ -10,6 +10,7 @@ include
 lib
 lambda/worker/slapman
 slapman/vendor
+build
 
 # Java related
 pom.xml
