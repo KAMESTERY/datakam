@@ -29,6 +29,7 @@ var (
 		},
 	})
 
+	// GameScorePageListType represents a oaged list of GameScores
 	GameScorePageListType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScorePageList",
 		Fields: graphql.Fields{
@@ -51,6 +52,7 @@ var (
 		},
 	})
 
+	// GameScoreRowType represents a single row of the GameScore Table
 	GameScoreRowType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScoreRow",
 		Fields: graphql.Fields{
@@ -69,6 +71,7 @@ var (
 		},
 	})
 
+	// GameScoreUpdateType represents the Update response to a GameScores row
 	GameScoreUpdateType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScoreUpdate",
 		Fields: graphql.Fields{
