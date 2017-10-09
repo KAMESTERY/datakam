@@ -10,14 +10,16 @@ import (
 	jwtReq "github.com/dgrijalva/jwt-go/request"
 )
 
+var jwt_logger = utils.NewLogger("middlewarejwt")
+
 func pathContains(req *http.Request, chunks ...string) (match bool) {
 	for _, chunk := range chunks {
 		if match = strings.Contains(req.URL.String(), chunk); match {
-			utils.Debug(req, "Can Proceed without JWT")
+			jwt_logger.Debug("Can Proceed without JWT")
 			break
 		}
 	}
-	utils.Debug(req, "Cannot Proceed without JWT")
+	jwt_logger.Debug("Cannot Proceed without JWT")
 	return
 }
 
@@ -27,7 +29,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 
 		if !pathContains(req, "login", "register") {
 			// Validate the JWT Token
-			utils.Debug(req, "Validating JWT Token...")
+			jwt_logger.Debug("Validating JWT Token...")
 			extractor := jwtReq.MultiExtractor{
 				// jwtReq.HeaderExtractor{"Token"},
 				// jwtReq.ArgumentExtractor{"token"},
@@ -38,10 +40,10 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			})
 			if err == nil && token.Valid {
 				// Call the next middleware handler
-				utils.Debugf(req, "Valid Token: %+v", token)
+				jwt_logger.Debugf("Valid Token: %+v", token)
 				next.ServeHTTP(rw, req)
 			} else {
-				utils.Errorf(req, "Unauthorized Request: %+v", err)
+				jwt_logger.Errorf("Unauthorized Request: %+v", err)
 				rw.WriteHeader(http.StatusUnauthorized)
 				fmt.Fprint(rw, "Authentication failed")
 			}

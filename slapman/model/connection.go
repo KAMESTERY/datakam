@@ -1,15 +1,16 @@
 package model
 
 import (
-	"net/http"
 	"os"
 	"slapman/utils"
 
-	"github.com/gorilla/context"
 	"github.com/jinzhu/gorm"
 )
 
-var driverString, connString string
+var (
+	connection_logger        = utils.NewLogger("modelconnection")
+	driverString, connString string
+)
 
 func init() {
 	// Database Connection Strings
@@ -21,28 +22,15 @@ func init() {
 	}
 }
 
-//SetDbConn Sets the Database Connection in Http Context
-func SetDbConn(r *http.Request, dbConn *gorm.DB) {
-	context.Set(r, utils.DbCtxKey, dbConn)
-}
-
-//GetDbConn Gets the Database Connection from Http Context
-func GetDbConn(r *http.Request) (dbConn *gorm.DB) {
-	if dbConn, ok := context.GetOk(r, utils.DbCtxKey); ok {
-		return dbConn.(*gorm.DB)
-	}
-	return
-}
-
 //NewDBConn Creates a New Database
-func NewDBConn(r *http.Request) *gorm.DB {
-	utils.Debug(r, "Connecting to the Database")
+func NewDBConn() *gorm.DB {
+	connection_logger.Debug("Connecting to the Database")
 	db, err := gorm.Open(driverString, connString)
 	if err != nil {
-		utils.Errorf(r, "ERROR:::: %+v", err)
+		connection_logger.Errorf("ERROR:::: %+v", err)
 		panic("failed to connect database")
 	}
-	utils.Debugf(r, "Database Connection: %+v", db)
+	connection_logger.Debugf("Database Connection: %+v", db)
 	db.LogMode(true)
 	return db
 }

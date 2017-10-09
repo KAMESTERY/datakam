@@ -14,6 +14,8 @@ type jwtAuthErrors struct {
 	Status string
 }
 
+var jwt_logger = utils.NewLogger("servicesjwt")
+
 // RegisterHandler registers a new user
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -26,24 +28,24 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Debugf(r, "Posted New User: %+v", &newUser)
+	jwt_logger.Debugf("Posted New User: %+v", &newUser)
 
 	// verify new user credentials
 	if !newUser.Ok() {
-		utils.Errorf(r, "BAD CREDS:::: %+v", newUser)
+		jwt_logger.Errorf("BAD CREDS:::: %+v", newUser)
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Invalid User Credentials Provided"}, http.StatusConflict)
 		return
 	}
 
 	// validate new user information
-	if userExists := newUser.FindUser(r); userExists != nil {
-		utils.Errorf(r, "ALREADY EXISTS:::: %+v", newUser)
+	if userExists := newUser.FindUser(); userExists != nil {
+		jwt_logger.Errorf("ALREADY EXISTS:::: %+v", newUser)
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"User already Exists"}, http.StatusConflict)
 		return
 	}
 
 	// Create New User Here
-	if newUser.Save(r) {
+	if newUser.Save() {
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"New User Successfully Created"}, http.StatusCreated)
 	} else {
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Could Not Create New User"}, http.StatusInternalServerError)
@@ -53,31 +55,31 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // LoginHandler reads the login credentials, checks them and creates the JWT token
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
-	utils.Debug(r, "Logging in...")
+	jwt_logger.Debug("Logging in...")
 
 	var userInfo model.User
 
-	utils.Debugf(r, "Request Body: %+v", r.Body)
+	jwt_logger.Debugf("Request Body: %+v", r.Body)
 
 	// decode into User struct
 	err := json.NewDecoder(r.Body).Decode(&userInfo)
 	if err != nil {
-		utils.Errorf(r, "ERROR:::: %+v", err)
+		jwt_logger.Errorf("ERROR:::: %+v", err)
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Error in request body"}, http.StatusInternalServerError)
 		return
 	}
 
 	if !userInfo.Ok() {
-		utils.Errorf(r, "INVALID USER:::: %+v", userInfo)
+		jwt_logger.Errorf("INVALID USER:::: %+v", userInfo)
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Invalid User Info"}, http.StatusBadRequest)
 		return
 	}
 
-	utils.Debugf(r, "Posted User Info: %+v", userInfo)
+	jwt_logger.Debugf("Posted User Info: %+v", userInfo)
 
 	// validate user credentials
-	if userRef := userInfo.Verify(r); userRef != nil {
-		utils.Debugf(r, "Logging in User: %+v", userRef)
+	if userRef := userInfo.Verify(); userRef != nil {
+		jwt_logger.Debugf("Logging in User: %+v", userRef)
 
 		// create a signer for rsa 256 and claim c
 		c := struct {
@@ -92,10 +94,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		t := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
 
-		utils.Debugf(r, "Sign Key: %+v", utils.SignKey)
+		jwt_logger.Debugf("Sign Key: %+v", utils.SignKey)
 		tokenString, err := t.SignedString(utils.SignKey)
 		if err != nil {
-			utils.Errorf(r, "Token Signing error: %+v\n", err)
+			jwt_logger.Errorf("Token Signing error: %+v\n", err)
 			utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Sorry, error while Signing Token!"}, http.StatusInternalServerError)
 			return
 		}

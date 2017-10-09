@@ -1,12 +1,14 @@
 package model
 
 import (
-	"net/http"
 	"slapman/utils"
 	kscrypto "slapman/utils/crypto"
 )
 
-var userTblsMap = make(map[string]string)
+var (
+	user_logger = utils.NewLogger("modeluser")
+	userTblsMap = make(map[string]string)
+)
 
 // UserRef struct to be used for JWT Bearer Token
 type UserRef struct {
@@ -18,7 +20,7 @@ type UserRef struct {
 // GetUserTable Get actual User Table from Domain
 func (uref *UserRef) GetUserTable() (userTable string) {
 	userTable = userTblsMap[uref.Domain]
-	utils.Debugf(nil, "Retrieved User Table: %s from %+v with Domain: %s", userTable, userTblsMap, uref.Domain)
+	user_logger.Debugf("Retrieved User Table: %s from %+v with Domain: %s", userTable, userTblsMap, uref.Domain)
 	return
 }
 
@@ -32,7 +34,7 @@ type User struct {
 }
 
 // Save Persists New User to the Database
-func (user *User) Save(r *http.Request) (ok bool) {
+func (user *User) Save() (ok bool) {
 	if cryptedPassBytes, err := kscrypto.HashPassword([]byte(user.Password)); err == nil {
 		cryptedPass := string(cryptedPassBytes)
 		newUser := &User{
@@ -46,12 +48,12 @@ func (user *User) Save(r *http.Request) (ok bool) {
 			user.Active,
 			user.LastLogin,
 		}
-		db := NewDBConn(r)
+		db := NewDBConn()
 		defer db.Close()
 		db.Table(newUser.GetUserTable()).Save(newUser)
 		ok = true
 	} else {
-		utils.Errorf(r, "ERROR:::: %+v", err)
+		user_logger.Errorf("ERROR:::: %+v", err)
 	}
 	return
 }
@@ -66,27 +68,27 @@ func (user *User) Ok() (ok bool) {
 }
 
 // FindUser Finds an existing User in the Database
-func (user *User) FindUser(r *http.Request) (userFound *User) {
+func (user *User) FindUser() (userFound *User) {
 	userFound = &User{}
-	db := NewDBConn(r)
+	db := NewDBConn()
 	defer db.Close()
 	db.Table(user.GetUserTable()).Where(user).First(userFound)
 	return
 }
 
 // Verify Verifies User for Authentication
-func (user *User) Verify(r *http.Request) (userRef *UserRef) {
+func (user *User) Verify() (userRef *UserRef) {
 	if !user.Ok() {
-		utils.Errorf(r, "BAD USER CREDENTIALS:::: %+v", user)
+		user_logger.Errorf("BAD USER CREDENTIALS:::: %+v", user)
 	}
 
 	// validate user credentials
-	if userFound := user.FindUser(r); userFound.Ok() {
+	if userFound := user.FindUser(); userFound.Ok() {
 		if cryptedPassBytes, err := kscrypto.HashPassword([]byte(user.Password)); err != nil {
-			utils.Errorf(r, "ERROR:::: %+v", err)
+			user_logger.Errorf("ERROR:::: %+v", err)
 		} else {
 			if err := kscrypto.CheckPasswordHash([]byte(userFound.Password), cryptedPassBytes); err != nil {
-				utils.Errorf(r, "ERROR:::: %+v", err)
+				user_logger.Errorf("ERROR:::: %+v", err)
 			} else {
 				userRef = userFound.GetRef()
 			}

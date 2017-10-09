@@ -24,8 +24,9 @@ const (
 )
 
 var (
-	contentType = http.CanonicalHeaderKey("Content-Type")
-	gopaths     []string
+	recovery_logger = utils.NewLogger("middlewarerecovery")
+	contentType     = http.CanonicalHeaderKey("Content-Type")
+	gopaths         []string
 )
 
 type jsonError struct {
@@ -94,7 +95,7 @@ func RecoveryNew(h http.Handler) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				frames := stack.Callers(3)
-				utils.Errorf(r, fmt.Sprintf(logFmt, "PANIC", err, frames.String()))
+				recovery_logger.Errorf(fmt.Sprintf(logFmt, "PANIC", err, frames.String()))
 
 				w.WriteHeader(http.StatusInternalServerError)
 

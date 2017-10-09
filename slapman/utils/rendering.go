@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+var rendering_logger = NewLogger("utilsrendering")
+
 // Rendering START
 
 func RenderCsv(lst []string) string {
@@ -22,7 +24,7 @@ func RenderCsv(lst []string) string {
 func RenderJsonString(data interface{}) (jsonString string) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
-		Errorf(nil, "ERROR:::: %+v", err.Error())
+		rendering_logger.Errorf("ERROR:::: %+v", err.Error())
 	}
 	jsonString = string(jsonBytes)
 	return
@@ -38,7 +40,7 @@ func RenderJSONWithCode(w http.ResponseWriter, r *http.Request, data interface{}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	defer w.WriteHeader(code)
 	if err := EncodeJson(w, data); err != nil {
-		Errorf(r, "ERROR:::: %+v", err.Error())
+		rendering_logger.Errorf("ERROR:::: %+v", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

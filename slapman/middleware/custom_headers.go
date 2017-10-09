@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	cacheSince = time.Now().Format(http.TimeFormat)
-	cacheUntil = time.Now().AddDate(60, 0, 0).Format(http.TimeFormat)
+	headers_logger = utils.NewLogger("middlewareheaders")
+	cacheSince     = time.Now().Format(http.TimeFormat)
+	cacheUntil     = time.Now().AddDate(60, 0, 0).Format(http.TimeFormat)
 )
 
 // CustomHeaders Sets Common Custom Headers
@@ -36,7 +37,7 @@ func CustomHeaders(next http.Handler) http.Handler {
 		// Etag Header
 		etagHasher := md5.New()
 		keyBase := fmt.Sprintf("slapman-%s-%s", req.Method, req.URL.String())
-		utils.Debugf(req, "Path: %s", keyBase)
+		headers_logger.Debugf("Path: %s", keyBase)
 		io.WriteString(etagHasher, keyBase)
 		key := hex.EncodeToString(etagHasher.Sum(nil))
 		e := `"` + key + `"`

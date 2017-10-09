@@ -9,29 +9,31 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"slapman/model"
+	"slapman/resolvers"
 	"slapman/utils"
 )
 
 var (
+	graphql_logger = utils.NewLogger("servicesgraphql")
+
 	schema graphql.Schema
 	err    error
 
 	// Schema
 
 	queryFields = graphql.Fields{
-		"hello":              &model.HelloFields,
-		"weather":            &model.WeatherFields,
-		"serverip":           &model.ServerIPFields,
-		"gameScoreScan":      &model.GameScoreScanFields,
-		"gameScoreScanPages": &model.GameScoreScanPagesFields,
-		"gameScoreQuery":     &model.GameQueryFields,
+		"hello":              &resolvers.HelloFields,
+		"weather":            &resolvers.WeatherFields,
+		"serverip":           &resolvers.ServerIPFields,
+		"gameScoreScan":      &resolvers.GameScoreScanFields,
+		"gameScoreScanPages": &resolvers.GameScoreScanPagesFields,
+		"gameScoreQuery":     &resolvers.GameQueryFields,
 	}
 	rootQuery = graphql.ObjectConfig{Name: "RootQuery", Fields: queryFields}
 
 	mutationFields = graphql.Fields{
-		"gameScorePut":    &model.GameScorePutFields,
-		"gameScoreUpdate": &model.GameScoreUpdateFields,
+		"gameScorePut":    &resolvers.GameScorePutFields,
+		"gameScoreUpdate": &resolvers.GameScoreUpdateFields,
 	}
 	rootMutation = graphql.ObjectConfig{Name: "RootMutation", Fields: mutationFields}
 
@@ -44,7 +46,7 @@ var (
 func init() {
 	schema, err = graphql.NewSchema(schemaConfig)
 	if err != nil {
-		utils.Fatalf(nil, "failed to create new schema, error: %v", err)
+		graphql_logger.Fatalf("failed to create new schema, error: %v", err)
 	}
 }
 
@@ -58,19 +60,19 @@ func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, q
 		}
 		response := graphql.Do(params)
 		if len(response.Errors) > 0 {
-			utils.Fatalf(nil, "failed to execute graphql operation, errors: %+v", response.Errors)
+			graphql_logger.Fatalf("failed to execute graphql operation, errors: %+v", response.Errors)
 			respChan <- response.Errors
 		} else {
-			utils.Debugf(r, "%s \n", response)
+			graphql_logger.Debugf("%s \n", response)
 			respChan <- response
 		}
 	}()
 	select {
 	case resp := <-respChan:
-		utils.Debugf(r, "%s \n", resp)
+		graphql_logger.Debugf("%s \n", resp)
 		utils.RenderJSON(w, r, resp)
 	case <-ctx.Done():
-		utils.Fatalf(nil, "ERROR:::: %+v", ctx.Err())
+		graphql_logger.Fatalf("ERROR:::: %+v", ctx.Err())
 		utils.RenderJSONWithCode(w, r, ctx.Err(), http.StatusInternalServerError)
 	}
 }
@@ -89,7 +91,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 		query := mux.Vars(r)["query"]
 		//query := r.URL.Query().Get("query")
 
-		utils.Debugf(r, "Query: %+v", query)
+		graphql_logger.Debugf("Query: %+v", query)
 
 		// CORS Headers
 		utils.CorsHeaders(w)
@@ -110,14 +112,14 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		utils.Debugf(r, "Query: %+v", gqlReq.Query)
+		graphql_logger.Debugf("Query: %+v", gqlReq.Query)
 
 		executeQuery(ctx, w, r, gqlReq.Query)
 	default:
 		warnStruct := struct {
 			Msg string
 		}{"Bad Request"}
-		utils.Warnf(r, "ERROR:::: %+v", warnStruct)
+		graphql_logger.Warnf("ERROR:::: %+v", warnStruct)
 		utils.RenderJSONWithCode(w, r, warnStruct, http.StatusBadRequest)
 	}
 }

@@ -1,11 +1,14 @@
-package model
+package resolvers
 
 import (
+	"slapman/utils"
+
 	"github.com/graphql-go/graphql"
 )
 
 var (
-	HelloFields = graphql.Field{
+	hello_logger = utils.NewLogger("resolvershello")
+	HelloFields  = graphql.Field{
 		Type:        graphql.String,
 		Description: "Greeting or Salutation",
 		Resolve:     Greet,
@@ -13,5 +16,6 @@ var (
 )
 
 func Greet(p graphql.ResolveParams) (interface{}, error) {
+	hello_logger.Debugf("Greeting %+v", p)
 	return "world", nil
 }

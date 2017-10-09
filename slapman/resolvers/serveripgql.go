@@ -1,12 +1,14 @@
-package model
+package resolvers
 
 import (
-	"github.com/graphql-go/graphql"
 	"slapman/utils"
+
+	"github.com/graphql-go/graphql"
 )
 
 var (
-	ServerIPFields = graphql.Field{
+	serverip_logger = utils.NewLogger("resolversserverip")
+	ServerIPFields  = graphql.Field{
 		Type:        graphql.String,
 		Description: "The Current IP of the Lambda Function",
 		Resolve:     GetServerIP,
@@ -29,6 +31,6 @@ func GetServerIP(p graphql.ResolveParams) (interface{}, error) {
 		return nil, err
 	}
 
-	utils.Debugf(nil, "Response: %+v\n", response)
+	serverip_logger.Debugf("Response: %+v\n", response)
 	return response.Ip, nil
 }

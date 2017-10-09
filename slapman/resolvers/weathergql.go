@@ -1,4 +1,4 @@
-package model
+package resolvers
 
 import (
 	"github.com/graphql-go/graphql"
@@ -17,6 +17,7 @@ type Weather struct {
 }
 
 var (
+	weather_logger = utils.NewLogger("resolversweather")
 	// define custom GraphQL ObjectType `weatherType` for our Golang struct `weatherStruct`
 	// Note that
 	// - the fields in our weatherType maps with the json tags for the fields in our struct
@@ -80,7 +81,7 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 	locationQuery, isOk := params.Args["location"].(string)
 
 	if isOk {
-		utils.Debugf(nil, "Is OK: %+v\n", isOk)
+		weather_logger.Debugf("Is OK: %+v\n", isOk)
 	}
 
 	var response struct {
@@ -111,7 +112,7 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 		return nil, err
 	}
 
-	utils.Debugf(nil, "Response: %+v\n", response)
+	weather_logger.Debugf("Response: %+v\n", response)
 
 	weather := Weather{
 		Location:    locationQuery,
@@ -123,7 +124,7 @@ func FetchWeather(params graphql.ResolveParams) (interface{}, error) {
 		Deg:         response.Wind.Deg,
 	}
 
-	utils.Debugf(nil, "Weather: %+v\n", weather)
+	weather_logger.Debugf("Weather: %+v\n", weather)
 
 	// return the new Weather object that we supposedly save to DB
 	// Note here that

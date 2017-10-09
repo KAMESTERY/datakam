@@ -15,8 +15,9 @@ const (
 
 // verify key and sign key
 var (
-	SignKey   *rsa.PrivateKey
-	VerifyKey *rsa.PublicKey
+	SignKey     *rsa.PrivateKey
+	VerifyKey   *rsa.PublicKey
+	keys_logger = NewLogger("utilskeys")
 )
 
 // read the key files before starting http handlers
@@ -25,23 +26,23 @@ func init() {
 
 	signBytes, err := ioutil.ReadFile(privKeyPath)
 	if err != nil {
-		Fatalf(nil, "Error reading private key %+v", err)
+		keys_logger.Fatalf("Error reading private key %+v", err)
 		return
 	}
 	SignKey, err = jwt.ParseRSAPrivateKeyFromPEM(signBytes)
 	if err != nil {
-		Fatalf(nil, "Error parsing private key bytes %+v", err)
+		keys_logger.Fatalf("Error parsing private key bytes %+v", err)
 		return
 	}
 
 	verifyBytes, err := ioutil.ReadFile(pubKeyPath)
 	if err != nil {
-		Fatalf(nil, "Error reading public key %+v", err)
+		keys_logger.Fatalf("Error reading public key %+v", err)
 		return
 	}
 	VerifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
-		Fatalf(nil, "Error parsing public key bytes %+v", err)
+		keys_logger.Fatalf("Error parsing public key bytes %+v", err)
 		return
 	}
 }

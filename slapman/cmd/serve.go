@@ -33,21 +33,25 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// serveCmd represents the serve command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
+var (
+	serve_logger = utils.NewLogger("cmdserve")
+
+	// serveCmd represents the serve command
+	serveCmd = &cobra.Command{
+		Use:   "serve",
+		Short: "A brief description of your command",
+		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
-		serve()
-	},
-}
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("serve called")
+			serve()
+		},
+	}
+)
 
 // App Init
 func init() {
@@ -89,7 +93,7 @@ func serve() {
 		}
 		err := os.Setenv("MODE", mode)
 		if err != nil {
-			utils.Errorf(nil, "ERROR:::: %+v", err)
+			serve_logger.Errorf("ERROR:::: %+v", err)
 			return
 		}
 		fmt.Printf("Mode: %+v\n", mode)
@@ -100,17 +104,17 @@ func serve() {
 				port = "1112"
 			}
 			host := os.Getenv("HOST")
-			utils.Infof(nil, "Routes created, now serving on  %+v: %+v", host, port)
+			serve_logger.Infof("Routes created, now serving on  %+v: %+v", host, port)
 			err = http.ListenAndServe(host+":"+port, nil)
 			if err != nil {
-				utils.Errorf(nil, "ERROR:::: %+v", err)
+				serve_logger.Errorf("ERROR:::: %+v", err)
 				return
 			}
 		} else {
-			utils.Infof(nil, "Serving on FCGI")
+			serve_logger.Infof("Serving on FCGI")
 			err = fcgi.Serve(nil, nil)
 			if err != nil {
-				utils.Errorf(nil, "ERROR:::: %+v", err)
+				serve_logger.Errorf("ERROR:::: %+v", err)
 				return
 			}
 		}
@@ -118,7 +122,7 @@ func serve() {
 
 	// Wait
 	<-stop
-	utils.Info(nil, "Shutdown")
+	serve_logger.Info("Shutdown")
 }
 
 // Got it from here: https://gist.github.com/hyg/9c4afcd91fe24316cbf0

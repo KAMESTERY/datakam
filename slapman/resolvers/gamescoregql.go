@@ -1,4 +1,4 @@
-package model
+package resolvers
 
 import (
 	"fmt"
@@ -10,6 +10,8 @@ import (
 )
 
 var (
+	gamescore_logger = utils.NewLogger("resolversgamescores")
+
 	// GameScoreListType represents a list of GameScores
 	GameScoreListType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "GameScoreList",
@@ -85,6 +87,7 @@ var (
 		},
 	})
 
+	// GameQueryFields represents the parameters and the resolver function for a GraphQL DynamoDB Query
 	GameQueryFields = graphql.Field{
 		Type:        GameScoreListType,
 		Description: "The DynamoDB Table Query Items",
@@ -95,20 +98,20 @@ var (
 			index, _ := p.Args["index"].(string)
 			params, ok := p.Args["parameters"].([]interface{})
 			if !ok {
-				utils.Debugf(nil, "PARAMETERS TYPE: %+v", reflect.TypeOf(p.Args["parameters"]))
+				gamescore_logger.Debugf("PARAMETERS TYPE: %+v", reflect.TypeOf(p.Args["parameters"]))
 				queryError := fmt.Errorf("Could not Execute the Query with the Provided Arguments: %+v", p.Args)
-				utils.Errorf(nil, "ERROR:::: %+v", queryError)
+				gamescore_logger.Errorf("ERROR:::: %+v", queryError)
 				return nil, queryError
 			}
 
-			utils.Debugf(nil, "QUERY PARAMS: %+v", params)
+			gamescore_logger.Debugf("QUERY PARAMS: %+v", params)
 
 			queryBuilder := utils.DynaQueryDsl(p.Context, table, index).Build(params)
 
 			limit, ok := p.Args["limit"].(int)
 			if ok && limit > 0 {
 				queryBuilder.WithLimit(limit)
-				utils.Debugf(nil, "Limiting Query Results Count to: %+v", limit)
+				gamescore_logger.Debugf("Limiting Query Results Count to: %+v", limit)
 			}
 
 			queryInput, err := queryBuilder.AsInput()
@@ -132,6 +135,7 @@ var (
 		},
 	}
 
+	// GameScoreScanFields represents the parameters and the resolver function for a GraphQL DynamoDB Scan
 	GameScoreScanFields = graphql.Field{
 		Type:        GameScoreListType,
 		Description: "The DynamoDB Table Items",
@@ -160,6 +164,7 @@ var (
 		},
 	}
 
+	// GameScoreScanPagesFields represents the parameters and the resolver function for a GraphQL DynamoDB Scan Pages
 	GameScoreScanPagesFields = graphql.Field{
 		Type:        GameScorePageListType,
 		Description: "The DynamoDB Table Items",
@@ -191,6 +196,7 @@ var (
 		},
 	}
 
+	// GameScorePutFields represents the parameters and the resolver function for a GraphQL DynamoDB Put
 	GameScorePutFields = graphql.Field{
 		Type:        graphql.String,
 		Description: "The DynamoDB Table Items",
@@ -207,7 +213,7 @@ var (
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
-			utils.Debugf(nil, "Put Args: %+v", p.Args)
+			gamescore_logger.Debugf("Put Args: %+v", p.Args)
 
 			gameScore := struct {
 				UserId    string `json:"UserId"`
@@ -220,12 +226,12 @@ var (
 				userId = utils.GenerateUUID()
 			}
 			gameScore.UserId = userId
-			utils.Debugf(nil, "Putting GameScore using UserId: %+v", userId)
+			gamescore_logger.Debugf("Putting GameScore using UserId: %+v", userId)
 
 			gameTitle, ok := p.Args["gameTitle"].(string)
 			if ok {
 				gameScore.GameTitle = gameTitle
-				utils.Debugf(nil, "Putting GameScore using GameTitle: %+v", gameTitle)
+				gamescore_logger.Debugf("Putting GameScore using GameTitle: %+v", gameTitle)
 			}
 
 			topScore, err := utils.ParseInt64(p.Args["topScore"])
@@ -233,12 +239,13 @@ var (
 				return nil, err
 			}
 			gameScore.TopScore = topScore
-			utils.Debugf(nil, "Putting GameScore using TopScore: %+v", topScore)
+			gamescore_logger.Debugf("Putting GameScore using TopScore: %+v", topScore)
 
 			return utils.DynaResolvePutItem(p, "GameScores", gameScore)
 		},
 	}
 
+	// GameScoreUpdateFields represents the parameters and the resolver function for a GraphQL DynamoDB Update
 	GameScoreUpdateFields = graphql.Field{
 		Type:        GameScoreUpdateType,
 		Description: "The DynamoDB Table Items",
@@ -255,25 +262,25 @@ var (
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
-			utils.Debugf(nil, "Put Args: %+v", p.Args)
+			gamescore_logger.Debugf("Put Args: %+v", p.Args)
 
 			keyData := make(map[string]interface{})
 			data := make(map[string]interface{})
 
 			if userId, ok := p.Args["userId"].(string); ok {
 				keyData["UserId"] = userId
-				utils.Debugf(nil, "Updating GameScore with UserId: %+v", userId)
+				gamescore_logger.Debugf("Updating GameScore with UserId: %+v", userId)
 			}
 
 			if gameTitle, ok := p.Args["gameTitle"].(string); ok {
 				keyData["GameTitle"] = gameTitle
-				utils.Debugf(nil, "Updating GameScore with GameTitle: %+v", gameTitle)
+				gamescore_logger.Debugf("Updating GameScore with GameTitle: %+v", gameTitle)
 			}
 
 			topScore, err := utils.ParseInt64(p.Args["topScore"])
 			if err == nil { // There has to be a topScore
 				data["TopScore"] = topScore
-				utils.Debugf(nil, "Updating GameScore with TopScore: %+v", topScore)
+				gamescore_logger.Debugf("Updating GameScore with TopScore: %+v", topScore)
 			}
 
 			updatedItem, err := utils.DynaResolveUpdateItem(p, "GameScores", keyData, data)

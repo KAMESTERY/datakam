@@ -2,8 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"html/template"
-	"net/http"
 	"net/smtp"
 	"strconv"
 )
@@ -33,53 +33,71 @@ Sincerely,
 &#123;&#123;.From&#125;&#125;
 `
 
-func SendEmail(r *http.Request) (string, error) {
+var mail_logger = NewLogger("utilsmail")
 
-	emailUser := &EmailUser{"username", "password", "smtp.gmail.com", 587}
-	// emailUser := &EmailUser{"outcastgeek", "SuperPolyglot2012", "smtp.gmail.com", 465}
-	// emailUser := &EmailUser{"outcastgeek", "SuperPolyglot2012", "smtp.gmail.com", 25}
+func SendEmail(ctx context.Context) (string, error) {
 
-	auth := smtp.PlainAuth("",
-		emailUser.Username,
-		emailUser.Password,
-		emailUser.EmailServer,
-	)
+	respChan := make(chan string, 1)
+	errChan := make(chan error, 1)
 
-	var (
-		err error
-		doc bytes.Buffer
-	)
+	go func() {
+		emailUser := &EmailUser{"username", "password", "smtp.gmail.com", 587}
+		// emailUser := &EmailUser{"outcastgeek", "SuperPolyglot2012", "smtp.gmail.com", 465}
+		// emailUser := &EmailUser{"outcastgeek", "SuperPolyglot2012", "smtp.gmail.com", 25}
 
-	context := &SmtpTemplateData{
-		"SmtpEmailSender",
-		"outcastgeek+golang@gmail.com",
-		"This is the e-mail subject line!",
-		"Hello, this is a test e-mail body.",
-	}
+		auth := smtp.PlainAuth("",
+			emailUser.Username,
+			emailUser.Password,
+			emailUser.EmailServer,
+		)
 
-	t := template.New("emailTemplate")
-	t, err = t.Parse(emailTemplate)
-	if err != nil {
-		Error(r, "error trying to parse mail template", err)
+		var (
+			err error
+			doc bytes.Buffer
+		)
+
+		context := &SmtpTemplateData{
+			"SmtpEmailSender",
+			"outcastgeek+golang@gmail.com",
+			"This is the e-mail subject line!",
+			"Hello, this is a test e-mail body.",
+		}
+
+		t := template.New("emailTemplate")
+		t, err = t.Parse(emailTemplate)
+		if err != nil {
+			mail_logger.Error("error trying to parse mail template", err)
+			errChan <- err
+		}
+
+		err = t.Execute(&doc, context)
+		if err != nil {
+			mail_logger.Error("error trying to execute mail template", err)
+			errChan <- err
+		}
+
+		err = smtp.SendMail(
+			emailUser.EmailServer+":"+strconv.Itoa(emailUser.Port), // in our case, "smtp.google.com:587"
+			auth,
+			emailUser.Username,
+			[]string{"outcastgeek@gmail.com"},
+			doc.Bytes(),
+		)
+		if err != nil {
+			mail_logger.Error("ERROR: attempting to send a mail ", err)
+			errChan <- err
+		}
+		respChan <- "Email Sent!"
+	}()
+
+	select {
+	case resp := <-respChan:
+		return resp, nil
+	case err := <-errChan:
+		httputils_logger.Errorf("ERROR:::: %+v", err.Error())
 		return "", err
+	case <-ctx.Done():
+		httputils_logger.Errorf("ERROR:::: %+v", ctx.Err())
+		return "", ctx.Err()
 	}
-
-	err = t.Execute(&doc, context)
-	if err != nil {
-		Error(r, "error trying to execute mail template", err)
-		return "", err
-	}
-
-	err = smtp.SendMail(
-		emailUser.EmailServer+":"+strconv.Itoa(emailUser.Port), // in our case, "smtp.google.com:587"
-		auth,
-		emailUser.Username,
-		[]string{"outcastgeek@gmail.com"},
-		doc.Bytes(),
-	)
-	if err != nil {
-		Error(r, "ERROR: attempting to send a mail ", err)
-		return "", err
-	}
-	return "Email Sent!", nil
 }

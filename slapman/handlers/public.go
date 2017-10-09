@@ -5,9 +5,11 @@ import (
 	"slapman/utils"
 )
 
+var public_logger = utils.NewLogger("handlerspublic")
+
 // Home serves home page
 func Home(w http.ResponseWriter, r *http.Request) {
-	utils.Debug(r, "Serving Home Page")
+	public_logger.Debug("Serving Home Page")
 	m := struct {
 		Msg string
 	}{

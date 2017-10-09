@@ -29,6 +29,7 @@ const (
 )
 
 var (
+	aws_logger              = NewLogger("utilsaws")
 	DynaQueryParamInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		Name: "DynaQueryParam",
 		Fields: graphql.InputObjectConfigFieldMap{
@@ -76,7 +77,7 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 	// Grab Region from Context
 	region, ok := ctx.Value(regionKey).(string)
 	if !ok {
-		Warnf(nil, "WARNING:::: Using Default AWS Region: +%v", defaultRegion)
+		aws_logger.Warnf("WARNING:::: Using Default AWS Region: +%v", defaultRegion)
 		region = defaultRegion
 	}
 
@@ -87,14 +88,14 @@ func NewAwsSession(ctx context.Context) (sess *session.Session) {
 	if len(region) > 0 {
 		awsCfg.WithRegion(region)
 	}
-	Debugf(nil, "AWS Config: %+v", awsCfg)
+	aws_logger.Debugf("AWS Config: %+v", awsCfg)
 
 	// // Create the session that an Aws Service will use
 	sess = session.Must(session.NewSession(awsCfg))
 	// sess = session.Must(session.NewSessionWithOptions(session.Options{
 	// 	SharedConfigState: session.SharedConfigEnable,
 	// }))
-	Debugf(nil, "AWS Session: %+v", sess)
+	aws_logger.Debugf("AWS Session: %+v", sess)
 
 	return
 }
@@ -115,7 +116,7 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (int, inter
 
 	count := len(rows)
 
-	Debugf(nil, "%+v Rows: %+v", count, rows)
+	aws_logger.Debugf("%+v Rows: %+v", count, rows)
 
 	return count, rows, nil
 }
@@ -136,32 +137,32 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 	limit, ok := ctx.Value(limitKey).(int)
 	if !ok || limit < 0 {
 		limit = defaultLimit
-		Warnf(nil, "WARNING:::: Using Default Limit of: %+v", defaultLimit)
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
 	}
 	params.Limit = aws.Int64(int64(limit))
 
-	Debugf(nil, "Params: %+v", params)
+	aws_logger.Debugf("Params: %+v", params)
 
 	// Make the DynamoDB Query API call
 	result, err := svc.ScanWithContext(ctx, params)
 	if err != nil {
 		scanError := errors.New("Failed to make DynamoDB Query API call")
-		Errorf(nil, "ERROR:::: %+v", err)
+		aws_logger.Errorf("ERROR:::: %+v", err)
 		return nil, scanError
 	}
 
-	Debugf(nil, "Result: %+v", result)
+	aws_logger.Debugf("Result: %+v", result)
 
 	var rows []map[string]interface{}
 	// Unmarshal the Items field in the result value to the Item Go type.
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &rows)
 	if err != nil {
 		unmarshalError := errors.New("Failed to unmarshal Query result items")
-		Errorf(nil, "ERROR:::: %+v", unmarshalError)
+		aws_logger.Errorf("ERROR:::: %+v", unmarshalError)
 		return nil, unmarshalError
 	}
 
-	Debugf(nil, "Rows: %+v", rows)
+	aws_logger.Debugf("Rows: %+v", rows)
 
 	return rows, nil
 }
@@ -190,14 +191,14 @@ func DynaResolveScanPages(p graphql.ResolveParams, tableName string) (int, inter
 	}
 	count := len(rows)
 
-	Debugf(nil, "%+v Rows: %+v", count, rows)
+	aws_logger.Debugf("%+v Rows: %+v", count, rows)
 
 	return count, rows, nil
 }
 
 func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]interface{}, err error) {
 
-	Debugf(nil, "PAGE SCAN CONTEXT: %+v", ctx)
+	aws_logger.Debugf("PAGE SCAN CONTEXT: %+v", ctx)
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -213,17 +214,17 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 	limit, ok := ctx.Value(limitKey).(int)
 	if !ok || limit < 0 {
 		limit = defaultLimit
-		Warnf(nil, "WARNING:::: Using Default Limit of: %+v", defaultLimit)
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
 	}
 	params.Limit = aws.Int64(int64(limit))
 
 	pageNum, ok := ctx.Value(pageKey).(int)
 	if !ok || pageNum < 0 {
 		pageNum = defaultPageNum
-		Warnf(nil, "WARNING:::: Retrieving Default Page #%+v", defaultPageNum)
+		aws_logger.Warnf("WARNING:::: Retrieving Default Page #%+v", defaultPageNum)
 	}
 
-	Debugf(nil, "Params: %+v", params)
+	aws_logger.Debugf("Params: %+v", params)
 
 	currentPage := 0
 	// Make the DynamoDB Query API call
@@ -233,17 +234,17 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 		func(page *dynamodb.ScanOutput, lastPage bool) bool {
 
 			if currentPage == pageNum {
-				Debugf(nil, "Page #%+v Result: %+v", pageNum, page)
+				aws_logger.Debugf("Page #%+v Result: %+v", pageNum, page)
 
 				// Unmarshal the Items field in the result value to the Item Go type.
 				err = dynamodbattribute.UnmarshalListOfMaps(page.Items, &rows)
 				if err != nil {
 					err = errors.New("Failed to unmarshal Query result items")
-					Errorf(nil, "ERROR:::: %+v", err)
+					aws_logger.Errorf("ERROR:::: %+v", err)
 					return false // stop paging
 				}
 
-				Debugf(nil, "Page #%+v Rows: %+v", pageNum, rows)
+				aws_logger.Debugf("Page #%+v Rows: %+v", pageNum, rows)
 
 				return false // stop paging
 			}
@@ -255,7 +256,7 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 	)
 	if err != nil {
 		scanError := errors.New("Failed to make DynamoDB Query API call")
-		Errorf(nil, "SCAN PAGES ERROR:::: %+v", err)
+		aws_logger.Errorf("SCAN PAGES ERROR:::: %+v", err)
 		return nil, scanError
 	}
 
@@ -275,7 +276,7 @@ func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interfac
 
 func dynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
 
-	Debugf(nil, "Putting Data: %+v", data)
+	aws_logger.Debugf("Putting Data: %+v", data)
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -285,7 +286,7 @@ func dynaPutItem(ctx context.Context, tableName string, data interface{}) (succe
 
 	dataItem, err := dynamodbattribute.MarshalMap(data)
 	if err != nil {
-		Errorf(nil, "ERROR:::: %+v \nCould not put %+v", err, data)
+		aws_logger.Errorf("ERROR:::: %+v \nCould not put %+v", err, data)
 		return
 	}
 
@@ -294,18 +295,18 @@ func dynaPutItem(ctx context.Context, tableName string, data interface{}) (succe
 		Item:      dataItem,
 		TableName: aws.String(tableName),
 	}
-	Debugf(nil, "Params: %+v", params)
+	aws_logger.Debugf("Params: %+v", params)
 
 	// Now put the data item, either logging or discarding the result
 	success, err = svc.PutItemWithContext(ctx, params)
 	if err != nil {
 		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
-			Warn(nil, "WARNING:::: The provisioned Throughput has been Exceeded")
+			aws_logger.Warn("WARNING:::: The provisioned Throughput has been Exceeded")
 		}
-		Errorf(nil, "Error inserting %v (%v)", data, err)
+		aws_logger.Errorf("Error inserting %v (%v)", data, err)
 		return
 	}
-	Debugf(nil, "PUT ITEM SUCCESS:::: %+v", success)
+	aws_logger.Debugf("PUT ITEM SUCCESS:::: %+v", success)
 
 	return
 }
@@ -334,7 +335,7 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 	for key, val := range keyData {
 		keyAttr, marshalErr := dynamodbattribute.Marshal(val)
 		if marshalErr != nil {
-			Errorf(nil, "ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
+			aws_logger.Errorf("ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
 			return nil, marshalErr
 		}
 		keyMap[key] = keyAttr
@@ -350,7 +351,7 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 
 		attrVal, marshalErr := dynamodbattribute.Marshal(v)
 		if marshalErr != nil {
-			Errorf(nil, "ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
+			aws_logger.Errorf("ERROR:::: UpdateItem Marshal ERROR: %+v", marshalErr)
 			return nil, marshalErr
 		}
 		attributeValues[kVal] = attrVal
@@ -377,18 +378,18 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 		ReturnValues:                aws.String("ALL_NEW"),
 	}
 
-	Debugf(nil, "Params: %+v", params)
+	aws_logger.Debugf("Params: %+v", params)
 
 	// Now put the data item, either logging or discarding the result
 	result, err := svc.UpdateItemWithContext(ctx, params)
 	if err != nil {
 		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
-			Warn(nil, "WARNING:::: The provisioned Throughput has been Exceeded")
+			aws_logger.Warn("WARNING:::: The provisioned Throughput has been Exceeded")
 		}
-		Errorf(nil, "Error inserting %v (%v)", params, err)
+		aws_logger.Errorf("Error inserting %v (%v)", params, err)
 		return
 	}
-	Debugf(nil, "UPDATE ITEM SUCCESS:::: %+v", result)
+	aws_logger.Debugf("UPDATE ITEM SUCCESS:::: %+v", result)
 
 	updatedItem := make(map[string]interface{})
 	// Unmarshal the Updated Item field in the result value to the Item Go type.
@@ -397,15 +398,15 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 		err = dynamodbattribute.Unmarshal(upAttr, &upVal)
 		if err != nil {
 			unmarshalError := errors.New("Failed to unmarshal Update result items")
-			Errorf(nil, "ERROR:::: %+v", unmarshalError)
+			aws_logger.Errorf("ERROR:::: %+v", unmarshalError)
 			return nil, unmarshalError
 		}
-		Debugf(nil, "UPVAL: %+v", upVal)
+		aws_logger.Debugf("UPVAL: %+v", upVal)
 		updatedItem[upKey] = upVal
 	}
 
 	success = updatedItem
-	Debugf(nil, "Updated Item: %+v", success)
+	aws_logger.Debugf("Updated Item: %+v", success)
 
 	return
 }
@@ -430,7 +431,7 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 
 func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []map[string]interface{}, err error) {
 
-	Debugf(nil, "Query Input: %+v", queryInput)
+	aws_logger.Debugf("Query Input: %+v", queryInput)
 
 	// Create the session that the DynamoDB service will use
 	sess := NewAwsSession(ctx)
@@ -442,22 +443,22 @@ func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []
 	result, err := svc.QueryWithContext(ctx, queryInput)
 	if err != nil {
 		queryError := errors.New("Failed to make DynamoDB Query API call")
-		Errorf(nil, "ERROR:::: %+v", err)
+		aws_logger.Errorf("ERROR:::: %+v", err)
 		return nil, queryError
 	}
 
-	Debugf(nil, "Result: %+v", result)
+	aws_logger.Debugf("Result: %+v", result)
 
 	var rows []map[string]interface{}
 	// Unmarshal the Items field in the result value to the Item Go type.
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &rows)
 	if err != nil {
 		unmarshalError := errors.New("Failed to unmarshal Query result items")
-		Errorf(nil, "ERROR:::: %+v", unmarshalError)
+		aws_logger.Errorf("ERROR:::: %+v", unmarshalError)
 		return nil, unmarshalError
 	}
 
-	Debugf(nil, "Rows: %+v", rows)
+	aws_logger.Debugf("Rows: %+v", rows)
 
 	return rows, nil
 }
@@ -478,7 +479,7 @@ func asDynaQueryParamList(data []interface{}) (params []dynaQueryParam) {
 		params = append(params, param)
 	}
 
-	Debugf(nil, "QUERY PARAMS: %+v", params)
+	aws_logger.Debugf("QUERY PARAMS: %+v", params)
 
 	return
 }
@@ -508,7 +509,7 @@ func DynaQueryDsl(ctx context.Context, table, index string) *QueryDsl {
 	if ok && limit > 0 {
 		qi.Limit = aws.Int64(limit)
 	} else {
-		Warnf(nil, "WARNING:::: Using Default Limit of: +%v", defaultLimit)
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: +%v", defaultLimit)
 		qi.Limit = aws.Int64(defaultLimit)
 	}
 
@@ -559,7 +560,7 @@ func (qi *QueryDsl) AsInput() (*dynamodb.QueryInput, error) {
 	if len(qi.ErrorList) > 0 {
 		errorMessages := strings.Join(qi.ErrorList, ",\n ")
 		dslError := fmt.Errorf("ERRORS:::: %+v", errorMessages)
-		Errorf(nil, "ERROR:::: QUERY DSL ERROR: %+v", dslError)
+		aws_logger.Errorf("ERROR:::: QUERY DSL ERROR: %+v", dslError)
 		return nil, dslError
 	}
 

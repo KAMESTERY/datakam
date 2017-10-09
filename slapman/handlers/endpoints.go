@@ -3,11 +3,14 @@ package handlers
 import (
 	"fmt"
 	//	"slapman/sql"
+
 	"net/http"
 	"os"
 	"runtime"
 	"slapman/utils"
 )
+
+var endpoints_logger = utils.NewLogger("handlersendpoints")
 
 func Hellofcgi(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello from Fast CGI's: (CPUS:%+v, FCGI:%+v, DB_DRIVER:%+v)",
@@ -15,7 +18,7 @@ func Hellofcgi(w http.ResponseWriter, r *http.Request) {
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	utils.Debug(r, "Just saying hello AE...")
+	endpoints_logger.Debug("Just saying hello AE...")
 
 	p := struct {
 		Title string
@@ -30,7 +33,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SweetHandler(w http.ResponseWriter, r *http.Request) {
-	utils.Debug(r, "Very sweet!!!!")
+	endpoints_logger.Debug("Very sweet!!!!")
 	//	go aego_log.Printf("Very sweet!!!!")
 
 	p := struct {
@@ -46,7 +49,7 @@ func SweetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EmailHandler(w http.ResponseWriter, r *http.Request) {
-	success, err := utils.SendEmail(r)
+	success, err := utils.SendEmail(r.Context())
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
 		utils.RenderJSONWithCode(w, r, err.Error(), http.StatusInternalServerError)

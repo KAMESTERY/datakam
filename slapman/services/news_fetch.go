@@ -7,12 +7,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var news_logger = utils.NewLogger("servicesnews")
+
 // Fetch retrieves the url content contain and renders its body into a template
 func Fetch(w http.ResponseWriter, r *http.Request) {
 
 	url := mux.Vars(r)["url"]
 
-	resp, err := utils.HttpGet(r, url)
+	resp, err := utils.GetString(r.Context(), "http://"+url)
 	if err != nil {
 		errorData := struct {
 			Code    int
@@ -27,7 +29,7 @@ func Fetch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Debugf(r, "Fetched URL: %s", url)
+	news_logger.Debugf("Fetched URL: %s", url)
 
 	utils.RenderJSON(w, r, resp)
 }

@@ -1,13 +1,17 @@
 package model
 
-import "slapman/utils"
+import (
+	"slapman/utils"
+)
 
 const (
 	slapmanDomain = "slapman"
 	slapmanUser   = "shop_user"
 )
 
+var ksecom_logger = utils.NewLogger("modelksecom")
+
 func init() {
 	userTblsMap[slapmanDomain] = slapmanUser
-	utils.Debugf(nil, "Added %s to User Table Maps: %+v", slapmanUser, userTblsMap)
+	ksecom_logger.Debugf("Added %s to User Table Maps: %+v", slapmanUser, userTblsMap)
 }
