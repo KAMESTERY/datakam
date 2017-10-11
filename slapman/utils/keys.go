@@ -21,7 +21,12 @@ var (
 )
 
 // read the key files before starting http handlers
-func init() {
+func SetupCrypto(cryptoRsa string) {
+	// using asymmetric crypto/RSA keys
+	// location of the files used for signing and verification
+	privKeyPath := baseDir + "/" + cryptoRsa + ".rsa"    // openssl genrsa -out app.rsa 1024
+	pubKeyPath := baseDir + "/" + cryptoRsa + ".rsa.pub" // openssl rsa -in app.rsa -pubout > app.rsa.pub
+
 	var err error
 
 	signBytes, err := ioutil.ReadFile(privKeyPath)

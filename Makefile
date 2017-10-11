@@ -2,6 +2,7 @@
 
 BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
+WORKER=slapman
 
 # These are the values we want to pass for VERSION and BUILD
 VERSION=0.0.1
@@ -31,6 +32,12 @@ build-lambda: deps-deploy prod-build-worker package-lambda
 package-lambda:
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
 
+# Crypto
+
+rsa:
+	openssl genrsa -out $(BASEDIR)/lambda/worker/$(WORKER).rsa 1024
+	openssl rsa -in $(BASEDIR)/lambda/worker/$(WORKER).rsa -pubout > $(BASEDIR)/lambda/worker/$(WORKER).rsa.pub
+
 # PY3.6
 
 CMD = $(BASEDIR)/cmd.sh
@@ -55,16 +62,15 @@ deps-upgrade:
 
 # Golang
 
-WORKER=slapman
 PROJ_GOPATH = $(BASEDIR)/build
 OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -linkmode "internal" -extldflags "-static"'
+LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -X "main.CryptoRsa=${WORKER}" -linkmode "internal" -extldflags "-static"'
 
-build-worker: worker-link go-fmt
+build-worker: worker-link go-fmt rsa
 	cd $(GOPATH)/src/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
-prod-build-worker: worker-link go-fmt go-lint
+prod-build-worker: worker-link go-fmt go-lint rsa
 	cd $(GOPATH)/src/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
 # prod-build-worker: worker-link

@@ -1,20 +1,22 @@
 package utils
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 
 var (
 	baseDir = func() string {
 		bd := os.Getenv("BASEDIR")
 		if len(bd) == 0 {
-			bd = "."
+			dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+			if err != nil {
+				dir = "."
+			}
+			bd = dir
 		}
 		return bd
 	}()
-
-	// using asymmetric crypto/RSA keys
-	// location of the files used for signing and verification
-	privKeyPath = baseDir + "/keys/slapman.rsa"     // openssl genrsa -out app.rsa 1024
-	pubKeyPath  = baseDir + "/keys/slapman.rsa.pub" // openssl rsa -in app.rsa -pubout > app.rsa.pub
 
 	//TemplatesDir = baseDir + "/templates/*"
 	TemplatesDir = baseDir + "/templates"
