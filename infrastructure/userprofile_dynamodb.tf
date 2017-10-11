@@ -57,7 +57,57 @@ resource "aws_dynamodb_table" "userprofile-table" {
     write_capacity = 10
     read_capacity = 10
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID", "AvatarHash", "Name", "AboutMe", "MemberSince", "LastSeen"]
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "AvatarHashIndex"
+    hash_key = "AvatarHash"
+    range_key = "Age"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "NameIndex"
+    hash_key = "Name"
+    range_key = "AboutMe"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+//  This one exceeded the limit reason why it was added as range_key for Name GSI
+//  global_secondary_index {
+//    name = "AboutMeIndex"
+//    hash_key = "AboutMe"
+//    write_capacity = 10
+//    read_capacity = 10
+//    projection_type = "INCLUDE"
+//    non_key_attributes = ["UserID"]
+//  }
+
+  global_secondary_index {
+    name = "MemberSinceIndex"
+    hash_key = "MemberSince"
+    range_key = "Location"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "LastSeenIndex"
+    hash_key = "LastSeen"
+    range_key = "Location"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
   }
 
   tags {

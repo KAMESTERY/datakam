@@ -47,7 +47,35 @@ resource "aws_dynamodb_table" "user-table" {
     write_capacity = 10
     read_capacity = 10
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID", "Username", "Role", "PasswordHash"]
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "RoleIndex"
+    hash_key = "Role"
+    range_key = "Confirmed"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "UsernameIndex"
+    hash_key = "Username"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "PasswordHashIndex"
+    hash_key = "PasswordHash"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
   }
 
   tags {
