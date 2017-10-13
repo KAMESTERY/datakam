@@ -9,6 +9,8 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+const gameScoresTable = "GameScores"
+
 var (
 	gamescore_logger = utils.NewLogger("resolversgamescores")
 
@@ -128,7 +130,7 @@ var (
 				Count int         `json:"count"`
 				Rows  interface{} `json:"rows"`
 			}{
-				"GameScores",
+				gameScoresTable,
 				count,
 				rows,
 			}, nil
@@ -148,7 +150,7 @@ var (
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			count, rows, err := utils.DynaResolveScanItems(p, "GameScores")
+			count, rows, err := utils.DynaResolveScanItems(p, gameScoresTable)
 			if err != nil {
 				return nil, err
 			}
@@ -157,7 +159,7 @@ var (
 				Count int         `json:"count"`
 				Rows  interface{} `json:"rows"`
 			}{
-				"GameScores",
+				gameScoresTable,
 				count,
 				rows,
 			}, nil
@@ -180,7 +182,7 @@ var (
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			count, rows, err := utils.DynaResolveScanPages(p, "GameScores")
+			count, rows, err := utils.DynaResolveScanPages(p, gameScoresTable)
 			if err != nil {
 				return nil, err
 			}
@@ -189,7 +191,7 @@ var (
 				Count int         `json:"count"`
 				Rows  interface{} `json:"rows"`
 			}{
-				"GameScores",
+				gameScoresTable,
 				count,
 				rows,
 			}, nil
@@ -241,7 +243,7 @@ var (
 			gameScore.TopScore = topScore
 			gamescore_logger.Debugf("Putting GameScore using TopScore: %+v", topScore)
 
-			return utils.DynaResolvePutItem(p, "GameScores", gameScore)
+			return utils.DynaResolvePutItem(p, gameScoresTable, gameScore)
 		},
 	}
 
@@ -283,7 +285,7 @@ var (
 				gamescore_logger.Debugf("Updating GameScore with TopScore: %+v", topScore)
 			}
 
-			updatedItem, err := utils.DynaResolveUpdateItem(p, "GameScores", keyData, data)
+			updatedItem, err := utils.DynaResolveUpdateItem(p, gameScoresTable, keyData, data)
 			if err != nil {
 				return nil, err
 			}
@@ -291,7 +293,7 @@ var (
 				Table  string      `json:"table"`
 				Update interface{} `json:"update"`
 			}{
-				"GameScore",
+				gameScoresTable,
 				updatedItem,
 			}, nil
 		},

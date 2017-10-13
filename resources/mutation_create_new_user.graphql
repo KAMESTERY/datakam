@@ -1,0 +1,8 @@
+mutation CreateNewUser {
+  userCreateQuery(
+    username:"Lambert",
+    email:"lambert@awesome.com",
+    password: "sdfsdaf",
+    confirmPassword:"sdfsdaf"
+  )
+}

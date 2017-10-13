@@ -35,6 +35,11 @@ resource "aws_dynamodb_table" "user-table" {
     type = "S"
   }
 
+  attribute {
+    name = "LastSeen"
+    type = "S"
+  }
+
   ttl {
     attribute_name = "TimeToExist"
     enabled = false
@@ -72,6 +77,16 @@ resource "aws_dynamodb_table" "user-table" {
   global_secondary_index {
     name = "PasswordHashIndex"
     hash_key = "PasswordHash"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["UserID"]
+  }
+
+  global_secondary_index {
+    name = "LastSeenIndex"
+    hash_key = "LastSeen"
+    range_key = "Email"
     write_capacity = 10
     read_capacity = 10
     projection_type = "INCLUDE"
@@ -137,11 +152,6 @@ resource "aws_dynamodb_table" "userprofile-table" {
     type = "S"
   }
 
-  attribute {
-    name = "LastSeen"
-    type = "S"
-  }
-
   ttl {
     attribute_name = "TimeToExist"
     enabled = false
@@ -190,16 +200,6 @@ resource "aws_dynamodb_table" "userprofile-table" {
   global_secondary_index {
     name = "MemberSinceIndex"
     hash_key = "MemberSince"
-    range_key = "Location"
-    write_capacity = 10
-    read_capacity = 10
-    projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
-  }
-
-  global_secondary_index {
-    name = "LastSeenIndex"
-    hash_key = "LastSeen"
     range_key = "Location"
     write_capacity = 10
     read_capacity = 10

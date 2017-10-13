@@ -1,4 +1,3 @@
-
 resource "aws_iam_role" "iam_for_slapman" {
   name = "iam_for_slapman"
 
@@ -51,7 +50,11 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
       ],
       "Resource": [
         "${aws_dynamodb_table.game-scores-dynamodb-table.arn}",
-        "${aws_dynamodb_table.game-scores-dynamodb-table.arn}/index/*"
+        "${aws_dynamodb_table.game-scores-dynamodb-table.arn}/index/*",
+        "${aws_dynamodb_table.user-table.arn}",
+        "${aws_dynamodb_table.user-table.arn}/index/*",
+        "${aws_dynamodb_table.userprofile-table.arn}",
+        "${aws_dynamodb_table.userprofile-table.arn}/index/*"
       ],
       "Effect": "Allow",
       "Sid": ""

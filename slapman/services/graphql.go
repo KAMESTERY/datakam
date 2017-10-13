@@ -13,6 +13,9 @@ import (
 	"slapman/utils"
 )
 
+// http://docs.aws.amazon.com/lambda/latest/dg/limits.html
+const maxExecutionDuration = 300 * time.Second
+
 var (
 	graphql_logger = utils.NewLogger("servicesgraphql")
 
@@ -34,6 +37,7 @@ var (
 	mutationFields = graphql.Fields{
 		"gameScorePut":    &resolvers.GameScorePutFields,
 		"gameScoreUpdate": &resolvers.GameScoreUpdateFields,
+		"userCreateQuery": &resolvers.UserCreateFields,
 	}
 	rootMutation = graphql.ObjectConfig{Name: "RootMutation", Fields: mutationFields}
 
@@ -79,7 +83,7 @@ func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, q
 
 func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), maxExecutionDuration)
 	defer cancel()
 
 	switch r.Method {

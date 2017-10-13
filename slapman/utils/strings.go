@@ -13,6 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/pbkdf2"
 
+	"crypto/md5"
 	"github.com/segmentio/ksuid"
 )
 
@@ -94,4 +95,19 @@ func ParseInt64(d interface{}) (i64 int64, err error) {
 func GenerateUUID() string {
 	uuid := ksuid.New()
 	return uuid.String()
+}
+
+func GetStrValue(m map[string]interface{}, key string) (val string) {
+	str, ok := m[key].(string)
+	if ok {
+		val = str
+	}
+	return
+}
+
+func HashStringMD5(str string) string {
+	// Got it from here https://github.com/mindreframer/golang-devops-stuff/blob/master/src/github.com/gogits/gogs/modules/avatar/avatar.go
+	h := md5.New()
+	h.Write([]byte(strings.ToLower(str)))
+	return hex.EncodeToString(h.Sum(nil))
 }
