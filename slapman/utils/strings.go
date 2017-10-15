@@ -14,6 +14,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 
 	"crypto/md5"
+
 	"github.com/segmentio/ksuid"
 )
 
@@ -58,7 +59,7 @@ func VerifyPassword(rawPwd string, encodedPwd string) bool {
 
 // HashPassword Hash password
 func HashPassword(password []byte) ([]byte, error) {
-	return bcrypt.GenerateFromPassword(password, 14)
+	return bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost) // Cost of 14 is too expensive in the 18 to 19 seconds range
 }
 
 // CheckPasswordHash Check Password
@@ -95,14 +96,6 @@ func ParseInt64(d interface{}) (i64 int64, err error) {
 func GenerateUUID() string {
 	uuid := ksuid.New()
 	return uuid.String()
-}
-
-func GetStrValue(m map[string]interface{}, key string) (val string) {
-	str, ok := m[key].(string)
-	if ok {
-		val = str
-	}
-	return
 }
 
 func HashStringMD5(str string) string {

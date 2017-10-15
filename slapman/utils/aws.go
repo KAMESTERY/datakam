@@ -15,6 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 
+	"os"
+
 	"github.com/graphql-go/graphql"
 )
 
@@ -22,10 +24,8 @@ const (
 	defaultRegion  = endpoints.UsEast1RegionID
 	defaultLimit   = 24
 	defaultPageNum = 0
-	regionKey      = 16
 	limitKey       = 17
 	pageKey        = 18
-	maxGoroutines  = 20
 )
 
 var (
@@ -69,14 +69,19 @@ var (
 			Type: graphql.Int,
 		},
 	}
+	sess *session.Session
 )
 
-//NewAwsSession creates a new Session for an AWS Service
-func NewAwsSession(ctx context.Context) (sess *session.Session) {
+func init() {
+	sess = newAwsSession()
+}
 
-	// Grab Region from Context
-	region, ok := ctx.Value(regionKey).(string)
-	if !ok {
+//NewAwsSession creates a new Session for an AWS Service
+func newAwsSession() (sess *session.Session) {
+
+	// Grab Region from Environment
+	region := os.Getenv("REGION")
+	if len(region) < 1 {
 		aws_logger.Warnf("WARNING:::: Using Default AWS Region: +%v", defaultRegion)
 		region = defaultRegion
 	}
@@ -122,9 +127,6 @@ func DynaResolveScanItems(p graphql.ResolveParams, tableName string) (int, inter
 }
 
 func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interface{}, error) {
-
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
 
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
@@ -200,9 +202,6 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 
 	aws_logger.Debugf("PAGE SCAN CONTEXT: %+v", ctx)
 
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
-
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
 
@@ -277,9 +276,6 @@ func DynaResolvePutItem(p graphql.ResolveParams, tableName string, data interfac
 func dynaPutItem(ctx context.Context, tableName string, data interface{}) (success interface{}, err error) {
 
 	aws_logger.Debugf("Putting Data: %+v", data)
-
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
 
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
@@ -358,9 +354,6 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 	}
 	updateExpression = aws.String("SET " + strings.Join(upExpChunks, ", "))
 
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
-
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
 
@@ -437,9 +430,6 @@ func dynaGetItem(ctx context.Context, tableName string, keyData map[string]inter
 		keyMap[key] = keyAttr
 	}
 
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
-
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
 
@@ -505,9 +495,6 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []map[string]interface{}, err error) {
 
 	aws_logger.Debugf("Query Input: %+v", queryInput)
-
-	// Create the session that the DynamoDB service will use
-	sess := NewAwsSession(ctx)
 
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)

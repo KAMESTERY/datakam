@@ -2,11 +2,12 @@ package resolvers
 
 import (
 	"slapman/utils"
+	"slapman/utils/group"
 
 	"fmt"
-	"github.com/graphql-go/graphql"
-	"sync"
 	"time"
+
+	"github.com/graphql-go/graphql"
 )
 
 const (
@@ -68,37 +69,16 @@ var (
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
-			user_logger.Debugf("Put Args: %+v", p.Args)
+			user_logger.Debugf("Create User Args: %+v", p.Args)
 
 			//userID := utils.GenerateUUID()
 			timeStamp := time.Now().String()
 
-			email := utils.GetStrValue(p.Args, "email")
-			if len(email) < 1 {
+			email := p.Args["email"].(string)
+			if email == "" {
 				return nil, fmt.Errorf("Email Cannot be Empty")
 			}
 			userID := email // The user ID serves as the UserID
-
-			username := utils.GetStrValue(p.Args, "username")
-			if len(username) < 1 {
-				return nil, fmt.Errorf("Username Cannot be Empty")
-			}
-
-			password := utils.GetStrValue(p.Args, "password")
-			confirmPassword := utils.GetStrValue(p.Args, "confirmPassword")
-			if len(password) < 1 {
-				return nil, fmt.Errorf("Password Cannot be Empty")
-			}
-			if len(confirmPassword) < 1 {
-				return nil, fmt.Errorf("Password Confirmation Cannot be Empty")
-			}
-			if password != confirmPassword {
-				return nil, fmt.Errorf("Password/Confirmation Do Not Match")
-			}
-			passwordHash, err := utils.HashPassword([]byte(password))
-			if err != nil {
-				return nil, err
-			}
 
 			emailFound, err := emailTaken(p, email)
 			if err != nil {
@@ -108,66 +88,88 @@ var (
 				return nil, fmt.Errorf("This email [%+v] is already taken", email)
 			}
 
-			errChan := make(chan error, 2)
-			var wg sync.WaitGroup
-			wg.Add(2)
+			var g group.Group
+			{
+				// Create User
+				g.Add(func() (err error) {
 
-			// Create User
-			go func() {
+					username := p.Args["username"].(string)
+					if username == "" {
+						err = fmt.Errorf("Username Cannot be Empty")
+					}
+					password := p.Args["password"].(string)
+					confirmPassword := p.Args["confirmPassword"].(string)
+					if password == "" {
+						err = fmt.Errorf("Password Cannot be Empty")
+					}
+					if confirmPassword == "" {
+						err = fmt.Errorf("Password Confirmation Cannot be Empty")
+					}
+					if password != confirmPassword {
+						err = fmt.Errorf("Password/Confirmation Do Not Match")
+					}
 
-				user := User{
-					UserID:       userID,
-					Email:        email,
-					Username:     username,
-					PasswordHash: string(passwordHash),
-					Confirmed:    0,
-					Role:         basicUserRole,
-					LastSeen:     timeStamp,
-				}
+					user_logger.Debug("Hashing password...")
+					passwordHash, err := utils.HashPassword([]byte(password))
+					if err != nil {
+						return
+					}
+					user_logger.Debug("Done Hashing password")
 
-				user_logger.Debugf("Persisting User: %+v", user)
+					user := User{
+						UserID:       userID,
+						Email:        email,
+						Username:     username,
+						PasswordHash: string(passwordHash),
+						Confirmed:    0,
+						Role:         basicUserRole,
+						LastSeen:     timeStamp,
+					}
 
-				_, err = utils.DynaResolvePutItem(p, userTable, user)
-				if err != nil {
-					errChan <- err
-				}
-				wg.Done()
-			}()
+					user_logger.Debugf("Persisting User: %+v", user)
 
-			// Create User Profile
-			go func() {
+					_, err = utils.DynaResolvePutItem(p, userTable, user)
+					if err != nil {
+						return
+					}
 
-				avatartHash := utils.HashStringMD5(email)
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
+			}
+			{
+				// Create User Profile
+				g.Add(func() (err error) {
 
-				userProfile := UserProfile{
-					UserID:      userID,
-					AvatarHash:  avatartHash,
-					Name:        userProfileName,
-					Age:         userProfileAge,
-					AboutMe:     userProfileAboutMe,
-					Location:    userProfileLocation,
-					MemberSince: timeStamp,
-				}
+					avatartHash := utils.HashStringMD5(email)
 
-				user_logger.Debugf("Persisting User Profile: %+v", userProfile)
+					userProfile := UserProfile{
+						UserID:      userID,
+						AvatarHash:  avatartHash,
+						Name:        userProfileName,
+						Age:         userProfileAge,
+						AboutMe:     userProfileAboutMe,
+						Location:    userProfileLocation,
+						MemberSince: timeStamp,
+					}
 
-				_, err = utils.DynaResolvePutItem(p, userProfileTable, userProfile)
-				if err != nil {
-					errChan <- err
-				}
-				wg.Done()
-			}()
+					user_logger.Debugf("Persisting User Profile: %+v", userProfile)
 
-			wg.Wait()
+					_, err = utils.DynaResolvePutItem(p, userProfileTable, userProfile)
+					if err != nil {
+						return
+					}
 
-			if errCount := len(errChan); errCount > 0 {
-				err = <-errChan
-				if errCount == cap(errChan) {
-					err = fmt.Errorf("%+v\n%+v", err, <-errChan)
-				}
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
+			}
 
+			err = g.Run()
+			if err != nil {
 				user_logger.Errorf("ERROR:::: %+v", err)
-
 				return nil, err
 			}
 
@@ -176,40 +178,9 @@ var (
 	}
 )
 
-//func emailTaken(p graphql.ResolveParams, email string) (found bool, err error) {
-//
-//	index := "EmailIndex"
-//	params := []interface{}{
-//		map[string]string{
-//			"field":     "Email",
-//			"operation": "EQ",
-//			"value":     email,
-//		},
-//	}
-//	queryBuilder := utils.DynaQueryDsl(p.Context, userTable, index).Build(params)
-//
-//	limit, ok := p.Args["limit"].(int)
-//	if ok && limit > 0 {
-//		queryBuilder.WithLimit(limit)
-//		user_logger.Debugf("Limiting Query Results Count to: %+v", limit)
-//	}
-//
-//	queryInput, bErr := queryBuilder.AsInput()
-//	if err = bErr; err != nil {
-//		return
-//	}
-//
-//	count, _, qErr := utils.DynaResolveQuery(p, queryInput)
-//	if err = qErr; err != nil {
-//		return
-//	}
-//
-//	found = count > 0
-//	return
-//}
-
-// TODO: Figure out how to GetItem without using Hash Key, but Global Secondary Index instead
 func emailTaken(p graphql.ResolveParams, email string) (found bool, err error) {
+
+	user_logger.Debugf("Checking use of Email: [%+v]...", email)
 
 	keyData := map[string]interface{}{
 		"UserID": email,
