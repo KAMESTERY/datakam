@@ -405,8 +405,80 @@ func dynaUpdateItem(ctx context.Context, tableName string, keyData, data map[str
 		updatedItem[upKey] = upVal
 	}
 
-	success = updatedItem
+	if len(updatedItem) > 0 {
+		success = updatedItem
+	}
 	aws_logger.Debugf("Updated Item: %+v", success)
+
+	return
+}
+
+///////////////////////////////////// GETTING ITEM AWS DYNAMODB
+
+func DynaResolveGetItem(p graphql.ResolveParams, tableName string, keyData map[string]interface{}) (interface{}, error) {
+
+	// Set the current context
+	ctx := p.Context
+	ctx = context.WithValue(ctx, limitKey, p.Args["limit"])
+
+	return dynaGetItem(ctx, tableName, keyData)
+}
+
+func dynaGetItem(ctx context.Context, tableName string, keyData map[string]interface{}) (success interface{}, err error) {
+
+	keyMap := make(map[string]*dynamodb.AttributeValue)
+
+	for key, val := range keyData {
+		keyAttr, marshalErr := dynamodbattribute.Marshal(val)
+		if marshalErr != nil {
+			aws_logger.Errorf("ERROR:::: GetItem Marshal ERROR: %+v", marshalErr)
+			return nil, marshalErr
+		}
+		keyMap[key] = keyAttr
+	}
+
+	// Create the session that the DynamoDB service will use
+	sess := NewAwsSession(ctx)
+
+	// Create the DynamoDB service client to make the query request with.
+	svc := dynamodb.New(sess)
+
+	params := &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key:       keyMap,
+	}
+
+	aws_logger.Debugf("Params: %+v", params)
+
+	// Now get the data item, either logging or discarding the result
+	result, err := svc.GetItemWithContext(ctx, params)
+	if err != nil {
+		if err.(awserr.Error).Code() == dynamodb.ErrCodeProvisionedThroughputExceededException {
+			aws_logger.Warn("WARNING:::: The provisioned Throughput has been Exceeded")
+		}
+		aws_logger.Errorf("Error retrieving %v (%v)", params, err)
+		return
+	}
+	aws_logger.Debugf("GET ITEM SUCCESS:::: %+v", result)
+
+	getItem := make(map[string]interface{})
+	// Unmarshal the Item from the result value into the Item Go type.
+	for itemKey, itemAttr := range result.Item {
+		var itemVal interface{}
+		err = dynamodbattribute.Unmarshal(itemAttr, &itemVal)
+		if err != nil {
+			unmarshalError := errors.New("Failed to unmarshal Update result items")
+			aws_logger.Errorf("ERROR:::: %+v", unmarshalError)
+			return nil, unmarshalError
+		}
+		aws_logger.Debugf("ITEMVAL: %+v", itemVal)
+		getItem[itemKey] = itemVal
+	}
+
+	if len(getItem) > 0 {
+		success = getItem
+	}
+	aws_logger.Debugf("Get Item: %+v", success)
 
 	return
 }
@@ -418,6 +490,7 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 
 	// Set the current context
 	ctx := p.Context
+	ctx = context.WithValue(ctx, limitKey, p.Args["limit"])
 
 	rows, err := dynaQuery(ctx, queryInput)
 	if err != nil {
@@ -438,6 +511,13 @@ func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []
 
 	// Create the DynamoDB service client to make the query request with.
 	svc := dynamodb.New(sess)
+
+	limit, ok := ctx.Value(limitKey).(int)
+	if !ok || limit < 0 {
+		limit = defaultLimit
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
+	}
+	queryInput.Limit = aws.Int64(int64(limit))
 
 	// Now run the Query
 	result, err := svc.QueryWithContext(ctx, queryInput)

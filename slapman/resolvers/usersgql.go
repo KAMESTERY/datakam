@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"sync"
 	"time"
 )
 
@@ -69,26 +70,18 @@ var (
 
 			user_logger.Debugf("Put Args: %+v", p.Args)
 
-			userID := utils.GenerateUUID()
+			//userID := utils.GenerateUUID()
 			timeStamp := time.Now().String()
 
 			email := utils.GetStrValue(p.Args, "email")
 			if len(email) < 1 {
 				return nil, fmt.Errorf("Email Cannot be Empty")
 			}
+			userID := email // The user ID serves as the UserID
 
 			username := utils.GetStrValue(p.Args, "username")
 			if len(username) < 1 {
 				return nil, fmt.Errorf("Username Cannot be Empty")
-			}
-
-			user := User{
-				UserID:    userID,
-				Email:     email,
-				Username:  username,
-				Confirmed: 0,
-				Role:      basicUserRole,
-				LastSeen:  timeStamp,
 			}
 
 			password := utils.GetStrValue(p.Args, "password")
@@ -106,7 +99,6 @@ var (
 			if err != nil {
 				return nil, err
 			}
-			user.PasswordHash = string(passwordHash)
 
 			emailFound, err := emailTaken(p, email)
 			if err != nil {
@@ -116,60 +108,122 @@ var (
 				return nil, fmt.Errorf("This email [%+v] is already taken", email)
 			}
 
-			user_logger.Debugf("Persisting User: %+v", user)
+			errChan := make(chan error, 2)
+			var wg sync.WaitGroup
+			wg.Add(2)
 
-			avatartHash := utils.HashStringMD5(email)
+			// Create User
+			go func() {
 
-			userProfile := UserProfile{
-				UserID:      userID,
-				AvatarHash:  avatartHash,
-				Name:        userProfileName,
-				Age:         userProfileAge,
-				AboutMe:     userProfileAboutMe,
-				Location:    userProfileLocation,
-				MemberSince: timeStamp,
-			}
+				user := User{
+					UserID:       userID,
+					Email:        email,
+					Username:     username,
+					PasswordHash: string(passwordHash),
+					Confirmed:    0,
+					Role:         basicUserRole,
+					LastSeen:     timeStamp,
+				}
 
-			user_logger.Debugf("Persisting User Profile: %+v", userProfile)
+				user_logger.Debugf("Persisting User: %+v", user)
 
-			_, err = utils.DynaResolvePutItem(p, userTable, user)
-			if err != nil {
+				_, err = utils.DynaResolvePutItem(p, userTable, user)
+				if err != nil {
+					errChan <- err
+				}
+				wg.Done()
+			}()
+
+			// Create User Profile
+			go func() {
+
+				avatartHash := utils.HashStringMD5(email)
+
+				userProfile := UserProfile{
+					UserID:      userID,
+					AvatarHash:  avatartHash,
+					Name:        userProfileName,
+					Age:         userProfileAge,
+					AboutMe:     userProfileAboutMe,
+					Location:    userProfileLocation,
+					MemberSince: timeStamp,
+				}
+
+				user_logger.Debugf("Persisting User Profile: %+v", userProfile)
+
+				_, err = utils.DynaResolvePutItem(p, userProfileTable, userProfile)
+				if err != nil {
+					errChan <- err
+				}
+				wg.Done()
+			}()
+
+			wg.Wait()
+
+			if errCount := len(errChan); errCount > 0 {
+				err = <-errChan
+				if errCount == cap(errChan) {
+					err = fmt.Errorf("%+v\n%+v", err, <-errChan)
+				}
+
+				user_logger.Errorf("ERROR:::: %+v", err)
+
 				return nil, err
 			}
 
-			return utils.DynaResolvePutItem(p, userProfileTable, userProfile)
+			return "success", nil
 		},
 	}
 )
 
+//func emailTaken(p graphql.ResolveParams, email string) (found bool, err error) {
+//
+//	index := "EmailIndex"
+//	params := []interface{}{
+//		map[string]string{
+//			"field":     "Email",
+//			"operation": "EQ",
+//			"value":     email,
+//		},
+//	}
+//	queryBuilder := utils.DynaQueryDsl(p.Context, userTable, index).Build(params)
+//
+//	limit, ok := p.Args["limit"].(int)
+//	if ok && limit > 0 {
+//		queryBuilder.WithLimit(limit)
+//		user_logger.Debugf("Limiting Query Results Count to: %+v", limit)
+//	}
+//
+//	queryInput, bErr := queryBuilder.AsInput()
+//	if err = bErr; err != nil {
+//		return
+//	}
+//
+//	count, _, qErr := utils.DynaResolveQuery(p, queryInput)
+//	if err = qErr; err != nil {
+//		return
+//	}
+//
+//	found = count > 0
+//	return
+//}
+
+// TODO: Figure out how to GetItem without using Hash Key, but Global Secondary Index instead
 func emailTaken(p graphql.ResolveParams, email string) (found bool, err error) {
 
-	index := "EmailIndex"
-	params := []interface{}{
-		map[string]string{
-			"field":     "Email",
-			"operation": "EQ",
-			"value":     email,
-		},
-	}
-	queryBuilder := utils.DynaQueryDsl(p.Context, userTable, index).Build(params)
-
-	limit, ok := p.Args["limit"].(int)
-	if ok && limit > 0 {
-		queryBuilder.WithLimit(limit)
-		user_logger.Debugf("Limiting Query Results Count to: %+v", limit)
+	keyData := map[string]interface{}{
+		"UserID": email,
+		"Email":  email,
 	}
 
-	queryInput, bErr := queryBuilder.AsInput()
-	if err = bErr; err != nil {
+	foundRecord, getErr := utils.DynaResolveGetItem(p, userTable, keyData)
+	if getErr != nil {
+		err = fmt.Errorf("Could not check for existing email: %+v", getErr)
 		return
 	}
 
-	count, _, qErr := utils.DynaResolveQuery(p, queryInput)
-	if err = qErr; err != nil {
-		return
-	}
+	user_logger.Debugf("Found existing Record: %+v with email: %+v", foundRecord, email)
 
-	found = count > 0
+	found = foundRecord != nil
 	return
 }

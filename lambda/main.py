@@ -34,7 +34,12 @@ async def fetch(url):
 
 async def post(url, data):
     logger.info(f"Posting to: {url} with data: {data}")
-    raw = requests.post(url, data=json.dumps(data))
+    raw = requests.post(
+        url,
+        data=json.dumps(data),
+        verify=False,
+        timeout=None
+    )
     logger.info("%s", raw)
     response = raw.json()
     logger.info("%s", response)
