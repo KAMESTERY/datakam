@@ -12,6 +12,11 @@ lib
 lambda/worker/slapman
 slapman/vendor
 build
+/*.log
+/target
+/*-init.clj
+/resources/public/js/compiled
+out
 
 # Java related
 pom.xml

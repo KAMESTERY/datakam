@@ -1,0 +1,4 @@
+(ns slapman.db)
+
+(def default-db
+  {:name "re-frame"})
