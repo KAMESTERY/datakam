@@ -23,6 +23,7 @@ Native development with Nim and Rust
 * `aws dynamodb create-table --table-name myTable --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url http://0.0.0.0:8000`
 * `aws dynamodb list-tables --endpoint-url http://0.0.0.0:8000 --output json`
 * Generate View from Template: `lein new re-frame slapman +cider +test +less +re-com +re-frisk +routes +aliases`
+* Upgrade Leiningen Dependencies: `lein ancient upgrade :allow-all`
 
 ## Miscellaneous
 

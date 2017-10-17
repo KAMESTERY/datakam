@@ -1,14 +1,18 @@
 (defproject slapman "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.908"]
-                 [reagent "0.7.0"]
-                 [re-frame "0.10.1"]
-                 [org.clojure/core.async "0.2.391"]
-                 [re-com "2.1.0"]
-                 [secretary "1.2.3"]]
+  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
+                 [org.clojure/clojurescript "1.9.946"]
+                 [reagent "0.8.0-alpha1"]
+                 [re-frame "0.10.2"]
+                 [org.clojure/core.async "0.3.443"]
+                 [re-com "2.2.0-SNAPSHOT"]
+                 [secretary "1.2.3"]
+                 [degree9/firebase-cljs "1.3.0"] ;; Check this out: https://github.com/velveteer/crossed/blob/master/src/app/handlers.cljs
+                 [com.taoensso/timbre "4.10.0"]]
 
-  :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-less "1.7.5"]]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-less "1.7.5"]
+            [lein-ancient "0.6.12"]
+            [lein-cljfmt "0.5.7"]]
 
   :min-lein-version "2.5.3"
 
@@ -33,12 +37,12 @@
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.9.4"]
-                   [figwheel-sidecar "0.5.13"]
+   {:dependencies [[binaryage/devtools "0.9.7"]
+                   [figwheel-sidecar "0.5.15-SNAPSHOT"]
                    [com.cemerick/piggieback "0.2.2"]
                    [re-frisk "0.5.0"]]
 
-    :plugins      [[lein-figwheel "0.5.13"]
+    :plugins      [[lein-figwheel "0.5.15-SNAPSHOT"]
                    [lein-doo "0.1.8"]
                    [lein-pdo "0.1.1"]]}}
 

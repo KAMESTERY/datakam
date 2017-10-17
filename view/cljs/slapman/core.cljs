@@ -5,7 +5,8 @@
             [slapman.subs]
             [slapman.routes :as routes]
             [slapman.views :as views]
-            [slapman.config :as config]))
+            [slapman.config :as config]
+            [slapman.dal :as dal]))
 
 
 (defn dev-setup []
