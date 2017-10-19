@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/graphql-go/graphql"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
@@ -20,6 +22,15 @@ const (
 	userProfileLocation = "What is your location?"
 )
 
+// Note: Do not embed in User Struct as it creates some issues
+type UserRef struct {
+	UserID   string `json:"UserID"`
+	Email    string `json:"Email"`
+	Username string `json:"Username"`
+	Role     int64  `json:"Role"`
+	LastSeen string `json:"LastSeen`
+}
+
 type User struct {
 	UserID       string `json:"UserID"`
 	Email        string `json:"Email"`
@@ -28,6 +39,15 @@ type User struct {
 	Confirmed    int    `json:"Confirmed"`
 	PasswordHash string `json:"PasswordHash`
 	LastSeen     string `json:"LastSeen`
+}
+
+func (user *User) asUserRef() (userRef UserRef) {
+	userRef.UserID = user.UserID
+	userRef.Email = user.Email
+	userRef.Username = user.Username
+	userRef.Role = user.Role
+	userRef.LastSeen = user.LastSeen
+	return
 }
 
 type UserProfile struct {
@@ -42,6 +62,100 @@ type UserProfile struct {
 
 var (
 	user_logger = utils.NewLogger("resolversuser")
+
+	// JwtTokenType represents a JWT Token
+	JwtTokenType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "JwtToken",
+		Fields: graphql.Fields{
+			"token": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
+		},
+	})
+
+	// UserLoginFields represents the parameters and the resolver function to Login a user from the DynamoDB User Table
+	UserLoginFields = graphql.Field{
+		Type:        JwtTokenType,
+		Description: "Creates a new entry in DynamoDB User Table",
+		Args: graphql.FieldConfigArgument{
+			"region": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"limit": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"email": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"password": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			user_logger.Debugf("Login User Args: %+v", p.Args)
+
+			email := p.Args["email"].(string)
+			if email == "" {
+				return nil, fmt.Errorf("Email Cannot be Empty")
+			}
+			userID := email // The user ID serves as the UserID
+
+			password := p.Args["password"].(string)
+			if password == "" {
+				return nil, fmt.Errorf("Password Cannot be Empty")
+			}
+
+			keyData := map[string]interface{}{
+				"UserID": userID,
+				"Email":  email,
+			}
+
+			foundRecord, getErr := utils.DynaResolveGetItem(p, userTable, keyData)
+			if getErr != nil {
+				return nil, fmt.Errorf("Could not log you in: %+v", getErr)
+			}
+			user_logger.Debugf("Found Record: %+v", foundRecord)
+
+			var foundUser User
+			mapstructure.Decode(foundRecord, &foundUser)
+
+			user_logger.Debugf("Found User: %+v", foundUser)
+
+			// Checking user password
+			if err := utils.CheckPasswordHash([]byte(foundUser.PasswordHash), []byte(password)); err != nil {
+				user_logger.Errorf("ERROR:::: %+v", err)
+				return nil, fmt.Errorf("Wrong Email/Password Provided")
+			}
+
+			user_logger.Debugf("Logging in user with email: [%+v]", email)
+
+			// Create a signer for rsa 256 and claim c
+			c := struct {
+				User UserRef
+				jwt.StandardClaims
+			}{
+				foundUser.asUserRef(),
+				jwt.StandardClaims{
+					ExpiresAt: time.Now().Add(time.Minute * 20).Unix(),
+					Issuer:    "admin",
+				},
+			}
+			t := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
+			tokenString, err := t.SignedString(utils.SignKey)
+			if err != nil {
+				user_logger.Errorf("ERROR:::: Token Signing error: %+v\n", err)
+				return nil, fmt.Errorf("Sorry, error while Signing Token!")
+			}
+
+			response := struct {
+				Token string `json:"token"`
+			}{tokenString}
+
+			return response, nil
+		},
+	}
 
 	// UserCreateFields represents the parameters and the resolver function to create a new entry in DynamoDB User Table
 	UserCreateFields = graphql.Field{
@@ -120,10 +234,10 @@ var (
 						UserID:       userID,
 						Email:        email,
 						Username:     username,
-						PasswordHash: string(passwordHash),
-						Confirmed:    0,
 						Role:         basicUserRole,
 						LastSeen:     timeStamp,
+						PasswordHash: string(passwordHash),
+						Confirmed:    0,
 					}
 
 					user_logger.Debugf("Persisting User: %+v", user)

@@ -31,6 +31,7 @@ var (
 		"gameScoreScan":      &resolvers.GameScoreScanFields,
 		"gameScoreScanPages": &resolvers.GameScoreScanPagesFields,
 		"gameScoreQuery":     &resolvers.GameQueryFields,
+		"userLoginQuery":     &resolvers.UserLoginFields,
 	}
 	rootQuery = graphql.ObjectConfig{Name: "RootQuery", Fields: queryFields}
 
