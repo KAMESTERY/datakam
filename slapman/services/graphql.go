@@ -31,14 +31,15 @@ var (
 		"gameScoreScan":      &resolvers.GameScoreScanFields,
 		"gameScoreScanPages": &resolvers.GameScoreScanPagesFields,
 		"gameScoreQuery":     &resolvers.GameQueryFields,
-		"userLoginQuery":     &resolvers.UserLoginFields,
+		"userLogin":          &resolvers.UserLoginFields,
 	}
 	rootQuery = graphql.ObjectConfig{Name: "RootQuery", Fields: queryFields}
 
 	mutationFields = graphql.Fields{
-		"gameScorePut":    &resolvers.GameScorePutFields,
-		"gameScoreUpdate": &resolvers.GameScoreUpdateFields,
-		"userCreateQuery": &resolvers.UserCreateFields,
+		"gameScorePut":        &resolvers.GameScorePutFields,
+		"gameScoreUpdate":     &resolvers.GameScoreUpdateFields,
+		"userCreate":          &resolvers.UserCreateFields,
+		"userJwtTokenRefresh": &resolvers.UserJwtTokenRefreshFields,
 	}
 	rootMutation = graphql.ObjectConfig{Name: "RootMutation", Fields: mutationFields}
 

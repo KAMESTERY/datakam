@@ -74,6 +74,28 @@ var (
 		},
 	})
 
+	// UserJwtTokenRefreshFields represents the parameters and the resolver function to Refrsh a user JWT Token
+	UserJwtTokenRefreshFields = graphql.Field{
+		Type:        JwtTokenType,
+		Description: "Refreshes the JWT Token for a user",
+		Args: graphql.FieldConfigArgument{
+			"token": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			user_logger.Debugf("Token Refresh Args: %+v", p.Args)
+
+			tokenString := p.Args["token"].(string)
+			if tokenString == "" {
+				return nil, fmt.Errorf("Token Cannot be Empty")
+			}
+
+			return utils.RefreshRsa256JwtToken(tokenString)
+		},
+	}
+
 	// UserLoginFields represents the parameters and the resolver function to Login a user from the DynamoDB User Table
 	UserLoginFields = graphql.Field{
 		Type:        JwtTokenType,
@@ -142,18 +164,8 @@ var (
 					Issuer:    "admin",
 				},
 			}
-			t := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
-			tokenString, err := t.SignedString(utils.SignKey)
-			if err != nil {
-				user_logger.Errorf("ERROR:::: Token Signing error: %+v\n", err)
-				return nil, fmt.Errorf("Sorry, error while Signing Token!")
-			}
 
-			response := struct {
-				Token string `json:"token"`
-			}{tokenString}
-
-			return response, nil
+			return utils.GenerateRsa256JwtToken(c)
 		},
 	}
 

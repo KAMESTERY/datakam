@@ -27,6 +27,8 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [Critical vulnerabilities in JSON Web Token libraries](https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/)
+* [GO JWT Middleware](https://github.com/auth0/go-jwt-middleware/blob/master/jwtmiddleware.go)
 * [Enable CORS for an API Gateway Resource](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html)
 * [How to use GraphQL with jQuery](https://www.graph.cool/docs/tutorials/graphql-and-jquery-kohj2aengo/#graphql-vs-rest)
 * [Supported AWS Services](https://www.rusoto.org/supported-aws-services.html)

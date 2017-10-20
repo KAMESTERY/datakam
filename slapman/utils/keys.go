@@ -17,6 +17,9 @@ const (
 var (
 	SignKey     *rsa.PrivateKey
 	VerifyKey   *rsa.PublicKey
+	signBytes   []byte
+	verifyBytes []byte
+	err         error
 	keys_logger = NewLogger("utilskeys")
 )
 
@@ -27,9 +30,7 @@ func SetupCrypto(cryptoRsa string) {
 	privKeyPath := baseDir + "/" + cryptoRsa + ".rsa"    // openssl genrsa -out app.rsa 1024
 	pubKeyPath := baseDir + "/" + cryptoRsa + ".rsa.pub" // openssl rsa -in app.rsa -pubout > app.rsa.pub
 
-	var err error
-
-	signBytes, err := ioutil.ReadFile(privKeyPath)
+	signBytes, err = ioutil.ReadFile(privKeyPath)
 	if err != nil {
 		keys_logger.Fatalf("Error reading private key %+v", err)
 		return
@@ -40,7 +41,7 @@ func SetupCrypto(cryptoRsa string) {
 		return
 	}
 
-	verifyBytes, err := ioutil.ReadFile(pubKeyPath)
+	verifyBytes, err = ioutil.ReadFile(pubKeyPath)
 	if err != nil {
 		keys_logger.Fatalf("Error reading public key %+v", err)
 		return

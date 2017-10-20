@@ -92,21 +92,29 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				Issuer:    "admin",
 			},
 		}
-		t := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
 
-		jwt_logger.Debugf("Sign Key: %+v", utils.SignKey)
-		tokenString, err := t.SignedString(utils.SignKey)
+		response, err := utils.GenerateRsa256JwtToken(c)
 		if err != nil {
 			jwt_logger.Errorf("Token Signing error: %+v\n", err)
 			utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Sorry, error while Signing Token!"}, http.StatusInternalServerError)
 			return
 		}
 
+		//t := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
+		//
+		//jwt_logger.Debugf("Sign Key: %+v", utils.SignKey)
+		//tokenString, err := t.SignedString(utils.SignKey)
+		//if err != nil {
+		//	jwt_logger.Errorf("Token Signing error: %+v\n", err)
+		//	utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Sorry, error while Signing Token!"}, http.StatusInternalServerError)
+		//	return
+		//}
+
 		//TODO: update last user login
 
-		response := struct {
-			Token string `json:"token"`
-		}{tokenString}
+		//response := struct {
+		//	Token string `json:"token"`
+		//}{tokenString}
 		utils.RenderJSON(w, r, response)
 	} else {
 		utils.RenderJSONWithCode(w, r, jwtAuthErrors{"Wrong info"}, http.StatusForbidden)
