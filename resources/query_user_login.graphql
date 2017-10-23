@@ -1,0 +1,10 @@
+
+query UserLogin {
+  userLogin(
+    email:"lambert@awesome.com",
+    password: "sdfsdaf"
+  ) {
+    token
+  }
+}
+

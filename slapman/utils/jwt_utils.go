@@ -31,9 +31,13 @@ func GenerateRsa256JwtToken(claims jwt.Claims) (token JwtToken, err error) {
 
 func ValidateRsa256JwtToken(tokenString string) (valid bool) {
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return signBytes, nil
 	})
+
+	//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	//	return signBytes, nil
+	//})
 
 	valid = err == nil && token.Valid && token.Header["alg"] == jwt.SigningMethodRS256.Alg()
 
@@ -45,6 +49,8 @@ func ValidateRsa256JwtToken(tokenString string) (valid bool) {
 func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, err error) {
 
 	jwtutils_logger.Debugf("Refreshing JWT Token...")
+
+	jwtutils_logger.Debugf("Sign Bytes: %+v", signBytes)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return signBytes, nil

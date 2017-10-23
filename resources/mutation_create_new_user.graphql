@@ -1,5 +1,5 @@
 mutation CreateNewUser {
-  userCreateQuery(
+  userCreate(
     username:"Lambert",
     email:"lambert@awesome.com",
     password: "sdfsdaf",

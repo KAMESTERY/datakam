@@ -1,0 +1,8 @@
+
+mutation UserJwtTokenRefresh {
+  userJwtTokenRefresh(
+    token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyIjp7IlVzZXJJRCI6ImxhbWJlcnRAYXdlc29tZS5jb20iLCJFbWFpbCI6ImxhbWJlcnRAYXdlc29tZS5jb20iLCJVc2VybmFtZSI6IkxhbWJlcnQiLCJSb2xlIjoxMjM0LCJMYXN0U2VlbiI6IjIwMTctMTAtMTUgMDI6MzM6MjcuMTc1NTIzODkyICswMDAwIFVUQyBtPSsxMDkuNTcxODc3Mjc1In0sImV4cCI6MTUwODY1MTg2OCwiaXNzIjoiYWRtaW4ifQ.HdyhgVazDROY67Ybh9n0ujPLWiUu7ORKfoGglNmxXupsj0slsxkdEed7sQgvxl5pC7U1kLu8fEBy_M005uCwoUyocATX3pWClOFZ7lqTL3juD5i1Ipd6XNeABo_1fOnqkEANReH9e-ow1N4_x-xits2vZFT74nxex2ug-aAQxgE"
+  ) {
+    token
+  }
+}
