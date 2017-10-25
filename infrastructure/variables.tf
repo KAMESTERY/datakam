@@ -10,3 +10,8 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "web-bucket" {
+  description = "The S3 bucket name for the Website"
+  default = "slapman-web"
+}
+

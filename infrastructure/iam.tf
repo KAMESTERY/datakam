@@ -20,6 +20,14 @@ resource "aws_iam_role" "iam_for_slapman" {
       },
       "Effect": "Allow",
       "Sid": ""
+    },
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
     }
   ]
 }
@@ -72,6 +80,13 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:logs:*:*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::${var.web-bucket}/*"
+      ]
     }
   ]
 }

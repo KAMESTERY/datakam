@@ -3,6 +3,7 @@
 BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
 WORKER=slapman
+WEBSITE=slapman-web
 
 # These are the values we want to pass for VERSION and BUILD
 VERSION=0.0.1
@@ -25,6 +26,10 @@ deploy:
 
 prod-url:
 	terraform show | grep invoke_url
+
+publish-website: deploy
+	lein do clean, cljsbuild once min
+	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 
 build-lambda: deps-deploy prod-build-worker package-lambda
 	@echo "Completed Building Lambda"
