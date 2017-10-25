@@ -93,7 +93,7 @@ var (
 	GameQueryFields = graphql.Field{
 		Type:        GameScoreListType,
 		Description: "The DynamoDB Table Query Items",
-		Args:        utils.DynaQueryArgs,
+		Args:        utils.DynaQueryAuthArgs,
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
 			table, _ := p.Args["table"].(string)
@@ -107,6 +107,11 @@ var (
 			}
 
 			gamescore_logger.Debugf("QUERY PARAMS: %+v", params)
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
 
 			queryBuilder := utils.DynaQueryDsl(p.Context, table, index).Build(params)
 
@@ -148,8 +153,18 @@ var (
 			"limit": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
+
 			count, rows, err := utils.DynaResolveScanItems(p, gameScoresTable)
 			if err != nil {
 				return nil, err
@@ -180,8 +195,18 @@ var (
 			"limit": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
+
 			count, rows, err := utils.DynaResolveScanPages(p, gameScoresTable)
 			if err != nil {
 				return nil, err
@@ -212,10 +237,19 @@ var (
 			"topScore": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
 			gamescore_logger.Debugf("Put Args: %+v", p.Args)
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
 
 			gameScore := struct {
 				UserId    string `json:"UserId"`
@@ -261,10 +295,19 @@ var (
 			"topScore": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
 			gamescore_logger.Debugf("Put Args: %+v", p.Args)
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
 
 			keyData := make(map[string]interface{})
 			data := make(map[string]interface{})

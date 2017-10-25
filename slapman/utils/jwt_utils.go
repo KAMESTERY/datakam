@@ -29,19 +29,30 @@ func GenerateRsa256JwtToken(claims jwt.Claims) (token JwtToken, err error) {
 	return
 }
 
-func ValidateRsa256JwtToken(tokenString string) (valid bool) {
+func ValidateRsa256JwtTokenInParams(params map[string]interface{}) (err error) {
+	tokenString := params["token"].(string)
+	_, err = ValidateRsa256JwtToken(tokenString)
+	return
+}
 
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return signBytes, nil
+func ValidateRsa256JwtToken(tokenString string) (token *jwt.Token, err error) {
+
+	jwtutils_logger.Debugf("Validating JWT Token...")
+
+	token, err = jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return VerifyKey, nil
 	})
 
 	//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 	//	return signBytes, nil
 	//})
 
-	valid = err == nil && token.Valid && token.Header["alg"] == jwt.SigningMethodRS256.Alg()
+	if err != nil || !token.Valid || token.Header["alg"] != jwt.SigningMethodRS256.Alg() {
+		jwtutils_logger.Errorf("ERROR:::: JWT Token is Invalid: %+v", err)
+		return
+	}
 
-	jwtutils_logger.Debugf("JWT Token is Valid: [%+v]", valid)
+	jwtutils_logger.Debugf("JWT Token is Valid")
 
 	return
 }
@@ -50,13 +61,7 @@ func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, err error) {
 
 	jwtutils_logger.Debugf("Refreshing JWT Token...")
 
-	jwtutils_logger.Debugf("Sign Bytes: %+v", signBytes)
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return signBytes, nil
-	})
-
-	jwtutils_logger.Debugf("Old JWT Token", token)
+	token, err := ValidateRsa256JwtToken(tokenString)
 
 	if valid := err == nil && token.Valid && token.Method == jwt.SigningMethodRS256; !valid {
 		jwtutils_logger.Errorf("ERROR::: %+v", err)
@@ -65,6 +70,8 @@ func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, err error) {
 	}
 
 	newToken, err = GenerateRsa256JwtToken(token.Claims)
+
+	jwtutils_logger.Debugf("JWT Token has been Refreshed")
 
 	return
 }

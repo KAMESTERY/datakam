@@ -29,7 +29,8 @@ const (
 )
 
 var (
-	aws_logger              = NewLogger("utilsaws")
+	aws_logger = NewLogger("utilsaws")
+
 	DynaQueryParamInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		Name: "DynaQueryParam",
 		Fields: graphql.InputObjectConfigFieldMap{
@@ -69,6 +70,33 @@ var (
 			Type: graphql.Int,
 		},
 	}
+
+	DynaQueryAuthArgs = graphql.FieldConfigArgument{
+		"table": &graphql.ArgumentConfig{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "The DynamoDB Table to Query",
+		},
+		"index": &graphql.ArgumentConfig{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "The DynamoDB Table Index to Use",
+		},
+		"parameters": &graphql.ArgumentConfig{
+			Type: graphql.NewList(DynaQueryParamInputType),
+			//Type:        graphql.NewList(graphql.String),
+			Description: "The DynamoDB Query Parameters to Use",
+		},
+		"region": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+		"limit": &graphql.ArgumentConfig{
+			Type: graphql.Int,
+		},
+		"token": &graphql.ArgumentConfig{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "The JWT Token",
+		},
+	}
+
 	sess *session.Session
 )
 
