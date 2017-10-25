@@ -12,7 +12,8 @@
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-less "1.7.5"]
             [lein-ancient "0.6.12"]
-            [lein-cljfmt "0.5.7"]]
+            [lein-cljfmt "0.5.7"]
+            [cider/cider-nrepl "0.15.1"]]
 
   :min-lein-version "2.5.3"
 

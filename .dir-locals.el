@@ -13,5 +13,6 @@
          (eval . (setenv "GOPATH"
                          (concat
                           (getenv "GOPATH") ":" projectile-project-root "slapman/build")))
+         (eval . (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))"))
          )))
 
