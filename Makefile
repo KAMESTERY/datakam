@@ -26,6 +26,8 @@ deploy:
 
 prod-url:
 	terraform show | grep invoke_url
+	terraform show | grep $(WORKER)-api-url
+	terraform show | grep $(WEBSITE)-url
 
 publish-website: deploy
 	lein do clean, cljsbuild once min

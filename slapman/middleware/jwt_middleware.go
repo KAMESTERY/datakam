@@ -10,7 +10,14 @@ import (
 	jwtReq "github.com/dgrijalva/jwt-go/request"
 )
 
-var jwt_logger = utils.NewLogger("middlewarejwt")
+var (
+	jwt_logger     = utils.NewLogger("middlewarejwt")
+	pathExceptions = []string{
+		"login",
+		"register",
+		"graphql",
+	}
+)
 
 func pathContains(req *http.Request, chunks ...string) (match bool) {
 	for _, chunk := range chunks {
@@ -27,7 +34,7 @@ func pathContains(req *http.Request, chunks ...string) (match bool) {
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		if !pathContains(req, "login", "register") {
+		if !pathContains(req, pathExceptions...) {
 			// Validate the JWT Token
 			jwt_logger.Debug("Validating JWT Token...")
 			extractor := jwtReq.MultiExtractor{

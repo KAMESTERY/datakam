@@ -55,7 +55,7 @@ func ValidateRsa256JwtToken(tokenString string) (token *jwt.Token, err error) {
 	return
 }
 
-func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, err error) {
+func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, claims jwt.Claims, err error) {
 
 	jwtutils_logger.Debugf("Refreshing JWT Token...")
 
@@ -67,7 +67,8 @@ func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, err error) {
 		return
 	}
 
-	newToken, err = GenerateRsa256JwtToken(token.Claims)
+	claims = token.Claims
+	newToken, err = GenerateRsa256JwtToken(claims)
 
 	jwtutils_logger.Debugf("JWT Token has been Refreshed")
 

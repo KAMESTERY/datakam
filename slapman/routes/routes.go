@@ -43,7 +43,7 @@ func SetupAPI() http.Handler {
 
 	servicesRoutes := wrapCommonMiddlewares(
 		baseRoutes,
-		//middleware.JWTMiddleware,
+		middleware.JWTMiddleware,
 	)
 
 	return servicesRoutes

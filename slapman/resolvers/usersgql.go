@@ -92,7 +92,33 @@ var (
 				return nil, fmt.Errorf("Token Cannot be Empty")
 			}
 
-			return utils.RefreshRsa256JwtToken(tokenString)
+			newToken, claims, err := utils.RefreshRsa256JwtToken(tokenString)
+			if err != nil {
+				return nil, err
+			}
+
+			// Update the LastSeen TimeStamp for the Current User
+			var userClaim struct {
+				User UserRef
+			}
+			mapstructure.Decode(claims, &userClaim)
+
+			user_logger.Debugf("User Claims: [%+v]", claims)
+			user_logger.Debugf("Updating [LastSeen] Property for User: [%+v]", userClaim)
+
+			keyData := map[string]interface{}{
+				"UserID": userClaim.User.UserID,
+				"Email":  userClaim.User.Email,
+			}
+			data := map[string]interface{}{
+				"LastSeen": time.Now().String(),
+			}
+			_, err = utils.DynaResolveUpdateItem(p, userTable, keyData, data)
+			if err != nil {
+				user_logger.Errorf("ERROR:::: %+v", err) // Log the error and Proceed
+			}
+
+			return newToken, nil
 		},
 	}
 

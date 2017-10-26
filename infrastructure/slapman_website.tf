@@ -29,5 +29,5 @@ EOF
 }
 
 output "slapman-web-url" {
-  value = "${var.web-bucket}.s3-website-${var.aws_region}.amazonaws.com"
+  value = "http://${var.web-bucket}.s3-website-${var.aws_region}.amazonaws.com"
 }
