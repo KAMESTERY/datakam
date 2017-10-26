@@ -26,6 +26,8 @@ func GenerateRsa256JwtToken(claims jwt.Claims) (token JwtToken, err error) {
 
 	token.Token = tokenString
 
+	jwtutils_logger.Debugf("JWT Token has been Generated")
+
 	return
 }
 
@@ -39,13 +41,9 @@ func ValidateRsa256JwtToken(tokenString string) (token *jwt.Token, err error) {
 
 	jwtutils_logger.Debugf("Validating JWT Token...")
 
-	token, err = jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return VerifyKey, nil
 	})
-
-	//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	//	return signBytes, nil
-	//})
 
 	if err != nil || !token.Valid || token.Header["alg"] != jwt.SigningMethodRS256.Alg() {
 		jwtutils_logger.Errorf("ERROR:::: JWT Token is Invalid: %+v", err)
