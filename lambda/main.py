@@ -82,7 +82,7 @@ def handle(event, context):
     ]
     [data] = process(*tasks)
     metadata = dict(
-        event=event,
+        # event=event,
         msg='You have been Officially Slapped by a Py!!:-)',
     )
     logger.info("Collected Metadata: %s", metadata)

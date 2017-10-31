@@ -9,15 +9,18 @@ WEBSITE=slapman-web
 VERSION=0.0.1
 REVISION=$(shell echo `git rev-parse HEAD`)
 
-.PHONY: prod-deploy prod-url
+.PHONY: prod-deploy publish-website deploy-everything prod-url
 
 # DEVOPS
 
 devops-init:
 	terraform init infrastructure
 
+deploy-everything: prod-deploy publish-website
+	@echo "All Done!"
+
 prod-deploy: clean build-lambda deploy
-	@echo "Completed Production Deployment! :-)"
+	@echo "Completed the Production Deployment of Lambda [$(WORKER)]! :-)"
 
 deploy:
 	terraform get infrastructure
@@ -32,6 +35,7 @@ prod-url:
 publish-website: deploy
 	lein do clean, cljsbuild once min
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
+	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
 build-lambda: deps-deploy prod-build-worker package-lambda
 	@echo "Completed Building Lambda"
