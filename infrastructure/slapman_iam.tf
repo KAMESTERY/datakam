@@ -1,3 +1,4 @@
+
 resource "aws_iam_role" "iam_for_slapman" {
   name = "iam_for_slapman"
 
@@ -92,4 +93,3 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
 }
 EOF
 }
-

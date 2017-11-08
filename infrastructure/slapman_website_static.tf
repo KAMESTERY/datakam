@@ -28,6 +28,6 @@ EOF
   }
 }
 
-output "slapman-web-url" {
+output "slapman-static-web-url" {
   value = "http://${var.web-bucket}.s3-website-${var.aws_region}.amazonaws.com"
 }

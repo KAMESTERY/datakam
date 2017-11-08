@@ -6,6 +6,7 @@ import site
 # third-party libraries.
 site.addsitedir(os.path.join(os.path.dirname(__file__), 'lib'))
 
+import pprint
 import logging
 import awsgi
 
@@ -13,6 +14,8 @@ from flask import (
     Flask,
     render_template,
 )
+
+pp = pprint.PrettyPrinter(indent=4)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -35,8 +38,8 @@ launch()
 
 
 def handle(event, context):
-    logger.info("%s - %s", event, context)
+    logger.info("Event: %s - Context: %s", pp.pformat(event), pp.pformat(context))
     # terminate()
     response = awsgi.response(app, event, context)
-    logger.info("Response::::\n %s", response)
+    logger.info("Response::::\n %s", pp.pformat(response))
     return response
