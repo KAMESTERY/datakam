@@ -7,6 +7,7 @@
                  [re-com "2.2.0-SNAPSHOT"]
                  [secretary "1.2.3"]
                  [degree9/firebase-cljs "1.3.0"] ;; Check this out: https://github.com/velveteer/crossed/blob/master/src/app/handlers.cljs
+                 [quil "2.6.0"]
                  [com.taoensso/timbre "4.10.0"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
@@ -17,7 +18,7 @@
 
   :min-lein-version "2.5.3"
 
-  :source-paths ["view/clj"]
+  :source-paths ["view/clj" "view/cljc"]
 
   :clean-targets ^{:protect false} ["public/js/compiled" "target"
                                     "test/js"]
@@ -50,7 +51,7 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["view/cljs"]
+     :source-paths ["view/cljc" "view/cljs"]
      :figwheel     {:on-jsload "slapman.core/mount-root"}
      :compiler     {:main                 slapman.core
                     :output-to            "public/js/compiled/app.js"
@@ -63,7 +64,7 @@
                     }}
 
     {:id           "min"
-     :source-paths ["view/cljs"]
+     :source-paths ["view/cljc" "view/cljs"]
      :compiler     {:main            slapman.core
                     :output-to       "public/js/compiled/app.js"
                     :optimizations   :advanced
@@ -71,7 +72,7 @@
                     :pretty-print    false}}
 
     {:id           "test"
-     :source-paths ["view/cljs" "view/test/cljs"]
+     :source-paths ["view/cljc" "view/cljs" "view/test/cljs"]
      :compiler     {:main          slapman.runner
                     :output-to     "public/js/compiled/test.js"
                     :output-dir    "public/js/compiled/test/out"
