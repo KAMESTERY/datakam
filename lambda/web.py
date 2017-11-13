@@ -13,31 +13,20 @@ import awsgi
 
 from boltons.iterutils import remap
 
-from flask import (
-    Flask,
-    render_template,
-)
+from slapman_web.wsgi import application
 
 pp = pprint.PrettyPrinter(indent=4)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-app = Flask(__name__)
-
-
-@app.route('/')
-def index():
-    return render_template('home.jinja2', my_string="Wheeeee!", my_list=[0,1,2,3,4,5])
-
-
-from worker import (
-    launch,
-    terminate
-)
-
-# Launch Worker in the Background
-launch()
+# from worker import (
+#     launch,
+#     terminate
+# )
+#
+# # Launch Worker in the Background
+# launch()
 
 
 drop_none = lambda path, key, value: key is not None and value is not None
@@ -53,7 +42,7 @@ def handle(event, context):
 
     logger.info("Clean Event: %s", pp.pformat(clean_event))
 
-    response = awsgi.response(app, clean_event, context)
+    response = awsgi.response(application, clean_event, context)
     # response = awsgi.response(app, event, context)
     # res = awsgi.response(app, event, context)
     # response = dict(

@@ -33,3 +33,19 @@ resource "aws_lambda_permission" "allow_cloudwatch_slapman_slapalicious_POST" {
   qualifier      = "${aws_lambda_alias.slapman_slapalicious_POST_alias.name}"
 }
 
+//resource "aws_lambda_alias" "slapman_slapman_WEB_alias" {
+//  name             = "slapmanslapmanWEBalias"
+//  description      = "a sample description"
+//  function_name    = "${aws_lambda_function.slapman_web.function_name}"
+//  function_version = "$LATEST"
+//}
+//
+//resource "aws_lambda_permission" "allow_cloudwatch_slapman_slapman_WEB" {
+//  statement_id   = "AllowExecutionFromCloudWatch"
+//  action         = "lambda:InvokeFunction"
+//  function_name  = "${aws_lambda_function.slapman_web.function_name}"
+//  principal      = "events.amazonaws.com"
+//  source_account = "${var.aws_account_id}"
+//  source_arn     = "arn:aws:events:${var.aws_region}:${var.aws_account_id}:rule/RunDaily"
+//  qualifier      = "${aws_lambda_alias.slapman_slapman_WEB_alias.name}"
+//}

@@ -15,3 +15,10 @@ variable "web-bucket" {
   default = "slapman-web"
 }
 
+variable "burst_limit" {
+  default = 5
+}
+
+variable "rate_limit" {
+  default = 10
+}

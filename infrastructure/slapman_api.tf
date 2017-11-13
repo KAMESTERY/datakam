@@ -63,3 +63,7 @@ output "slapman-api-url" {
   value = "https://${aws_api_gateway_rest_api.slapalicious_api.id}.execute-api.${var.aws_region}.amazonaws.com/production/${aws_api_gateway_resource.slapalicious_api_res_slapalicious.path_part}"
 }
 
+output "slapman-api-invoke-url" {
+  value = "${aws_api_gateway_deployment.slapalicious_api_deployment.invoke_url}"
+}
+

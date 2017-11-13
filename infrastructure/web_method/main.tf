@@ -27,13 +27,17 @@ variable "account_id" {
   description = "The AWS account ID"
 }
 
+variable "api_gateway_stage" {
+  default = "production"
+}
+
 # Example: request for GET /slapman
 resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = "${var.rest_api_id}"
   resource_id   = "${var.resource_id}"
   http_method   = "${var.method}"
   authorization = "NONE"
-  api_key_required = true
+  api_key_required = false
 }
 
 # Example: GET /slapman => POST lambda
@@ -56,7 +60,6 @@ resource "aws_api_gateway_method_response" "proxy" {
   status_code = "200"
 
   response_models = {
-    "text/html" = "Empty"
     "application/json" = "Empty"
   }
 
@@ -67,10 +70,33 @@ resource "aws_api_gateway_method_response" "proxy" {
   }
 }
 
+# Response for: GET /slapman
+resource "aws_api_gateway_integration_response" "proxy" {
+  rest_api_id = "${var.rest_api_id}"
+  resource_id = "${var.resource_id}"
+  http_method = "${aws_api_gateway_method_response.proxy.http_method}"
+  status_code = "${aws_api_gateway_method_response.proxy.status_code}"
+
+  response_templates = {
+    "application/json" = ""
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS,GET,PUT,PATCH,DELETE'",
+    #"method.response.header.Access-Control-Allow-Origin" = "'http://localhost:1818'"
+    "method.response.header.Access-Control-Allow-Origin" = "'*'"
+  }
+}
+
 resource "aws_lambda_permission" "allow_api_gateway_lambda_proxy" {
   function_name = "${var.lambda}"
   statement_id  = "AllowExecutionFromApiGateway"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.region}:${var.account_id}:${var.rest_api_id}/*/*/*"
+}
+
+output "http_method" {
+  value = "${aws_api_gateway_integration_response.proxy.http_method}"
 }
