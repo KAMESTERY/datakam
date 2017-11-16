@@ -13,7 +13,7 @@ import awsgi
 
 from boltons.iterutils import remap
 
-from slapman_web.wsgi import application
+from slapweb.wsgi import app
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -42,7 +42,7 @@ def handle(event, context):
 
     logger.info("Clean Event: %s", pp.pformat(clean_event))
 
-    response = awsgi.response(application, clean_event, context)
+    response = awsgi.response(app, clean_event, context)
     # response = awsgi.response(app, event, context)
     # res = awsgi.response(app, event, context)
     # response = dict(

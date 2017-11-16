@@ -27,6 +27,7 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [ZODB + Traversal Wiki Tutorial](https://docs.pylonsproject.org/projects/pyramid/en/latest/tutorials/wiki/index.html)
 * [Critical vulnerabilities in JSON Web Token libraries](https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/)
 * [GO JWT Middleware](https://github.com/auth0/go-jwt-middleware/blob/master/jwtmiddleware.go)
 * [Enable CORS for an API Gateway Resource](http://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html)
