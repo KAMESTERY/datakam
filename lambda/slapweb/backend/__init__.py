@@ -19,6 +19,5 @@ def main(global_config, **settings):
         config.include('pyramid_zodbconn')
         config.set_root_factory(root_factory)
         config.add_static_view('static', 'static', cache_max_age=3600)
-        config.add_route('home', '/web')
         config.scan()
         return config.make_wsgi_app()

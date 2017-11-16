@@ -31,11 +31,10 @@ def configure_app(settings):
         config.include('pyramid_jinja2')
         config.include('pyramid_tm')
         config.include('pyramid_retry')
+        config.include('slapweb.views', route_prefix='/production/web')
         # config.include('pyramid_zodbconn')
         # config.set_root_factory(root_factory)
         config.add_static_view('static', 'static', cache_max_age=3600)
-        config.add_route('home', '/web')
-        config.scan('slapweb.backend')
         return config.make_wsgi_app()
 
 
@@ -48,16 +47,20 @@ setup_logging(init_path)
 
 # settings = get_settings(init_path)
 
-settings = {'pyramid.reload_templates': True,
+settings = {'pyramid.reload_templates': False,
             'pyramid.debug_authorization': False,
             'pyramid.debug_notfound': False,
             'pyramid.debug_routematch': False,
             'pyramid.default_locale_name': 'en',
-            'pyramid.includes': ['pyramid_debugtoolbar'],
+            'pyramid.includes': ['pyramid_beaker'],
 
             'zodbconn.uri': 'file://Data.fs?connection_cache_size=20000',
 
-            'retry.attempts': 3}
+            'retry.attempts': 3,
+
+            'jinja2.filters': {'model_url': 'pyramid_jinja2.filters:model_url_filter',
+                               'route_url': 'pyramid_jinja2.filters:route_url_filter',
+                               'static_url': 'pyramid_jinja2.filters:static_url_filter'}}
 
 print(f"Settings: {settings}")
 
