@@ -10,8 +10,8 @@ resource "aws_api_gateway_rest_api" "slapman_web" {
 resource "aws_api_gateway_resource" "slapman_web_res_slapman" {
   rest_api_id = "${aws_api_gateway_rest_api.slapman_web.id}"
   parent_id = "${aws_api_gateway_rest_api.slapman_web.root_resource_id}"
-  path_part = "web"
-  #path_part = "{proxy+}"
+  #path_part = "web"
+  path_part = "{proxy+}"
 }
 
 # Until now, the resource created could not respond to anything. We must set up

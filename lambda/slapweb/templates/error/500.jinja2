@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Slapman Web &middot; Getting a Slapalicious Slap!!">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="shortcut icon" href="/production/static/favicon.ico">
 {#    <link rel="shortcut icon" href="{{ request.static_url('backend:static/favicon.ico') }}">#}
     <title>We're sorry, but something went wrong (500)</title>
     <style type="text/css">
@@ -59,7 +59,7 @@
 <div class="dialog">
     <h1>Oops!</h1>
     <h2>{{ message }}</h2>
-    <p><a href="{{ request.route_url('home') }}">Now go home &raquo;</a></p>
+    <p><a href="/production/{{ request.route_url('home') }}">Now go home &raquo;</a></p>
 </div>
 </body>
 </html>

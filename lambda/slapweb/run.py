@@ -25,7 +25,7 @@ def configure_app(settings):
         config.include('pyramid_jinja2')
         config.include('pyramid_tm')
         config.include('pyramid_retry')
-        config.include('views', route_prefix='/production/web')
+        config.include('views', route_prefix='/web')
         # config.include('pyramid_zodbconn')
         # config.set_root_factory(root_factory)
         config.add_static_view('static', 'static', cache_max_age=3600)

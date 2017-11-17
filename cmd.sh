@@ -2,6 +2,7 @@
 
 BASEDIR=`pwd`
 ENV_NAME=SLAPENV
+unamestr=`uname`
 
 upgrade_all_deps() {
     pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
@@ -60,8 +61,14 @@ case $1 in
         pip install -r $2/requirements.txt -q --upgrade
         ;;
     deps.deploy)
-        activate_env
-        pip install -r $2/requirements.txt -q -t $2/lib
+        if [[ "$unamestr" == 'Linux' ]]; then
+           echo 'Using Python 3...'
+           activate_env
+           pip install -r $2/requirements.txt -q -t $2/lib
+        elif [[ "$unamestr" == 'Darwin' ]]; then
+           echo 'Using Docker Python 3...'
+           docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp python:3.6 pip install -r $2/requirements.txt -q -t $2/lib
+        fi
         ;;
     clean)
         clean_all

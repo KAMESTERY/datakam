@@ -3,10 +3,11 @@ args==0.1.0
 arrow==0.10.0
 astor==0.6.2
 aws-wsgi==0.0.7
+Beaker==1.9.0
 binaryornot==0.4.4
 boltons==17.1.0
 boto3==1.4.7
-botocore==1.7.45
+botocore==1.7.46
 BTrees==4.4.1
 certifi==2017.11.5
 cffi==1.11.2
@@ -20,7 +21,6 @@ graphene==2.0.1
 graphql-core==2.0
 graphql-relay==0.4.5
 hupper==1.0
-hy==0.13.0
 idna==2.6
 itsdangerous==0.24
 Jinja2==2.10
@@ -38,6 +38,7 @@ pycparser==2.18
 Pygments==2.2.0
 pynamodb==3.2.1
 pyramid==1.9.1
+pyramid-beaker==0.8
 pyramid-chameleon==0.3
 pyramid-debugtoolbar==4.3
 pyramid-exclog==1.0
