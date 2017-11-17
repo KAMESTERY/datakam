@@ -60,12 +60,7 @@
 <div class="dialog">
     <h1>Oops!</h1>
     <h2>{{ message }}</h2>
-    <p><a href="/production/{{ request.route_url('home') }}">Now go home &raquo;</a></p>
+    <p><a href="{{ request.route_url('home') }}">Now go home &raquo;</a></p>
 </div>
 </body>
 </html>
-
-
-<h1>Page Not Found</h1>
-<p>What you were looking for is just not there.
-<p><a href="/production/{{ request.route_url('home') }}">go somewhere nice</a>
