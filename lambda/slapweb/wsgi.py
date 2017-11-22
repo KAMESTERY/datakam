@@ -49,6 +49,9 @@ class LambdaRequest(Request):
 
         return app_url + '/production' + path + suffix + qs + anchor
 
+    # def static_url(self, path, **kw):
+    #     pass
+
 
 def configure_app(settings):
     """ This function returns a Pyramid WSGI application.
@@ -90,6 +93,7 @@ settings = {'pyramid.reload_templates': False,
                                'route_url': 'pyramid_jinja2.filters:route_url_filter',
                                'static_url': 'pyramid_jinja2.filters:static_url_filter'},
             'jinja2.globals': {'hello': 'slapweb.views.ext.hello',
-                               'has_cred': 'slapweb.views.ext.has_cred'}}
+                               'has_cred': 'slapweb.views.ext.has_cred',
+                               'now': 'datetime.datetime.now'}}
 
 app = configure_app(settings)

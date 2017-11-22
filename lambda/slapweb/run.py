@@ -43,9 +43,10 @@ setup_logging(init_path)
 # settings = get_settings(init_path)
 
 settings = {'pyramid.reload_templates': True,
-            'pyramid.debug_authorization': False,
+            'pyramid.reload_all': True,
+            'pyramid.debug_authorization': True,
             'pyramid.debug_notfound': False,
-            'pyramid.debug_routematch': False,
+            'pyramid.debug_routematch': True,
             'pyramid.default_locale_name': 'en',
             'pyramid.includes': ['pyramid_debugtoolbar',
                                  'pyramid_beaker'],
@@ -58,7 +59,8 @@ settings = {'pyramid.reload_templates': True,
                                'route_url': 'pyramid_jinja2.filters:route_url_filter',
                                'static_url': 'pyramid_jinja2.filters:static_url_filter'},
             'jinja2.globals': {'hello': 'views.ext.hello',
-                               'has_cred': 'views.ext.has_cred'}}
+                               'has_cred': 'views.ext.has_cred',
+                               'now': 'datetime.datetime.now'}}
 
 print(f"Settings: {settings}")
 

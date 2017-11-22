@@ -62,8 +62,14 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
         "dynamodb:BatchWriteItem",
         "dynamodb:GetRecords",
         "dynamodb:GetShardIterator",
+        "dynamodb:DescribeTable",
+        "dynamodb:DescribeLimits",
+        "dynamodb:DescribeTimeToLive",
         "dynamodb:DescribeStream",
-        "dynamodb:ListStreams"
+        "dynamodb:ListStreams",
+        "dynamodb:TagResource",
+        "dynamodb:UntagResource",
+        "dynamodb:ListTagsOfResource"
       ],
       "Resource": [
         "${aws_dynamodb_table.game-scores-dynamodb-table.arn}",

@@ -1,0 +1,69 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale_name }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta content="_csrf" name="csrf-param" />
+    <meta content="{{ request.session.get_csrf_token() }}=" name="csrf-token" />
+
+    {% block page_meta %}
+    {% endblock %}
+
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//ajax.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//code.getmdl.io">
+    <link rel="dns-prefetch" href="//code.jquery.com">
+    <link rel="dns-prefetch" href="//maxcdn.bootstrapcdn.com">
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Place favicon.ico in the root directory -->
+{#    <link rel="shortcut icon" href="{{ request.static_url('static/favicon.ico') }}">#}
+    <link rel="shortcut icon" href="static/favicon.ico">
+
+{#    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">#}
+{#    <link rel="stylesheet" href="//code.getmdl.io/1.3.0/material.deep_purple-blue.min.css" />#}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css" />
+
+    {% block page_css %}
+    {% endblock %}
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+
+{% block body %}
+{% endblock %}
+
+{#<script defer src="//code.getmdl.io/1.3.0/material.min.js"></script>#}
+<script src="//code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+{% block page_js %}
+{% endblock %}
+
+<footer class="footer">
+    <div class="container">
+        <div class="content has-text-centered">
+            <p>
+                <strong>SlapWeb</strong> by <a href="//www.outcastgeek.com" target="blank">outcastgeek</a>.
+            </p>
+            <p>Copyright &copy; 2013 - {{ now().strftime("%Y") }}</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
