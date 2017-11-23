@@ -77,7 +77,11 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
         "${aws_dynamodb_table.user-table.arn}",
         "${aws_dynamodb_table.user-table.arn}/index/*",
         "${aws_dynamodb_table.userprofile-table.arn}",
-        "${aws_dynamodb_table.userprofile-table.arn}/index/*"
+        "${aws_dynamodb_table.userprofile-table.arn}/index/*",
+        "${aws_dynamodb_table.things-dynamodb-table.arn}",
+        "${aws_dynamodb_table.things-dynamodb-table.arn}/index/*",
+        "${aws_dynamodb_table.data-dynamodb-table.arn}",
+        "${aws_dynamodb_table.data-dynamodb-table.arn}/index/*"
       ],
       "Effect": "Allow",
       "Sid": ""
