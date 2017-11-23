@@ -28,6 +28,15 @@ except:
     renderer='templates/home.jinja2'
 )
 def my_view(request):
+
+    passwd = 'blahblah'
+    email = 'lambert@awesome.com'
+    print("Is {0} a valid password for {1}? Answer: {2}".format(
+        passwd,
+        email,
+        User.check_password(email, passwd)
+    ))
+
     for user in User.email_index.query('lambert@awesome.com'):
     # for user in User.query('Email', User.email == 'lambert@awesome.com'):
     # # for user in User.rate_limited_scan():

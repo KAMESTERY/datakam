@@ -1,6 +1,19 @@
 
 from datetime import datetime
 
+try:
+    from slapweb.security import (
+        hash_password,
+        check_password_hash
+    )
+except:
+    from security import (
+        hash_password,
+        check_password_hash
+    )
+
+from pyramid.security import Allow
+
 from pynamodb.attributes import (
     BooleanAttribute,
     NumberAttribute,
@@ -67,6 +80,31 @@ class User(PartialModel):
     last_seen = UnicodeAttribute(attr_name='LastSeen')
     # last_seen = UTCDateTimeAttribute(attr_name='LastSeen', default=datetime.now())
     last_seen_index = LastSeenIndex()
+
+    @property
+    def __acl__(self):
+        return [
+            (Allow, self.username, 'user'),
+        ]
+
+    def _get_password(self):
+        return self.password_hash
+
+    def _set_password(self, password):
+        self.password_hash = hash_password(password.encode('utf-8'))
+
+    password = property(_get_password, _set_password)
+
+    @classmethod
+    def check_password(cls, email, password):
+        user = next(iter([u for u in cls.query(email)]))
+        if not user:
+            return False, None
+        return check_password_hash(
+            password.encode('utf-8'),
+            user.password.encode('utf-8')
+        ), user
+
 
 
 ################ UserProfile Model and Indices
