@@ -12,7 +12,10 @@ except:
         check_password_hash
     )
 
-from pyramid.security import Allow
+from pyramid.security import (
+    Allow,
+    ALL_PERMISSIONS
+)
 
 from pynamodb.attributes import (
     BooleanAttribute,
@@ -72,7 +75,7 @@ class User(PartialModel):
     email_index = EmailIndex()
     username = UnicodeAttribute(attr_name='Username')
     username_index = UsernameIndex()
-    role = NumberAttribute(attr_name='Role', default=0)
+    roles = NumberAttribute(attr_name='Roles', default=0)
     role_index = RoleIndex()
     confirmed = BooleanAttribute('Confirmed', default=False)
     password_hash = UnicodeAttribute(attr_name='PasswordHash')
@@ -84,14 +87,15 @@ class User(PartialModel):
     @property
     def __acl__(self):
         return [
-            (Allow, self.username, 'user'),
+            (Allow, 'admin', ALL_PERMISSIONS),
+            (Allow, self.username, ['view', 'edit']),
         ]
 
     def _get_password(self):
         return self.password_hash
 
     def _set_password(self, password):
-        self.password_hash = hash_password(password.encode('utf-8'))
+        self.password_hash = hash_password(password)
 
     password = property(_get_password, _set_password)
 
@@ -100,10 +104,14 @@ class User(PartialModel):
         user = next(iter([u for u in cls.query(email)]))
         if not user:
             return False, None
-        return check_password_hash(
-            password.encode('utf-8'),
-            user.password.encode('utf-8')
-        ), user
+        return check_password_hash(password, user.password), user
+
+    @classmethod
+    def check_password(cls, email, password):
+        user = next(iter([u for u in cls.query(email)]))
+        if not user:
+            return False, None
+        return check_password_hash(password, user.password), user
 
 
 
@@ -154,3 +162,41 @@ class UserProfile(PartialModel):
     about_me = UnicodeAttribute(attr_name='AboutMe')
     member_since = UnicodeAttribute(attr_name='MemberSince')
     member_since_index = MemberSinceIndex()
+
+################ UserGroup Model and Indices
+
+class UserIDIndex(PartialIndex):
+    class Meta(PartialIndex.Meta):
+        index_name = 'UserIDIndex'
+    user_id = UnicodeAttribute(attr_name='UserID', hash_key=True)
+    name = UnicodeAttribute(attr_name='Name', range_key=True)
+
+class GroupNameIndex(PartialIndex):
+    class Meta(PartialIndex.Meta):
+        index_name = 'NameIndex'
+    name = UnicodeAttribute(attr_name='Name', hash_key=True)
+    user_id = UnicodeAttribute(attr_name='UserID', range_key=True)
+
+
+class UserGroup(PartialModel):
+    """
+    A DynamoDB Slapman Thing
+    """
+    class Meta(PartialModel.Meta):
+        table_name = "UserGroups"
+    group_id = UnicodeAttribute(attr_name='GroupID', hash_key=True)
+    user_id = UnicodeAttribute(attr_name='UserID', range_key=True)
+    user_id_index = UserIDIndex()
+    name = UnicodeAttribute(attr_name='Name')
+    name_index = GroupNameIndex()
+
+    @property
+    def __acl__(self):
+        return [
+            (Allow, 'admin', ALL_PERMISSIONS),
+        ]
+
+    @classmethod
+    def by_userid(cls, userid):
+        groups = [g for g in cls.query(userid)]
+        return groups

@@ -221,3 +221,56 @@ resource "aws_dynamodb_table" "userprofile-table" {
 //location = db.Column(db.String(64))
 //member_since = db.Column(db.DateTime(), default=datetime.utcnow)
 //last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+
+resource "aws_dynamodb_table" "usergroup-table" {
+  name = "UserGroups"
+  read_capacity = 20
+  write_capacity = 20
+  hash_key       = "GroupID"
+  range_key      = "UserID"
+
+  attribute {
+    name = "GroupID"
+    type = "S"
+  }
+
+  attribute {
+    name = "UserID"
+    type = "S"
+  }
+
+  attribute {
+    name = "Name"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "TimeToExist"
+    enabled = false
+  }
+
+  global_secondary_index {
+    name               = "UserIDIndex"
+    hash_key           = "UserID"
+    range_key          = "Name"
+    write_capacity     = 10
+    read_capacity      = 10
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["GroupID"]
+  }
+
+  global_secondary_index {
+    name = "NameIndex"
+    hash_key = "Name"
+    range_key = "UserID"
+    write_capacity = 10
+    read_capacity = 10
+    projection_type = "INCLUDE"
+    non_key_attributes = ["GroupID"]
+  }
+
+  tags {
+    Name = "usergroup-table-1"
+    Environment = "production"
+  }
+}

@@ -54,3 +54,10 @@ def my_view(request):
 
     return {'project': 'Slapman Web',
             'my_list': [user.username for user in User.rate_limited_scan()]}
+
+@view_config(
+    route_name='api',
+    renderer='templates/api.jinja2'
+)
+def api_view(request):
+    return {}

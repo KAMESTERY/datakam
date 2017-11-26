@@ -86,3 +86,12 @@ class Data(PartialModel):
     key = UnicodeAttribute(attr_name='Key')
     key_index = KeyIndex()
     value = UnicodeAttribute(attr_name='Value')
+
+
+################ Meta Data
+
+class ThingVersion:
+    UNPUBLISHED = 0x00
+    PUBLISHED = 0x01
+    COMPLETED = 0x02
+
