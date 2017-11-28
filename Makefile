@@ -25,7 +25,7 @@ prod-deploy: clean build-lambda deploy
 deploy:
 	terraform get infrastructure
 	terraform plan infrastructure
-	terraform apply infrastructure
+	terraform apply -auto-approve infrastructure
 
 prod-url:
 	terraform show | grep invoke_url
@@ -37,7 +37,8 @@ publish-website: deploy
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
-build-lambda: deps-deploy prod-build-worker package-lambda
+#build-lambda: deps-deploy prod-build-worker package-lambda
+build-lambda: deps-deploy package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:

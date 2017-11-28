@@ -3,6 +3,8 @@ __author__ = 'outcastgeek'
 
 import os
 
+import deform
+
 from pyramid.paster import setup_logging
 from pyramid.config import Configurator
 from pyramid.request import Request
@@ -68,6 +70,8 @@ def configure_app(settings):
         config.include('slapweb.views')
         # config.include('pyramid_zodbconn')
         # config.set_root_factory(root_factory)
+        deform.renderer.configure_zpt_renderer()
+        config.add_static_view('static_deform', 'deform:static')
         config.add_static_view('static', 'static', cache_max_age=3600)
         return config.make_wsgi_app()
 

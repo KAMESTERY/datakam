@@ -29,26 +29,26 @@ except:
 )
 def my_view(request):
 
-    passwd = 'blahblah'
-    email = 'lambert@awesome.com'
-    print("Is {0} a valid password for {1}? Answer: {2}".format(
-        passwd,
-        email,
-        User.check_password(email, passwd)
-    ))
+    # passwd = 'blahblah'
+    # email = 'lambert@awesome.com'
+    # print("Is {0} a valid password for {1}? Answer: {2}".format(
+    #     passwd,
+    #     email,
+    #     User.check_password(email, passwd)
+    # ))
 
-    for user in User.email_index.query('lambert@awesome.com'):
-    # for user in User.query('Email', User.email == 'lambert@awesome.com'):
-    # # for user in User.rate_limited_scan():
-    # for user in User.scan():
-    #     print("Scanned User: {0}".format(user))
-    #     # print("Rate Limited Scanned User: {0}".format(user))
-        print("User queried from index: {0}".format(user))
-
-    for thing in Thing.rate_limited_scan():
-    # for thing in Thing.scan():
-        print("Scanned Thing: {0}".format(thing))
-        # print("Rate Limited Scanned Thing: {0}".format(thing))
+    # for user in User.email_index.query('lambert@awesome.com'):
+    # # for user in User.query('Email', User.email == 'lambert@awesome.com'):
+    # # # for user in User.rate_limited_scan():
+    # # for user in User.scan():
+    # #     print("Scanned User: {0}".format(user))
+    # #     # print("Rate Limited Scanned User: {0}".format(user))
+    #     print("User queried from index: {0}".format(user))
+    #
+    # for thing in Thing.rate_limited_scan():
+    # # for thing in Thing.scan():
+    #     print("Scanned Thing: {0}".format(thing))
+    #     # print("Rate Limited Scanned Thing: {0}".format(thing))
 
     request.response.set_cookie('CookieLB', ':-):-)(-:(-:')
 
