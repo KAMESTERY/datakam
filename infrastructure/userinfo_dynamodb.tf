@@ -1,7 +1,7 @@
 resource "aws_dynamodb_table" "user-table" {
   name = "User"
-  read_capacity = 20
-  write_capacity = 20
+  read_capacity = 1
+  write_capacity = 1
   hash_key = "UserID"
   range_key = "Email"
 
@@ -49,48 +49,53 @@ resource "aws_dynamodb_table" "user-table" {
     name = "EmailIndex"
     hash_key = "Email"
     range_key = "Confirmed"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "RoleIndex"
     hash_key = "Role"
     range_key = "Confirmed"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "UsernameIndex"
     hash_key = "Username"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "PasswordHashIndex"
     hash_key = "PasswordHash"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "LastSeenIndex"
     hash_key = "LastSeen"
     range_key = "Email"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   tags {
@@ -112,8 +117,8 @@ resource "aws_dynamodb_table" "user-table" {
 
 resource "aws_dynamodb_table" "userprofile-table" {
   name = "UserProfile"
-  read_capacity = 20
-  write_capacity = 20
+  read_capacity = 1
+  write_capacity = 1
   hash_key = "UserID"
   range_key = "Location"
 
@@ -161,30 +166,33 @@ resource "aws_dynamodb_table" "userprofile-table" {
     name = "LocationIndex"
     hash_key = "Location"
     range_key = "Age"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "AvatarHashIndex"
     hash_key = "AvatarHash"
     range_key = "Age"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   global_secondary_index {
     name = "NameIndex"
     hash_key = "Name"
     range_key = "AboutMe"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   //  This one exceeded the limit reason why it was added as range_key for Name GSI
@@ -201,10 +209,11 @@ resource "aws_dynamodb_table" "userprofile-table" {
     name = "MemberSinceIndex"
     hash_key = "MemberSince"
     range_key = "Location"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["UserID"]
+    non_key_attributes = [
+      "UserID"]
   }
 
   tags {
@@ -224,10 +233,10 @@ resource "aws_dynamodb_table" "userprofile-table" {
 
 resource "aws_dynamodb_table" "usergroup-table" {
   name = "UserGroups"
-  read_capacity = 20
-  write_capacity = 20
-  hash_key       = "GroupID"
-  range_key      = "UserID"
+  read_capacity = 1
+  write_capacity = 1
+  hash_key = "GroupID"
+  range_key = "UserID"
 
   attribute {
     name = "GroupID"
@@ -250,23 +259,25 @@ resource "aws_dynamodb_table" "usergroup-table" {
   }
 
   global_secondary_index {
-    name               = "UserIDIndex"
-    hash_key           = "UserID"
-    range_key          = "Name"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["GroupID"]
+    name = "UserIDIndex"
+    hash_key = "UserID"
+    range_key = "Name"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "GroupID"]
   }
 
   global_secondary_index {
     name = "NameIndex"
     hash_key = "Name"
     range_key = "UserID"
-    write_capacity = 10
-    read_capacity = 10
+    write_capacity = 1
+    read_capacity = 1
     projection_type = "INCLUDE"
-    non_key_attributes = ["GroupID"]
+    non_key_attributes = [
+      "GroupID"]
   }
 
   tags {

@@ -1,4 +1,3 @@
-
 resource "aws_iam_role" "iam_for_slapman" {
   name = "iam_for_slapman"
 
@@ -34,6 +33,14 @@ resource "aws_iam_role" "iam_for_slapman" {
       "Action": "sts:AssumeRole",
       "Principal": {
         "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    },
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "application-autoscaling.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
@@ -108,6 +115,17 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
       "Resource": [
         "arn:aws:s3:::${var.web-bucket}/*"
       ]
+    },
+    {
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:UpdateTable",
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DeleteAlarms"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }

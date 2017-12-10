@@ -1,10 +1,9 @@
-
 resource "aws_dynamodb_table" "things-dynamodb-table" {
-  name           = "Things"
-  read_capacity  = 20
-  write_capacity = 20
-  hash_key       = "ThingID"
-  range_key      = "UserID"
+  name = "Things"
+  read_capacity = 1
+  write_capacity = 1
+  hash_key = "ThingID"
+  range_key = "UserID"
 
   attribute {
     name = "ThingID"
@@ -47,47 +46,51 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
   }
 
   global_secondary_index {
-    name               = "UserIDIndex"
-    hash_key           = "UserID"
-    range_key          = "Score"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["ThingID"]
+    name = "UserIDIndex"
+    hash_key = "UserID"
+    range_key = "Score"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "ThingID"]
   }
 
   global_secondary_index {
-    name               = "NameIndex"
-    hash_key           = "Name"
-    range_key          = "Version"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["ThingID"]
+    name = "NameIndex"
+    hash_key = "Name"
+    range_key = "Version"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "ThingID"]
   }
 
   global_secondary_index {
-    name               = "CreatedAtIndex"
-    hash_key           = "CreatedAt"
-    range_key          = "Name"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["ThingID"]
+    name = "CreatedAtIndex"
+    hash_key = "CreatedAt"
+    range_key = "Name"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "ThingID"]
   }
 
   global_secondary_index {
-    name               = "UpdatedAtIndex"
-    hash_key           = "UpdatedAt"
-    range_key          = "Name"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["ThingID"]
+    name = "UpdatedAtIndex"
+    hash_key = "UpdatedAt"
+    range_key = "Name"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "ThingID"]
   }
 
   tags {
-    Name        = "things-table-1"
+    Name = "things-table-1"
     Environment = "production"
   }
 }
@@ -103,11 +106,11 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
 //updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 resource "aws_dynamodb_table" "data-dynamodb-table" {
-  name           = "Data"
-  read_capacity  = 20
-  write_capacity = 20
-  hash_key       = "DataID"
-  range_key      = "ThingID"
+  name = "Data"
+  read_capacity = 1
+  write_capacity = 1
+  hash_key = "DataID"
+  range_key = "ThingID"
 
   attribute {
     name = "DataID"
@@ -135,27 +138,29 @@ resource "aws_dynamodb_table" "data-dynamodb-table" {
   }
 
   global_secondary_index {
-    name               = "ThingIDIndex"
-    hash_key           = "ThingID"
-    range_key          = "Key"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["DataID"]
+    name = "ThingIDIndex"
+    hash_key = "ThingID"
+    range_key = "Key"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "DataID"]
   }
 
   global_secondary_index {
-    name               = "KeyIndex"
-    hash_key           = "Key"
-    range_key          = "Value"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["DataID"]
+    name = "KeyIndex"
+    hash_key = "Key"
+    range_key = "Value"
+    write_capacity = 1
+    read_capacity = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "DataID"]
   }
 
   tags {
-    Name        = "data-table-1"
+    Name = "data-table-1"
     Environment = "production"
   }
 }
