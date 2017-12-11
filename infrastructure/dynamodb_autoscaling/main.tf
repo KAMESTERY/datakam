@@ -98,8 +98,8 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
       predefined_metric_type = "DynamoDBWriteCapacityUtilization"
     }
 
-    scale_in_cooldown = 20
-    scale_out_cooldown = 20
+    scale_in_cooldown = 10
+    scale_out_cooldown = 10
 
     target_value = 80
   }
@@ -138,8 +138,8 @@ resource "aws_appautoscaling_policy" "dynamodb_index_write_policy" {
       predefined_metric_type = "DynamoDBWriteCapacityUtilization"
     }
 
-    scale_in_cooldown = 20
-    scale_out_cooldown = 20
+    scale_in_cooldown = 10
+    scale_out_cooldown = 10
 
     target_value = 80
   }

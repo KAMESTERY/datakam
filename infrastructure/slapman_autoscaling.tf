@@ -5,8 +5,6 @@ module "user-table_EmailIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 2
-  min_capacity = 1
   index_name = "EmailIndex"
 }
 
@@ -14,8 +12,6 @@ module "user-table_RoleIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 2
-  min_capacity = 1
   index_name = "RoleIndex"
 }
 
@@ -23,8 +19,6 @@ module "user-table_UsernameIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 2
-  min_capacity = 1
   index_name = "UsernameIndex"
 }
 
@@ -32,8 +26,6 @@ module "user-table_PasswordHashIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 2
-  min_capacity = 1
   index_name = "PasswordHashIndex"
 }
 
@@ -41,8 +33,6 @@ module "user-table_LastSeenIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 2
-  min_capacity = 1
   index_name = "LastSeenIndex"
 }
 
@@ -98,8 +88,6 @@ module "things-dynamodb-table_UserIDIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 4
-  min_capacity = 1
   index_name = "UserIDIndex"
 }
 
@@ -107,8 +95,6 @@ module "things-dynamodb-table_NameIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 4
-  min_capacity = 1
   index_name = "NameIndex"
 }
 
@@ -116,8 +102,6 @@ module "things-dynamodb-table_CreatedAtIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 4
-  min_capacity = 1
   index_name = "CreatedAtIndex"
 }
 
@@ -125,8 +109,6 @@ module "things-dynamodb-table_UpdatedAtIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 4
-  min_capacity = 1
   index_name = "UpdatedAtIndex"
 }
 
@@ -136,8 +118,6 @@ module "data-dynamodb-table_ThingIDIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.data-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 16
-  min_capacity = 1
   index_name = "ThingIDIndex"
 }
 
@@ -145,7 +125,5 @@ module "data-dynamodb-table_KeyIndex_autoscaling" {
   source = "./dynamodb_autoscaling"
   resource_id = "${aws_dynamodb_table.data-dynamodb-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  max_capacity = 16
-  min_capacity = 1
   index_name = "KeyIndex"
 }
