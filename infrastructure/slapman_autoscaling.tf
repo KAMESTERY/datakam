@@ -1,56 +1,151 @@
 
-resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
-  max_capacity = 20
-  min_capacity = 1
-  resource_id = "table/${aws_dynamodb_table.user-table.name}"
+// User Table
+
+module "user-table_EmailIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
-  service_namespace = "dynamodb"
-}
-
-resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
-  max_capacity = 20
+  max_capacity = 2
   min_capacity = 1
-  resource_id = "table/${aws_dynamodb_table.user-table.name}"
+  index_name = "EmailIndex"
+}
+
+module "user-table_RoleIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.user-table.name}"
   role_arn = "${aws_iam_role.iam_for_slapman.arn}"
-  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
-  service_namespace = "dynamodb"
+  max_capacity = 2
+  min_capacity = 1
+  index_name = "RoleIndex"
 }
 
-resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
-  name               = "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.dynamodb_table_read_target.resource_id}"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = "${aws_appautoscaling_target.dynamodb_table_read_target.resource_id}"
-  scalable_dimension = "${aws_appautoscaling_target.dynamodb_table_read_target.scalable_dimension}"
-  service_namespace  = "${aws_appautoscaling_target.dynamodb_table_read_target.service_namespace}"
-
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBReadCapacityUtilization"
-    }
-
-    scale_in_cooldown = 10
-    scale_out_cooldown = 10
-
-    target_value = 90
-  }
+module "user-table_UsernameIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.user-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 2
+  min_capacity = 1
+  index_name = "UsernameIndex"
 }
 
-resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
-  name               = "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.dynamodb_table_write_target.resource_id}"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = "${aws_appautoscaling_target.dynamodb_table_write_target.resource_id}"
-  scalable_dimension = "${aws_appautoscaling_target.dynamodb_table_write_target.scalable_dimension}"
-  service_namespace  = "${aws_appautoscaling_target.dynamodb_table_write_target.service_namespace}"
+module "user-table_PasswordHashIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.user-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 2
+  min_capacity = 1
+  index_name = "PasswordHashIndex"
+}
 
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBWriteCapacityUtilization"
-    }
+module "user-table_LastSeenIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.user-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 2
+  min_capacity = 1
+  index_name = "LastSeenIndex"
+}
 
-    scale_in_cooldown = 10
-    scale_out_cooldown = 10
+// User Profile Table
 
-    target_value = 90
-  }
+module "userprofile-table_LocationIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.userprofile-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "LocationIndex"
+}
+
+module "userprofile-table_AvatarHashIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.userprofile-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "AvatarHashIndex"
+}
+
+module "userprofile-table_NameIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.userprofile-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "NameIndex"
+}
+
+module "userprofile-table_MemberSinceIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.userprofile-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "MemberSinceIndex"
+}
+
+// User Group Table
+
+module "usergroup-table_UserIDIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.usergroup-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "UserIDIndex"
+}
+
+module "usergroup-table_NameIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.usergroup-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  index_name = "NameIndex"
+}
+
+// Things Table
+
+module "things-dynamodb-table_UserIDIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 4
+  min_capacity = 1
+  index_name = "UserIDIndex"
+}
+
+module "things-dynamodb-table_NameIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 4
+  min_capacity = 1
+  index_name = "NameIndex"
+}
+
+module "things-dynamodb-table_CreatedAtIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 4
+  min_capacity = 1
+  index_name = "CreatedAtIndex"
+}
+
+module "things-dynamodb-table_UpdatedAtIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.things-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 4
+  min_capacity = 1
+  index_name = "UpdatedAtIndex"
+}
+
+// Data Table
+
+module "data-dynamodb-table_ThingIDIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.data-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 16
+  min_capacity = 1
+  index_name = "ThingIDIndex"
+}
+
+module "data-dynamodb-table_KeyIndex_autoscaling" {
+  source = "./dynamodb_autoscaling"
+  resource_id = "${aws_dynamodb_table.data-dynamodb-table.name}"
+  role_arn = "${aws_iam_role.iam_for_slapman.arn}"
+  max_capacity = 16
+  min_capacity = 1
+  index_name = "KeyIndex"
 }
