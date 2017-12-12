@@ -54,7 +54,6 @@ def login(request):
                 headers=headers
             )
         except deform.ValidationFailure as e:
-            print(f"Validation Error: {e}")
             # Render a form version where errors are visible next to the fields,
             # and the submitted values are posted back
             rendered_form = e.render()

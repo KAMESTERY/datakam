@@ -7,11 +7,11 @@ from pyramid.renderers import render
 
 class UserRegistrationSchema(deform.schema.CSRFSchema):
     email = colander.SchemaNode(
-        colander.String(encoding='utf-8', allow_empty=False),
-        validator=colander.Length(max=154)
+        colander.String(allow_empty=False),
+        validator=colander.Email()
     )
     username = colander.SchemaNode(
-        colander.String(encoding='utf-8', allow_empty=False),
+        colander.String(allow_empty=False),
         validator=colander.Length(max=154)
     )
     password = colander.SchemaNode(
