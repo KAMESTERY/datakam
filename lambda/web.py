@@ -40,7 +40,7 @@ def handle(event, context):
     if 'queryStringParameters' not in clean_event: clean_event['queryStringParameters'] = {}
     if 'headers' not in clean_event: clean_event['headers'] = {'content_type': 'application/json', 'host': 'someip', 'x_forwarded_proto': 'http'}
 
-    logger.info("Clean Event: %s", pp.pformat(clean_event))
+    # logger.info("Clean Event: %s", pp.pformat(clean_event))
 
     response = awsgi.response(app, clean_event, context)
     # response = awsgi.response(app, event, context)
@@ -50,5 +50,5 @@ def handle(event, context):
     #     headers= res.get('headers'),
     #     body= html.escape(res.get('body'), quote=True)
     # )
-    logger.info("Response::::\n %s", pp.pformat(response))
+    # logger.info("Response::::\n %s", pp.pformat(response))
     return response
