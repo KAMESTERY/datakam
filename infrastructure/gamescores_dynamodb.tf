@@ -1,9 +1,9 @@
 resource "aws_dynamodb_table" "game-scores-dynamodb-table" {
-  name = "GameScores"
-  read_capacity = 1
+  name           = "GameScores"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "UserId"
-  range_key = "GameTitle"
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
 
   attribute {
     name = "UserId"
@@ -22,24 +22,24 @@ resource "aws_dynamodb_table" "game-scores-dynamodb-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "GameTitleIndex"
-    hash_key = "GameTitle"
-    range_key = "TopScore"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "GameTitleIndex"
+    hash_key        = "GameTitle"
+    range_key       = "TopScore"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserId"]
+      "UserId",
+    ]
   }
 
   tags {
-    Name = "game-scores-dynamodb-table-1"
+    Name        = "game-scores-dynamodb-table-1"
     Environment = "production"
   }
 }
-
-

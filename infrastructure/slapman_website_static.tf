@@ -1,13 +1,12 @@
-
 resource "aws_s3_bucket" "slapman-web" {
   bucket = "${var.web-bucket}"
-  acl = "public-read"
+  acl    = "public-read"
 
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "POST"]
     allowed_origins = ["*"]
-    expose_headers = ["Etag"]
+    expose_headers  = ["Etag"]
     max_age_seconds = 3000
   }
 

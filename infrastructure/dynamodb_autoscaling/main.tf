@@ -1,4 +1,3 @@
-
 variable "resource_id" {
   description = "The Table resource ID"
 }
@@ -9,12 +8,12 @@ variable "role_arn" {
 
 variable "max_capacity" {
   description = "Maximum Capacity"
-  default = 20
+  default     = 20
 }
 
 variable "min_capacity" {
   description = "Minimum Capacity"
-  default = 1
+  default     = 1
 }
 
 variable "index_name" {
@@ -26,41 +25,41 @@ variable "index_name" {
 // Tables
 
 resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
-  max_capacity = "${var.max_capacity}"
-  min_capacity = "${var.min_capacity}"
-  resource_id = "table/${var.resource_id}"
-  role_arn = "${var.role_arn}"
+  max_capacity       = "${var.max_capacity}"
+  min_capacity       = "${var.min_capacity}"
+  resource_id        = "table/${var.resource_id}"
+  role_arn           = "${var.role_arn}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
-  service_namespace = "dynamodb"
+  service_namespace  = "dynamodb"
 }
 
 resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
-  max_capacity = "${var.max_capacity}"
-  min_capacity = "${var.min_capacity}"
-  resource_id = "table/${var.resource_id}"
-  role_arn = "${var.role_arn}"
+  max_capacity       = "${var.max_capacity}"
+  min_capacity       = "${var.min_capacity}"
+  resource_id        = "table/${var.resource_id}"
+  role_arn           = "${var.role_arn}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
-  service_namespace = "dynamodb"
+  service_namespace  = "dynamodb"
 }
 
 // Indices
 
 resource "aws_appautoscaling_target" "dynamodb_index_read_target" {
-  max_capacity = "${var.max_capacity}"
-  min_capacity = "${var.min_capacity}"
-  resource_id = "table/${var.resource_id}/index/${var.index_name}"
-  role_arn = "${var.role_arn}"
+  max_capacity       = "${var.max_capacity}"
+  min_capacity       = "${var.min_capacity}"
+  resource_id        = "table/${var.resource_id}/index/${var.index_name}"
+  role_arn           = "${var.role_arn}"
   scalable_dimension = "dynamodb:index:ReadCapacityUnits"
-  service_namespace = "dynamodb"
+  service_namespace  = "dynamodb"
 }
 
 resource "aws_appautoscaling_target" "dynamodb_index_write_target" {
-  max_capacity = "${var.max_capacity}"
-  min_capacity = "${var.min_capacity}"
-  resource_id = "table/${var.resource_id}/index/${var.index_name}"
-  role_arn = "${var.role_arn}"
+  max_capacity       = "${var.max_capacity}"
+  min_capacity       = "${var.min_capacity}"
+  resource_id        = "table/${var.resource_id}/index/${var.index_name}"
+  role_arn           = "${var.role_arn}"
   scalable_dimension = "dynamodb:index:WriteCapacityUnits"
-  service_namespace = "dynamodb"
+  service_namespace  = "dynamodb"
 }
 
 //// POLICIES
@@ -79,7 +78,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
       predefined_metric_type = "DynamoDBReadCapacityUtilization"
     }
 
-    scale_in_cooldown = 10
+    scale_in_cooldown  = 10
     scale_out_cooldown = 10
 
     target_value = 80
@@ -98,7 +97,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
       predefined_metric_type = "DynamoDBWriteCapacityUtilization"
     }
 
-    scale_in_cooldown = 10
+    scale_in_cooldown  = 10
     scale_out_cooldown = 10
 
     target_value = 80
@@ -119,7 +118,7 @@ resource "aws_appautoscaling_policy" "dynamodb_index_read_policy" {
       predefined_metric_type = "DynamoDBReadCapacityUtilization"
     }
 
-    scale_in_cooldown = 10
+    scale_in_cooldown  = 10
     scale_out_cooldown = 10
 
     target_value = 80
@@ -138,7 +137,7 @@ resource "aws_appautoscaling_policy" "dynamodb_index_write_policy" {
       predefined_metric_type = "DynamoDBWriteCapacityUtilization"
     }
 
-    scale_in_cooldown = 10
+    scale_in_cooldown  = 10
     scale_out_cooldown = 10
 
     target_value = 80

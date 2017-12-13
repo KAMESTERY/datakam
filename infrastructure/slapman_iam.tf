@@ -53,6 +53,7 @@ EOF
 resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
   name = "iam_for_slapman-added-lambda-iam-role-policy"
   role = "${aws_iam_role.iam_for_slapman.id}"
+
   policy = <<EOF
 {
   "Version": "2012-10-17",

@@ -1,4 +1,3 @@
-
 variable "aws_account_id" {
   description = "AWS account id"
   default     = "661405543333"
@@ -12,7 +11,7 @@ variable "aws_region" {
 
 variable "web-bucket" {
   description = "The S3 bucket name for the Website"
-  default = "slapman-web"
+  default     = "slapman-web"
 }
 
 variable "burst_limit" {

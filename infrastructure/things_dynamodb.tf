@@ -1,9 +1,9 @@
 resource "aws_dynamodb_table" "things-dynamodb-table" {
-  name = "Things"
-  read_capacity = 1
+  name           = "Things"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "ThingID"
-  range_key = "UserID"
+  hash_key       = "ThingID"
+  range_key      = "UserID"
 
   attribute {
     name = "ThingID"
@@ -42,55 +42,63 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "UserIDIndex"
-    hash_key = "UserID"
-    range_key = "Score"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "UserIDIndex"
+    hash_key        = "UserID"
+    range_key       = "Score"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "ThingID"]
+      "ThingID",
+    ]
   }
 
   global_secondary_index {
-    name = "NameIndex"
-    hash_key = "Name"
-    range_key = "Version"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "NameIndex"
+    hash_key        = "Name"
+    range_key       = "Version"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "ThingID"]
+      "ThingID",
+    ]
   }
 
   global_secondary_index {
-    name = "CreatedAtIndex"
-    hash_key = "CreatedAt"
-    range_key = "Name"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "CreatedAtIndex"
+    hash_key        = "CreatedAt"
+    range_key       = "Name"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "ThingID"]
+      "ThingID",
+    ]
   }
 
   global_secondary_index {
-    name = "UpdatedAtIndex"
-    hash_key = "UpdatedAt"
-    range_key = "Name"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "UpdatedAtIndex"
+    hash_key        = "UpdatedAt"
+    range_key       = "Name"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "ThingID"]
+      "ThingID",
+    ]
   }
 
   tags {
-    Name = "things-table-1"
+    Name        = "things-table-1"
     Environment = "production"
   }
 }
@@ -106,11 +114,11 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
 //updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 resource "aws_dynamodb_table" "data-dynamodb-table" {
-  name = "Data"
-  read_capacity = 1
+  name           = "Data"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "DataID"
-  range_key = "ThingID"
+  hash_key       = "DataID"
+  range_key      = "ThingID"
 
   attribute {
     name = "DataID"
@@ -134,38 +142,43 @@ resource "aws_dynamodb_table" "data-dynamodb-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "ThingIDIndex"
-    hash_key = "ThingID"
-    range_key = "Key"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "ThingIDIndex"
+    hash_key        = "ThingID"
+    range_key       = "Key"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "DataID"]
+      "DataID",
+    ]
   }
 
   global_secondary_index {
-    name = "KeyIndex"
-    hash_key = "Key"
-    range_key = "Value"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "KeyIndex"
+    hash_key        = "Key"
+    range_key       = "Value"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "DataID"]
+      "DataID",
+    ]
   }
 
   tags {
-    Name = "data-table-1"
+    Name        = "data-table-1"
     Environment = "production"
   }
 }
 
 // Data
+
 
 //data = db.relationship('Datum', backref='thing', lazy='dynamic', cascade="all, delete-orphan")
 //# comments = db.relationship('Comment', backref='thing', lazy='dynamic', cascade="all, delete-orphan")
@@ -173,6 +186,7 @@ resource "aws_dynamodb_table" "data-dynamodb-table" {
 //comments = db.relationship('Comment', backref='thing', lazy='subquery', cascade="all, delete-orphan")
 //tags = db.relationship('Tag', secondary=tagged_things, backref='thing', lazy='subquery')
 //# https://gist.github.com/techniq/5174410
+
 
 //id = db.Column(db.Integer, primary_key=True)
 //thing_id = db.Column(db.Integer, db.ForeignKey('things.id'))

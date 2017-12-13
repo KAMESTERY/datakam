@@ -1,4 +1,3 @@
-
 resource "aws_lambda_function" "slapman_slapalicious_OPTIONS" {
   filename         = "infrastructure/slapalicious.zip"
   function_name    = "slapman_slapalicious_OPTIONS"
@@ -7,7 +6,7 @@ resource "aws_lambda_function" "slapman_slapalicious_OPTIONS" {
   source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
-  timeout = "300"
+  timeout          = "300"
 
   environment {
     variables = {
@@ -24,7 +23,7 @@ resource "aws_lambda_function" "slapman_slapalicious_GET" {
   source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
-  timeout = "300"
+  timeout          = "300"
 
   environment {
     variables = {
@@ -41,7 +40,7 @@ resource "aws_lambda_function" "slapman_slapalicious_POST" {
   source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
-  timeout = "300"
+  timeout          = "300"
 
   environment {
     variables = {

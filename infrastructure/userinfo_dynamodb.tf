@@ -1,9 +1,9 @@
 resource "aws_dynamodb_table" "user-table" {
-  name = "User"
-  read_capacity = 1
+  name           = "User"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "UserID"
-  range_key = "Email"
+  hash_key       = "UserID"
+  range_key      = "Email"
 
   attribute {
     name = "UserID"
@@ -42,64 +42,74 @@ resource "aws_dynamodb_table" "user-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "EmailIndex"
-    hash_key = "Email"
-    range_key = "Confirmed"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "EmailIndex"
+    hash_key        = "Email"
+    range_key       = "Confirmed"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "RoleIndex"
-    hash_key = "Role"
-    range_key = "Confirmed"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "RoleIndex"
+    hash_key        = "Role"
+    range_key       = "Confirmed"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "UsernameIndex"
-    hash_key = "Username"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "UsernameIndex"
+    hash_key        = "Username"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "PasswordHashIndex"
-    hash_key = "PasswordHash"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "PasswordHashIndex"
+    hash_key        = "PasswordHash"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "LastSeenIndex"
-    hash_key = "LastSeen"
-    range_key = "Email"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "LastSeenIndex"
+    hash_key        = "LastSeen"
+    range_key       = "Email"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   tags {
-    Name = "user-table-1"
+    Name        = "user-table-1"
     Environment = "production"
   }
 }
@@ -116,11 +126,11 @@ resource "aws_dynamodb_table" "user-table" {
 //things = db.relationship('Thing', backref='user', lazy='dynamic')
 
 resource "aws_dynamodb_table" "userprofile-table" {
-  name = "UserProfile"
-  read_capacity = 1
+  name           = "UserProfile"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "UserID"
-  range_key = "Location"
+  hash_key       = "UserID"
+  range_key      = "Location"
 
   attribute {
     name = "UserID"
@@ -159,40 +169,46 @@ resource "aws_dynamodb_table" "userprofile-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "LocationIndex"
-    hash_key = "Location"
-    range_key = "Age"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "LocationIndex"
+    hash_key        = "Location"
+    range_key       = "Age"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "AvatarHashIndex"
-    hash_key = "AvatarHash"
-    range_key = "Age"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "AvatarHashIndex"
+    hash_key        = "AvatarHash"
+    range_key       = "Age"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   global_secondary_index {
-    name = "NameIndex"
-    hash_key = "Name"
-    range_key = "AboutMe"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "NameIndex"
+    hash_key        = "Name"
+    range_key       = "AboutMe"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "UserID"]
+      "UserID",
+    ]
   }
 
   //  This one exceeded the limit reason why it was added as range_key for Name GSI
@@ -206,18 +222,19 @@ resource "aws_dynamodb_table" "userprofile-table" {
   //  }
 
   global_secondary_index {
-    name = "MemberSinceIndex"
-    hash_key = "MemberSince"
-    range_key = "Location"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "MemberSinceIndex"
+    hash_key        = "MemberSince"
+    range_key       = "Location"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
-    non_key_attributes = [
-      "UserID"]
-  }
 
+    non_key_attributes = [
+      "UserID",
+    ]
+  }
   tags {
-    Name = "userprofile-table-1"
+    Name        = "userprofile-table-1"
     Environment = "production"
   }
 }
@@ -232,11 +249,11 @@ resource "aws_dynamodb_table" "userprofile-table" {
 //last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
 resource "aws_dynamodb_table" "usergroup-table" {
-  name = "UserGroups"
-  read_capacity = 1
+  name           = "UserGroups"
+  read_capacity  = 1
   write_capacity = 1
-  hash_key = "GroupID"
-  range_key = "UserID"
+  hash_key       = "GroupID"
+  range_key      = "UserID"
 
   attribute {
     name = "GroupID"
@@ -255,33 +272,37 @@ resource "aws_dynamodb_table" "usergroup-table" {
 
   ttl {
     attribute_name = "TimeToExist"
-    enabled = false
+    enabled        = false
   }
 
   global_secondary_index {
-    name = "UserIDIndex"
-    hash_key = "UserID"
-    range_key = "Name"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "UserIDIndex"
+    hash_key        = "UserID"
+    range_key       = "Name"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "GroupID"]
+      "GroupID",
+    ]
   }
 
   global_secondary_index {
-    name = "NameIndex"
-    hash_key = "Name"
-    range_key = "UserID"
-    write_capacity = 1
-    read_capacity = 1
+    name            = "NameIndex"
+    hash_key        = "Name"
+    range_key       = "UserID"
+    write_capacity  = 1
+    read_capacity   = 1
     projection_type = "INCLUDE"
+
     non_key_attributes = [
-      "GroupID"]
+      "GroupID",
+    ]
   }
 
   tags {
-    Name = "usergroup-table-1"
+    Name        = "usergroup-table-1"
     Environment = "production"
   }
 }

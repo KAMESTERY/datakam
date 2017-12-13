@@ -23,6 +23,7 @@ prod-deploy: clean build-lambda deploy
 	@echo "Completed the Production Deployment of Lambda [$(WORKER)]! :-)"
 
 deploy:
+	terraform fmt infrastructure
 	terraform get infrastructure
 	terraform plan infrastructure
 	terraform apply -auto-approve infrastructure

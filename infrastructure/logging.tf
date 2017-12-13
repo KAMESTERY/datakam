@@ -1,4 +1,3 @@
-
 resource "aws_lambda_alias" "slapman_slapalicious_GET_alias" {
   name             = "slapmanslapaliciousGETalias"
   description      = "a sample description"
@@ -49,3 +48,4 @@ resource "aws_lambda_permission" "allow_cloudwatch_slapman_slapalicious_POST" {
 //  source_arn     = "arn:aws:events:${var.aws_region}:${var.aws_account_id}:rule/RunDaily"
 //  qualifier      = "${aws_lambda_alias.slapman_slapman_WEB_alias.name}"
 //}
+

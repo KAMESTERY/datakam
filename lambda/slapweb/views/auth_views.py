@@ -39,6 +39,7 @@ def login(request):
         session.flash("You lack the credentials")
     came_from = request.params.get('came_from', referrer)
     session['came_from'] = came_from
+    print(f"Came from: {came_from}")
     form = get_user_registration_form(request)
     rendered_form = None
     if 'submit' in request.POST:
