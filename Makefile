@@ -14,6 +14,7 @@ REVISION=$(shell echo `git rev-parse HEAD`)
 # DEVOPS
 
 devops-init:
+	rm -rf .terraform
 	terraform init infrastructure
 
 deploy-everything: prod-deploy publish-website

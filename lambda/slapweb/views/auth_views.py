@@ -30,6 +30,7 @@ def login(request):
     login_route_url = request.route_url('login')
     register_route_url = request.route_url('register')
     referrer = request.url
+    print(f"Referrer: {referrer}")
     session = request.session
     if referrer == login_route_url or referrer == register_route_url:
         home_route_url = request.route_url('home')
@@ -37,7 +38,8 @@ def login(request):
         # referrer = '/' # never use the login from itself as came_from
     else:
         session.flash("You lack the credentials")
-    came_from = request.params.get('came_from', referrer)
+    came_from = request.route_url('home')
+    # came_from = request.params.get('came_from', referrer)
     session['came_from'] = came_from
     print(f"Came from: {came_from}")
     form = get_user_registration_form(request)
