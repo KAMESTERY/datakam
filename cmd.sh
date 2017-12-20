@@ -82,5 +82,8 @@ case $1 in
     dyna.tbl.list)
         aws dynamodb list-tables --endpoint-url $2 --output json
         ;;
+    aws-delete-alarms)
+        aws cloudwatch delete-alarms --alarm-names $2
+        ;;
     esac
 exit 0
