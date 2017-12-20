@@ -7,17 +7,40 @@ import deform
 
 from waitress import serve
 
-from pyramid.paster import setup_logging
-
 from pyramid.config import Configurator
-from pyramid_zodbconn import get_connection
+# from pyramid_zodbconn import get_connection
+
+import logging
+from logging.config import dictConfig
+
+logging_config = dict(
+    version = 1,
+    formatters = {
+        'f': {'format':
+                  '%(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s'}
+                  # '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+    },
+    handlers = {
+        'h': {'class': 'logging.StreamHandler',
+              'formatter': 'f',
+              'level': logging.DEBUG}
+    },
+    root = {
+        'handlers': ['h'],
+        'level': logging.DEBUG,
+    },
+)
+
+dictConfig(logging_config)
+
+log = logging.getLogger(__name__)
+
 # from slapweb.backend.models import appmaker
 
 
 # def root_factory(request):
 #     conn = get_connection(request)
 #     return appmaker(conn.root())
-
 
 def configure_app(settings):
     """ This function returns a Pyramid WSGI application.
@@ -36,15 +59,6 @@ def configure_app(settings):
         config.add_static_view('static', 'static', cache_max_age=3600)
         return config.make_wsgi_app()
 
-
-script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-
-# init_path = 'development.ini'
-init_path = os.path.join(script_dir, 'development.ini')
-
-setup_logging(init_path)
-
-# settings = get_settings(init_path)
 
 settings = {'pyramid.reload_templates': True,
             'pyramid.reload_all': True,
@@ -66,7 +80,7 @@ settings = {'pyramid.reload_templates': True,
                                'has_cred': 'views.ext.has_cred',
                                'now': 'datetime.datetime.now'}}
 
-print(f"Settings: {settings}")
+log.debug(f"Settings: {settings}")
 
 app = configure_app(settings)
 

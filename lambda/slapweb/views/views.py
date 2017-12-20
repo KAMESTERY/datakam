@@ -1,3 +1,6 @@
+
+import logging
+
 from pyramid.view import view_config
 # from .models import MyModel
 
@@ -20,6 +23,8 @@ except:
         Data
     )
 
+logging.basicConfig()
+log = logging.getLogger(__file__)
 
 # @view_config(context=MyModel, renderer='templates/mytemplate.pt')
 # @view_config(context=MyModel, renderer='templates/home.jinja2')
@@ -31,7 +36,7 @@ def my_view(request):
 
     # passwd = 'blahblah'
     # email = 'lambert@awesome.com'
-    # print("Is {0} a valid password for {1}? Answer: {2}".format(
+    # log.debug("Is {0} a valid password for {1}? Answer: {2}".format(
     #     passwd,
     #     email,
     #     User.check_password(email, passwd)
@@ -41,14 +46,14 @@ def my_view(request):
     # # for user in User.query('Email', User.email == 'lambert@awesome.com'):
     # # # for user in User.rate_limited_scan():
     # # for user in User.scan():
-    # #     print("Scanned User: {0}".format(user))
-    # #     # print("Rate Limited Scanned User: {0}".format(user))
-    #     print("User queried from index: {0}".format(user))
+    # #     log.debug("Scanned User: {0}".format(user))
+    # #     # log.debug("Rate Limited Scanned User: {0}".format(user))
+    #     log.debug("User queried from index: {0}".format(user))
     #
     # for thing in Thing.rate_limited_scan():
     # # for thing in Thing.scan():
-    #     print("Scanned Thing: {0}".format(thing))
-    #     # print("Rate Limited Scanned Thing: {0}".format(thing))
+    #     log.debug("Scanned Thing: {0}".format(thing))
+    #     # log.debug("Rate Limited Scanned Thing: {0}".format(thing))
 
     request.response.set_cookie('CookieLB', ':-):-)(-:(-:')
 
