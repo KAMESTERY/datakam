@@ -6,10 +6,16 @@ try:
         get_user_login_form,
         get_user_registration_form
     )
+    from slapweb.models.userinfo import (
+        User
+    )
 except:
     from forms.userforms import (
         get_user_login_form,
         get_user_registration_form
+    )
+    from models.userinfo import (
+        User
     )
 
 import colander
@@ -58,13 +64,18 @@ class AuthViews:
         self.session['came_from'] = self.came_from
         log.debug(f"Came from: {self.came_from}")
 
-    def process_form(self, form):
+    def process_form(self, form, login=True):
         rendered_form = None
         try:
             form_data = form.validate(self.request.POST.items())
             log.debug(f"User Data: {form_data}")
             username = form_data['username']
             email = form_data['email']
+            password = form_data['password']
+            if login and User.check_password(email, password):
+                pass
+            elif len(User.email_index.query('lambert@awesome.com')) == 0:
+                pass
             self.session.flash(f"Welcome {username}!")
             headers = remember(self.request, email)
             log.info(f"Processed successfully for: {username}")
