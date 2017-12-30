@@ -113,6 +113,18 @@ class User(PartialModel):
             return False, None
         return check_password_hash(password, user.password), user
 
+    @classmethod
+    def create(cls, email=None, password=None, username=None):
+        current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user = User(
+            user_id = email,
+            email = email,
+            username = username,
+            last_seen =current_timestamp
+        )
+        user.password = password
+        return user.save()
+
 
 
 ################ UserProfile Model and Indices

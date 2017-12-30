@@ -72,22 +72,38 @@ class AuthViews:
             username = form_data['username']
             email = form_data['email']
             password = form_data['password']
-            if login and User.check_password(email, password):
-                pass
-            elif len(User.email_index.query('lambert@awesome.com')) == 0:
-                pass
-            self.session.flash(f"Welcome {username}!")
-            headers = remember(self.request, email)
-            log.info(f"Processed successfully for: {username}")
-            return HTTPFound(
-                location=self.came_from,
-                headers=headers
-            )
+            if login:
+                success = User.check_password(email, password)
+                if success:
+                    log.info(f"Successfully logged in: {username}")
+                    return self.redirect_success(email, username)
+                else:
+                    err_msg = f"Could not login: {username}!"
+                    self.session.flash(err_msg)
+                    raise Exception(err_msg)
+            else:
+                existing_user_ids = [user.user_id for user in User.query(email)]
+                user_exists = len(existing_user_ids) > 0
+                if user_exists:
+                    log.warning(f"Existing User IDs: {existing_user_ids}")
+                    err_msg = f"Could not register: {username}!"
+                    self.session.flash(err_msg)
+                    raise Exception(err_msg)
+                else:
+                    User.create(
+                        email=email,
+                        username=username,
+                        password=password
+                    )
+                    log.info(f"Successfully registered: {username}")
+                    return self.redirect_success(email, username)
         except deform.ValidationFailure as e:
             log.warning(f"WARNING:::: {e}")
             # Render a form version where errors are visible next to the fields,
             # and the submitted values are posted back
             rendered_form = e.render()
+        except HTTPFound as e:
+            raise e
         except Exception as e:
             log.error(f"ERROR:::: {e}")
             # Ouch!!
@@ -97,6 +113,14 @@ class AuthViews:
         if rendered_form is None:
             rendered_form = form.render()
         return rendered_form
+
+    def redirect_success(self, email, username):
+        self.session.flash(f"Welcome {username}!")
+        headers = remember(self.request, email)
+        raise HTTPFound(
+            location=self.came_from,
+            headers=headers
+        )
 
     @view_config(route_name='login', request_method='GET')
     @view_config(route_name='register', request_method='GET')
@@ -109,7 +133,7 @@ class AuthViews:
     @view_config(route_name='register', request_method='POST')
     def handle_registration(self):
         return {
-            'registration_form': self.process_form(self.registration_form),
+            'registration_form': self.process_form(self.registration_form, login=False),
             'login_form': self.login_form.render()
         }
 
