@@ -91,6 +91,10 @@ class User(PartialModel):
             (Allow, self.username, ['view', 'edit']),
         ]
 
+    def update_last_seen(self):
+        self.last_seen = User.get_current_timestamp()
+        self.save()
+
     def _get_password(self):
         return self.password_hash
 
@@ -115,7 +119,7 @@ class User(PartialModel):
 
     @classmethod
     def create(cls, email=None, password=None, username=None):
-        current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_timestamp = User.get_current_timestamp()
         user = User(
             user_id = email,
             email = email,
@@ -125,6 +129,9 @@ class User(PartialModel):
         user.password = password
         return user.save()
 
+    @classmethod
+    def get_current_timestamp(cls):
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 ################ UserProfile Model and Indices

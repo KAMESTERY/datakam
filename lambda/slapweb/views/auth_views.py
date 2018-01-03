@@ -69,16 +69,18 @@ class AuthViews:
         try:
             form_data = form.validate(self.request.POST.items())
             log.debug(f"User Data: {form_data}")
-            username = form_data['username']
-            email = form_data['email']
-            password = form_data['password']
+            username = form_data.get('username', None)
+            email = form_data.get('email', None)
+            password = form_data.get('password', None)
             if login:
-                success = User.check_password(email, password)
+                success, user = User.check_password(email, password)
                 if success:
-                    log.info(f"Successfully logged in: {username}")
+                    log.info(f"Successfully logged in: {username or email}")
+                    user.update_last_seen()
+                    log.debug(f"Logged In User: {user}")
                     return self.redirect_success(email, username)
                 else:
-                    err_msg = f"Could not login: {username}!"
+                    err_msg = f"Could not login: {username or email}!"
                     self.session.flash(err_msg)
                     raise Exception(err_msg)
             else:
@@ -86,7 +88,7 @@ class AuthViews:
                 user_exists = len(existing_user_ids) > 0
                 if user_exists:
                     log.warning(f"Existing User IDs: {existing_user_ids}")
-                    err_msg = f"Could not register: {username}!"
+                    err_msg = f"Could not register: {username or email}!"
                     self.session.flash(err_msg)
                     raise Exception(err_msg)
                 else:
@@ -95,7 +97,7 @@ class AuthViews:
                         username=username,
                         password=password
                     )
-                    log.info(f"Successfully registered: {username}")
+                    log.info(f"Successfully registered: {username or email}")
                     return self.redirect_success(email, username)
         except deform.ValidationFailure as e:
             log.warning(f"WARNING:::: {e}")
@@ -115,7 +117,7 @@ class AuthViews:
         return rendered_form
 
     def redirect_success(self, email, username):
-        self.session.flash(f"Welcome {username}!")
+        self.session.flash(f"Welcome {username or email}!")
         headers = remember(self.request, email)
         raise HTTPFound(
             location=self.came_from,
@@ -124,6 +126,7 @@ class AuthViews:
 
     @view_config(route_name='login', request_method='GET')
     @view_config(route_name='register', request_method='GET')
+    @forbidden_view_config()
     def forms_display(self):
         return {
             'registration_form': self.registration_form.render(),
