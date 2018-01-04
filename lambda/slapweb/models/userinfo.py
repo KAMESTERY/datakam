@@ -124,10 +124,18 @@ class User(PartialModel):
             user_id = email,
             email = email,
             username = username,
-            last_seen =current_timestamp
+            last_seen = current_timestamp
         )
         user.password = password
-        return user.save()
+        return (
+            user.save(),
+            UserProfile.create(
+                user_id=email,
+                name=username,
+                member_since=current_timestamp
+            ),
+            UserGroup.create(user_id=email)
+        )
 
     @classmethod
     def get_current_timestamp(cls):
@@ -171,16 +179,30 @@ class UserProfile(PartialModel):
     class Meta(PartialModel.Meta):
         table_name = "UserProfile"
     user_id = UnicodeAttribute(attr_name='UserID', hash_key=True)
-    location = UnicodeAttribute(attr_name='Location', range_key=True)
+    location = UnicodeAttribute(attr_name='Location', range_key=True, default='Somewhere Nice')
     location_index = LocationIndex()
-    avatar_hash = UnicodeAttribute(attr_name='AvatarHash')
+    avatar_hash = UnicodeAttribute(attr_name='AvatarHash', default='23948esdfaouyhuihasd')
     avatar_hash_index = AvatarHashIndex()
     name = UnicodeAttribute(attr_name='Name')
     name_index = NameIndex()
-    age = NumberAttribute(attr_name='Age')
-    about_me = UnicodeAttribute(attr_name='AboutMe')
+    age = NumberAttribute(attr_name='Age', default=0)
+    about_me = UnicodeAttribute(attr_name='AboutMe', default='About Me')
     member_since = UnicodeAttribute(attr_name='MemberSince')
     member_since_index = MemberSinceIndex()
+
+    @classmethod
+    def by_userid(cls, userid):
+        profiles = [p for p in cls.user_id_index.query(userid)]
+        return profiles
+
+    @classmethod
+    def create(cls, user_id=None, name=None, member_since=None):
+        user_profile = UserProfile(
+            user_id=user_id,
+            name=name,
+            member_since=member_since
+        )
+        return user_profile.save()
 
 ################ UserGroup Model and Indices
 
@@ -219,3 +241,12 @@ class UserGroup(PartialModel):
     def by_userid(cls, userid):
         groups = [g for g in cls.user_id_index.query(userid)]
         return groups
+
+    @classmethod
+    def create(cls, user_id=None, group_id='user', name='user'):
+        user_group = UserGroup(
+            group_id=group_id,
+            user_id=user_id,
+            name=name
+        )
+        return user_group.save()

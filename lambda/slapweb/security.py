@@ -60,7 +60,10 @@ def groupfinder(userid, request):
             User,
             UserGroup
         )
-    user = next(iter([u for u in User.query(userid)]))
+    user = None
+    user_list = [u for u in User.query(userid)]
+    if len(user_list) > 0:
+        user = next(iter(user_list))
     if user:
         groups = UserGroup.by_userid(user.user_id)
         group_names = [g.name for g in groups]
