@@ -1,11 +1,20 @@
 
 __author__ = 'outcastgeek'
 
+try:
+    from slapweb.security import groupfinder
+except:
+    from security import groupfinder
+
 import os
 
 import deform
 
 from waitress import serve
+
+from pyramid.authentication import SessionAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.session import SignedCookieSessionFactory
 
 from pyramid.config import Configurator
 # from pyramid_zodbconn import get_connection
@@ -45,6 +54,14 @@ log = logging.getLogger(__name__)
 def configure_app(settings):
     """ This function returns a Pyramid WSGI application.
     """
+    authn_policy = SessionAuthenticationPolicy(callback=groupfinder, debug=True)
+    authz_policy = ACLAuthorizationPolicy()
+    session_factory = SignedCookieSessionFactory(
+        'itsaslapmanwebdevseekreet',
+        cookie_name='slapmanwebdev',
+        secure=False
+    )
+
     with Configurator(settings=settings) as config:
         config.include('pyramid_chameleon')
         config.include('pyramid_jinja2')
@@ -57,6 +74,11 @@ def configure_app(settings):
         deform.renderer.configure_zpt_renderer()
         config.add_static_view('static_deform', 'deform:static')
         config.add_static_view('static', 'static', cache_max_age=3600)
+
+        config.set_authentication_policy(authn_policy)
+        config.set_authorization_policy(authz_policy)
+        config.set_session_factory(session_factory)
+
         return config.make_wsgi_app()
 
 

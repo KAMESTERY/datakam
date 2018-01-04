@@ -23,6 +23,12 @@ except:
         Data
     )
 
+from pyramid.security import authenticated_userid
+from pyramid.session import (
+    signed_serialize,
+    signed_deserialize
+)
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -55,7 +61,18 @@ def my_view(request):
     #     log.debug("Scanned Thing: {0}".format(thing))
     #     # log.debug("Rate Limited Scanned Thing: {0}".format(thing))
 
+    userid = authenticated_userid(request)
+    log.info(f"UserID: {userid}")
+
     request.response.set_cookie('CookieLB', ':-):-)(-:(-:')
+
+    cookieval = request.cookies.get('signed_cookie', None)
+    if cookieval:
+        cookie_data = signed_deserialize(cookieval, 'secret')
+        log.info(f"Cookie Data: {cookie_data}")
+
+    cookieval = signed_serialize({'u':userid}, 'secret')
+    request.response.set_cookie('signed_cookie', cookieval)
 
     return {'project': 'Slapman Web',
             'my_list': [user.username for user in User.rate_limited_scan()]}

@@ -118,7 +118,7 @@ class AuthViews:
 
     def redirect_success(self, email, username):
         self.session.flash(f"Welcome {username or email}!")
-        headers = remember(self.request, email)
+        headers = remember(self.request, userid=email)
         raise HTTPFound(
             location=self.came_from,
             headers=headers
@@ -146,3 +146,11 @@ class AuthViews:
             'registration_form': self.registration_form.render(),
             'login_form': self.process_form(self.login_form)
         }
+
+    @view_config(route_name='logout')
+    def logout(self):
+        userid = self.request.authenticated_userid
+        self.request.session.flash(f"Goodbye {userid}!")
+        headers = forget(self.request)
+        return HTTPFound(location=self.request.route_url('home'),
+                         headers=headers)

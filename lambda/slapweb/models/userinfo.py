@@ -217,5 +217,5 @@ class UserGroup(PartialModel):
 
     @classmethod
     def by_userid(cls, userid):
-        groups = [g for g in cls.query(userid)]
+        groups = [g for g in cls.user_id_index.query(userid)]
         return groups
