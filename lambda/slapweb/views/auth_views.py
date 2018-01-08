@@ -4,18 +4,22 @@ import logging
 try:
     from slapweb.forms.userforms import (
         get_user_login_form,
-        get_user_registration_form
+        get_user_registration_form,
+        get_user_profile_form
     )
     from slapweb.models.userinfo import (
-        User
+        User,
+        UserProfile
     )
 except:
     from forms.userforms import (
         get_user_login_form,
-        get_user_registration_form
+        get_user_registration_form,
+        get_user_profile_form
     )
     from models.userinfo import (
-        User
+        User,
+        UserProfile
     )
 
 import colander
@@ -154,3 +158,31 @@ class AuthViews:
         headers = forget(self.request)
         return HTTPFound(location=self.request.route_url('home'),
                          headers=headers)
+
+@view_config(
+    route_name='profile',
+    renderer='templates/profile.jinja2',
+    permission='user'
+)
+def profile(request):
+    session = request.session
+    userid = request.authenticated_userid
+    rendered_form = None
+    profile_form = get_user_profile_form(request)
+    profile = UserProfile.by_userid(userid)
+    if 'update' in request.POST:
+        try:
+            form_data = profile_form.validate(request.POST.items())
+            log.debug(f"User Profile Data: {form_data}")
+            profile.update(**form_data)
+            session.flash(f"Profile Updated!")
+        except deform.ValidationFailure as e:
+            log.warning(f"WARNING:::: {e}")
+            # Render a form version where errors are visible next to the fields,
+            # and the submitted values are posted back
+            rendered_form = e.render()
+    if rendered_form is None:
+        rendered_form = profile_form.render(profile.attribute_values)
+    return {
+        'profile_form': rendered_form
+    }

@@ -41,6 +41,7 @@ class RootFactory(object):
     __acl__ = [
         (Allow, Everyone, 'view'),
         (Allow, Authenticated, 'user'),
+        (Allow, Group.SLAPMAN_USER, 'user'),
         (Allow, Group.SLAPMAN_COLLABO, ['create', 'edit']),
         (Allow, 'admin', ALL_PERMISSIONS)
     ]

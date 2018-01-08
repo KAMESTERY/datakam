@@ -2,9 +2,15 @@
 __author__ = 'outcastgeek'
 
 try:
-    from slapweb.security import groupfinder
+    from slapweb.security import (
+        groupfinder,
+        RootFactory
+    )
 except:
-    from security import groupfinder
+    from security import (
+        groupfinder,
+        RootFactory
+    )
 
 import os
 
@@ -62,7 +68,10 @@ def configure_app(settings):
         secure=False
     )
 
-    with Configurator(settings=settings) as config:
+    with Configurator(
+            root_factory=RootFactory,
+            settings=settings
+    ) as config:
         config.include('pyramid_chameleon')
         config.include('pyramid_jinja2')
         config.include('pyramid_tm')

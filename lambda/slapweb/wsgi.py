@@ -1,9 +1,15 @@
 __author__ = 'outcastgeek'
 
 try:
-    from slapweb.security import groupfinder
+    from slapweb.security import (
+        groupfinder,
+        RootFactory
+    )
 except:
-    from security import groupfinder
+    from security import (
+        groupfinder,
+        RootFactory
+    )
 
 import os
 
@@ -100,6 +106,7 @@ def configure_app(settings):
 
     with Configurator(
             request_factory=LambdaRequest,
+            root_factory=RootFactory,
             settings=settings
     ) as config:
         config.include('pyramid_chameleon')

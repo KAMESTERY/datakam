@@ -192,8 +192,9 @@ class UserProfile(PartialModel):
 
     @classmethod
     def by_userid(cls, userid):
-        profiles = [p for p in cls.user_id_index.query(userid)]
-        return profiles
+        profiles = [p for p in cls.query(userid)]
+        profile = next(iter(profiles))
+        return profile
 
     @classmethod
     def create(cls, user_id=None, name=None, member_since=None):
