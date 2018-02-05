@@ -174,7 +174,7 @@ def profile(request):
         try:
             form_data = profile_form.validate(request.POST.items())
             log.debug(f"User Profile Data: {form_data}")
-            profile.update(**form_data)
+            profile.do_update(**form_data)
             session.flash(f"Profile Updated!")
         except deform.ValidationFailure as e:
             log.warning(f"WARNING:::: {e}")

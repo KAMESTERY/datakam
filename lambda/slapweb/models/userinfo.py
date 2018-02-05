@@ -190,6 +190,30 @@ class UserProfile(PartialModel):
     member_since = UnicodeAttribute(attr_name='MemberSince')
     member_since_index = MemberSinceIndex()
 
+    # def do_update(self, location=None, avatar_hash=None, name=None, age=None, about_me=None, member_since=None,
+    #               condition=None, conditional_operator=None, **expected_values):
+    #     self.update(
+    #         actions=[
+    #             UserProfile.location.set(location or self.location),
+    #             UserProfile.avatar_hash.set(avatar_hash or self.avatar_hash),
+    #             UserProfile.name.set(name or self.name),
+    #             UserProfile.age.set(age or self.age),
+    #             UserProfile.about_me.set(about_me or self.about_me),
+    #             # UserProfile.member_since.set(member_since or self.member_since) # TODO: Should this be user editable????
+    #         ],
+    #         condition=condition)
+
+    def do_update(self, location=None, avatar_hash=None, name=None, age=None, about_me=None, member_since=None,
+                  condition=None, conditional_operator=None, **expected_values):
+        self.update(dict(
+            # location=dict(value=location, action='PUT'),
+            avatar_hash=dict(value=avatar_hash, action='PUT'),
+            name=dict(value=name, action='PUT'),
+            age=dict(value=age, action='PUT'),
+            about_me=dict(value=about_me, action='PUT'),
+            # member_since=dict(value=member_since, action='PUT')
+        ))
+
     @classmethod
     def by_userid(cls, userid):
         profiles = [p for p in cls.query(userid)]
