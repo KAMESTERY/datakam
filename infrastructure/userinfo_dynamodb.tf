@@ -130,7 +130,7 @@ resource "aws_dynamodb_table" "userprofile-table" {
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "UserID"
-  range_key      = "Location"
+  range_key      = "MemberSince"
 
   attribute {
     name = "UserID"

@@ -179,7 +179,7 @@ class UserProfile(PartialModel):
     class Meta(PartialModel.Meta):
         table_name = "UserProfile"
     user_id = UnicodeAttribute(attr_name='UserID', hash_key=True)
-    location = UnicodeAttribute(attr_name='Location', range_key=True, default='Somewhere Nice')
+    location = UnicodeAttribute(attr_name='Location', default='Somewhere Nice')
     location_index = LocationIndex()
     avatar_hash = UnicodeAttribute(attr_name='AvatarHash', default='23948esdfaouyhuihasd')
     avatar_hash_index = AvatarHashIndex()
@@ -187,7 +187,7 @@ class UserProfile(PartialModel):
     name_index = NameIndex()
     age = NumberAttribute(attr_name='Age', default=0)
     about_me = UnicodeAttribute(attr_name='AboutMe', default='About Me')
-    member_since = UnicodeAttribute(attr_name='MemberSince')
+    member_since = UnicodeAttribute(attr_name='MemberSince', range_key=True)
     member_since_index = MemberSinceIndex()
 
     # def do_update(self, location=None, avatar_hash=None, name=None, age=None, about_me=None, member_since=None,
@@ -206,7 +206,7 @@ class UserProfile(PartialModel):
     def do_update(self, location=None, avatar_hash=None, name=None, age=None, about_me=None, member_since=None,
                   condition=None, conditional_operator=None, **expected_values):
         self.update(dict(
-            # location=dict(value=location, action='PUT'),
+            location=dict(value=location, action='PUT'),
             avatar_hash=dict(value=avatar_hash, action='PUT'),
             name=dict(value=name, action='PUT'),
             age=dict(value=age, action='PUT'),
@@ -217,7 +217,9 @@ class UserProfile(PartialModel):
     @classmethod
     def by_userid(cls, userid):
         profiles = [p for p in cls.query(userid)]
-        profile = next(iter(profiles))
+        profile = None
+        if len(profiles) > 0:
+            profile = next(iter(profiles))
         return profile
 
     @classmethod
