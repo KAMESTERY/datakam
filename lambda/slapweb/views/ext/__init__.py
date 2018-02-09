@@ -1,7 +1,7 @@
 __author__ = 'outcastgeek'
 
 from pyramid.renderers import render
-from pyramid.security import has_permission
+# from pyramid.security import has_permission
 
 def hello(name):
     greeting = "Hello %s!!!!" % name
@@ -9,4 +9,5 @@ def hello(name):
     return response
 
 def has_cred(permission, request):
-    return has_permission(permission, request.context, request)
+    return request.has_permission(permission, request.context)
+    # return has_permission(permission, request.context, request)

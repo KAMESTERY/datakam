@@ -23,7 +23,7 @@ except:
         Data
     )
 
-from pyramid.security import authenticated_userid
+# from pyramid.security import authenticated_userid
 from pyramid.session import (
     signed_serialize,
     signed_deserialize
@@ -61,7 +61,8 @@ def my_view(request):
     #     log.debug("Scanned Thing: {0}".format(thing))
     #     # log.debug("Rate Limited Scanned Thing: {0}".format(thing))
 
-    userid = authenticated_userid(request)
+    # userid = authenticated_userid(request)
+    userid = request.authenticated_userid
     log.info(f"UserID: {userid}")
 
     request.response.set_cookie('CookieLB', ':-):-)(-:(-:')
@@ -76,10 +77,3 @@ def my_view(request):
 
     return {'project': 'Slapman Web',
             'my_list': [user.username for user in User.rate_limited_scan()]}
-
-@view_config(
-    route_name='api',
-    renderer='templates/api.jinja2'
-)
-def api_view(request):
-    return {}
