@@ -105,14 +105,10 @@ class User(PartialModel):
 
     @classmethod
     def check_password(cls, email, password):
-        user = next(iter([u for u in cls.query(email)]))
-        if not user:
+        users = [u for u in cls.query(email)]
+        if len(users) < 1:
             return False, None
-        return check_password_hash(password, user.password), user
-
-    @classmethod
-    def check_password(cls, email, password):
-        user = next(iter([u for u in cls.query(email)]))
+        user = next(iter(users))
         if not user:
             return False, None
         return check_password_hash(password, user.password), user

@@ -13,6 +13,18 @@ from .data import (
 )
 
 
+try:
+    from slapweb.models.userinfo import (
+        User,
+        UserProfile
+    )
+except:
+    from models.userinfo import (
+        User,
+        UserProfile
+    )
+
+
 class Ship(graphene.ObjectType):
     '''A ship in the Star Wars saga'''
 
@@ -77,7 +89,45 @@ class Weather(graphene.ObjectType):
     deg = graphene.String(description='The Degrees')
 
 
+class UserObject(graphene.ObjectType):
+    user_id = graphene.String(description='User ID')
+    email = graphene.String(description='Email')
+    username = graphene.String(description='Username')
+    roles = graphene.String(description='Roles')
+    confirmed = graphene.String(description='Confirmed')
+    last_seen = graphene.String(description='Last Seen')
+
+
+class CheckPassword(graphene.ObjectType):
+    user = graphene.Field(UserObject, description="User")
+    valid = graphene.Boolean(description='Correct Password Entered')
+
+
 class Query(graphene.ObjectType):
+
+    check_password = graphene.Field(
+        CheckPassword,
+        email=graphene.String(description='Email Address', required=True),
+        password=graphene.String(description='Password', required=True)
+    )
+
+    @resolve_only_args
+    def resolve_check_password(self, email, password):
+        valid, user = User.check_password(email, password)
+        response = CheckPassword(valid=False)
+        if user:
+            user=UserObject(
+                user_id=user.user_id,
+                email=user.email,
+                username=user.username,
+                roles=user.roles,
+                confirmed=user.confirmed,
+                last_seen=user.last_seen
+            )
+            response.user=user
+            response.valid=valid
+        return response
+
     currentip = graphene.String(description='The Current IP of the Lambda Function')
 
     @resolve_only_args
