@@ -163,6 +163,20 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
+
+    user_create = graphene.String(
+        description='Creation Status',
+        email=graphene.String(description='Email Address', required=True),
+        username=graphene.String(description='Username', required=True),
+        password=graphene.String(description='Password', required=True)
+    )
+
+    @resolve_only_args
+    def resolve_user_create(self, email, password, username):
+        u, p, g = User.create(email, password, username)
+        print(f"\nUser: {u}\nProfile: {p}\nGroup: {g}\n")
+        return "Success"
+
     introduce_ship = IntroduceShip.Field()
 
 
