@@ -12,7 +12,7 @@ func TestPublicRoutes(t *testing.T) {
 		name string
 		want *mux.Router
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := PublicRoutes(); !reflect.DeepEqual(got, tt.want) {

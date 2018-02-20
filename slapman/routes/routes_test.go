@@ -13,7 +13,7 @@ func TestSetupApp(t *testing.T) {
 		name string
 		want http.Handler
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := SetupApp(); !reflect.DeepEqual(got, tt.want) {
@@ -31,7 +31,7 @@ func Test_wrapMiddlewares(t *testing.T) {
 		args args
 		want http.Handler
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := wrapMiddlewares(tt.args.routes); !reflect.DeepEqual(got, tt.want) {

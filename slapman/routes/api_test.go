@@ -12,7 +12,7 @@ func TestNewServicesRouter(t *testing.T) {
 		name string
 		want *mux.Router
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := NewServicesRouter(); !reflect.DeepEqual(got, tt.want) {
