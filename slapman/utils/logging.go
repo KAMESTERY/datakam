@@ -23,7 +23,7 @@ const (
 	len2   = len(delim) + levlen
 	len3   = 2*len(delim) + levlen
 
-	prefix = "[dbu][%s]"
+	prefix = "[slapman][%s]"
 )
 
 var logLevels map[string]int
@@ -69,7 +69,8 @@ func join3(level, meta, msg string) string {
 }
 
 func (logger *Logger) output(level int, msg string) {
-	logLevel := 2 // Error Level By Default
+	//logLevel := 2 // Error Level By Default
+	logLevel := 3 // Info Level By Default
 	envLogLevel := os.Getenv("LOG_LEVEL")
 	if val, ok := logLevels[strings.ToUpper(envLogLevel)]; ok {
 		logLevel = val

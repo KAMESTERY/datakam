@@ -2,8 +2,12 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	_ "github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/graphql-go/graphql"
 
@@ -56,12 +60,12 @@ func init() {
 	}
 }
 
-func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, query string) {
+func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, requestString string) {
 	respChan := make(chan interface{}, 1)
 	go func() {
 		params := graphql.Params{
 			Schema:        schema,
-			RequestString: query,
+			RequestString: requestString,
 			Context:       ctx,
 		}
 		response := graphql.Do(params)
@@ -81,6 +85,12 @@ func executeQuery(ctx context.Context, w http.ResponseWriter, r *http.Request, q
 		graphql_logger.Fatalf("ERROR:::: %+v", ctx.Err())
 		utils.RenderJSONWithCode(w, r, ctx.Err(), http.StatusInternalServerError)
 	}
+}
+
+type GqlRequest struct {
+	OperationName string                 `json:"operationName"`
+	Query         string                 `json:"query"`
+	Variables     map[string]interface{} `json:"variables"`
 }
 
 func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
@@ -107,9 +117,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 		// CORS Headers
 		utils.CorsHeaders(w)
 
-		var gqlReq struct {
-			Query string `json:"query"`
-		}
+		var gqlReq GqlRequest
 
 		// decode into GqlRequest struct
 		err := utils.DecodeJson(r.Body, &gqlReq)
@@ -128,4 +136,44 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 		graphql_logger.Warnf("ERROR:::: %+v", warnStruct)
 		utils.RenderJSONWithCode(w, r, warnStruct, http.StatusBadRequest)
 	}
+}
+
+func lambdaGqlHandler(context context.Context, gqlReq GqlRequest) (response *graphql.Result, err error) {
+
+	graphql_logger.Infof("Request: %+v", gqlReq)
+
+	requestString := gqlReq.Query
+	graphql_logger.Debugf("Query: %+v", requestString)
+
+	respChan := make(chan *graphql.Result, 1)
+	go func() {
+		params := graphql.Params{
+			Schema:        schema,
+			RequestString: requestString,
+			Context:       context,
+		}
+		response := graphql.Do(params)
+		if len(response.Errors) > 0 {
+			graphql_logger.Fatalf("failed to execute graphql operation, errors: %+v", response.Errors)
+			err = fmt.Errorf("ERROR:::: %+v", response.Errors)
+		} else {
+			graphql_logger.Debugf("%s \n", response)
+		}
+		respChan <- response
+	}()
+	select {
+	case resp := <-respChan:
+		response = resp
+		graphql_logger.Debugf("%s \n", response)
+	case <-context.Done():
+		err = context.Err()
+		graphql_logger.Fatalf("ERROR:::: %+v", err)
+	}
+
+	return
+}
+
+//RunLambda Starts the lambdaGqlHandler which Handles AWS Lambda GraphQL Queries and Mutions
+func RunLambda() {
+	lambda.Start(lambdaGqlHandler)
 }

@@ -1,9 +1,9 @@
 resource "aws_lambda_function" "slapman_web_OPTIONS" {
-  filename         = "infrastructure/slapalicious.zip"
+  filename         = "infrastructure/slapalicious-web.zip"
   function_name    = "slapman_web_OPTIONS"
   role             = "${aws_iam_role.iam_for_slapman.arn}"
   handler          = "web.handle"
-  source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
+  source_code_hash = "${base64sha256(file("infrastructure/slapalicious-web.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
   timeout          = "300"
@@ -16,11 +16,11 @@ resource "aws_lambda_function" "slapman_web_OPTIONS" {
 }
 
 resource "aws_lambda_function" "slapman_web_GET" {
-  filename         = "infrastructure/slapalicious.zip"
+  filename         = "infrastructure/slapalicious-web.zip"
   function_name    = "slapman_web_GET"
   role             = "${aws_iam_role.iam_for_slapman.arn}"
   handler          = "web.handle"
-  source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
+  source_code_hash = "${base64sha256(file("infrastructure/slapalicious-web.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
   timeout          = "300"
@@ -33,11 +33,11 @@ resource "aws_lambda_function" "slapman_web_GET" {
 }
 
 resource "aws_lambda_function" "slapman_web_POST" {
-  filename         = "infrastructure/slapalicious.zip"
+  filename         = "infrastructure/slapalicious-web.zip"
   function_name    = "slapman_web_POST"
   role             = "${aws_iam_role.iam_for_slapman.arn}"
   handler          = "web.handle"
-  source_code_hash = "${base64sha256(file("infrastructure/slapalicious.zip"))}"
+  source_code_hash = "${base64sha256(file("infrastructure/slapalicious-web.zip"))}"
   memory_size      = "128"
   runtime          = "python3.6"
   timeout          = "300"

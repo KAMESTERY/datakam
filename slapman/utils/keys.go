@@ -20,6 +20,19 @@ var (
 	keys_logger = NewLogger("utilskeys")
 )
 
+func ConfigureCrypto(cryptoRsa string) {
+	// using asymmetric crypto/RSA keys
+	// location of the files used for signing and verification
+	privKeyPath := cryptoRsa + ".rsa"    // openssl genrsa -out app.rsa 1024
+	pubKeyPath := cryptoRsa + ".rsa.pub" // openssl rsa -in app.rsa -pubout > app.rsa.pub
+
+	signBytes := KeysBox.Bytes(privKeyPath)
+	SignKey, _ = jwt.ParseRSAPrivateKeyFromPEM(signBytes)
+
+	verifyBytes := KeysBox.Bytes(pubKeyPath)
+	VerifyKey, _ = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
+}
+
 // read the key files before starting http handlers
 func SetupCrypto(cryptoRsa string) {
 	// using asymmetric crypto/RSA keys

@@ -12,7 +12,10 @@ include
 lib
 lambda/worker/slapman
 slapman/vendor
+slapman/keys/slapman*
+*-packr.go
 build
+bin
 /*.log
 /target
 /*-init.clj

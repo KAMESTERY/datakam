@@ -22,9 +22,10 @@ func main() {
 
 	// Adjust Go Routines
 	//	runtime.GOMAXPROCS(runtime.NumCPU())
-	runtime.GOMAXPROCS(runtime.NumCPU() * 5)
+	//runtime.GOMAXPROCS(runtime.NumCPU() * 5)
 
-	utils.SetupCrypto(CryptoRsa)
+	utils.ConfigureCrypto(CryptoRsa)
+	//utils.SetupCrypto(CryptoRsa)
 
 	cmd.Execute()
 }

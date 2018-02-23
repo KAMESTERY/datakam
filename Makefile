@@ -4,6 +4,8 @@ BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
 WORKER=slapman
 WEBSITE=slapman-web
+CRYPTO_OUTPUT_DIR=$(BASEDIR)/$(WORKER)/keys
+OUTPUT_DIR=$(BASEDIR)/bin
 
 # These are the values we want to pass for VERSION and BUILD
 VERSION=0.0.1
@@ -39,18 +41,20 @@ publish-website: deploy
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
-#build-lambda: deps-deploy prod-build-worker package-lambda
-build-lambda: deps-deploy package-lambda
+#build-lambda: deps-deploy package-lambda
+build-lambda: deps-deploy prod-build-worker package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:
-	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious.zip .
+	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-web.zip .
+	cd $(OUTPUT_DIR) && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-api.zip .
 
 # Crypto
 
 rsa:
-	openssl genrsa -out $(BASEDIR)/lambda/worker/$(WORKER).rsa 1024
-	openssl rsa -in $(BASEDIR)/lambda/worker/$(WORKER).rsa -pubout > $(BASEDIR)/lambda/worker/$(WORKER).rsa.pub
+	mkdir -p $(CRYPTO_OUTPUT_DIR)
+	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
+	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
 
 # PY3.6
 
@@ -81,11 +85,14 @@ OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -X "main.CryptoRsa=${WORKER}" -linkmode "internal" -extldflags "-static"'
 
-build-worker: worker-link go-fmt rsa
-	cd $(GOPATH)/src/$(WORKER) && go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
+pack-assets:
+	packr -i $(BASEDIR)/$(WORKER)
 
-prod-build-worker: worker-link go-fmt go-lint rsa
-	cd $(GOPATH)/src/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(BASEDIR)/lambda/worker/$(WORKER)
+build-worker: rsa worker-link pack-assets go-fmt
+	cd $(GOPATH)/src/$(WORKER) && go build $(LDFLAGS) -v -o $(OUTPUT_DIR)/$(WORKER)
+
+prod-build-worker: rsa worker-link pack-assets go-fmt go-lint
+	cd $(GOPATH)/src/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(OUTPUT_DIR)/$(WORKER)
 
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
@@ -113,6 +120,7 @@ vendor-link:
 
 # TOOLING
 tools: worker-link
+	go get -u github.com/gobuffalo/packr/...
 	go get -u github.com/golang/dep/cmd/dep
 	go get -u github.com/mitchellh/gox
 	go get -u github.com/nsf/gocode
@@ -139,9 +147,9 @@ go-fmt:
 	gofmt -l -s -w $(BASEDIR)/$(WORKER)
 
 go-lint:
-	gometalinter --vendored-linters $(WORKER)
+	gometalinter --deadline 120s --vendored-linters $(WORKER)
 
 # CLEAN
 
 clean:
-	@rm -rf infrastructure/*.zip lambda/lib $(GOPATH)/src/$(WORKER)
+	@rm -rf $(OUTPUT_DIR) $(CRYPTO_OUTPUT_DIR) infrastructure/*.zip lambda/lib $(GOPATH)/src/$(WORKER) && packr clean

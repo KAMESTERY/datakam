@@ -3,6 +3,8 @@ package utils
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/gobuffalo/packr"
 )
 
 var (
@@ -19,9 +21,15 @@ var (
 	}()
 
 	//TemplatesDir = baseDir + "/templates/*"
-	TemplatesDir = baseDir + "/templates"
-	MarkdownsDir = baseDir + "/pages/"
-	StaticDir    = baseDir + "/static"
+	TemplatesDir = baseDir + "/../templates"
+	MarkdownsDir = baseDir + "/../pages/"
+	StaticDir    = baseDir + "/../static"
+
+	// Boxes
+	TemplatesBox = packr.NewBox("../templates")
+	MarkdownsBox = packr.NewBox("../pages/")
+	StaticBox    = packr.NewBox("../static")
+	KeysBox      = packr.NewBox("../keys")
 )
 
 // exists returns whether the given file or directory exists or not
