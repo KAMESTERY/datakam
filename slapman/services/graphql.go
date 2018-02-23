@@ -140,7 +140,7 @@ func HandleGqlRequest(w http.ResponseWriter, r *http.Request) {
 
 func lambdaGqlHandler(context context.Context, gqlReq GqlRequest) (response *graphql.Result, err error) {
 
-	graphql_logger.Infof("Request: %+v", gqlReq)
+	graphql_logger.Debugf("Request: %+v", gqlReq)
 
 	requestString := gqlReq.Query
 	graphql_logger.Debugf("Query: %+v", requestString)
