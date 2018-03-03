@@ -29,6 +29,10 @@ from . import (
     PartialIndex
 )
 
+from .slapalicious_client import (
+    invoke_gql
+)
+
 ################ User Model and Indices
 
 class EmailIndex(PartialIndex):
@@ -102,6 +106,13 @@ class User(PartialModel):
         self.password_hash = hash_password(password)
 
     password = property(_get_password, _set_password)
+
+    @classmethod
+    def user_login(cls, email, password):
+        resp = invoke_gql(
+            '{ userLogin(email: "%s", password: "%s") {token}}' % (email, password)
+        )
+        return resp
 
     @classmethod
     def check_password(cls, email, password):
