@@ -30,7 +30,8 @@ from . import (
 )
 
 from .slapalicious_client import (
-    invoke_gql
+    invoke_gql,
+    user_login
 )
 
 ################ User Model and Indices
@@ -109,10 +110,8 @@ class User(PartialModel):
 
     @classmethod
     def user_login(cls, email, password):
-        resp = invoke_gql(
-            '{ userLogin(email: "%s", password: "%s") {token}}' % (email, password)
-        )
-        return resp
+        user, token = user_login(email, password)
+        return user, token
 
     @classmethod
     def check_password(cls, email, password):

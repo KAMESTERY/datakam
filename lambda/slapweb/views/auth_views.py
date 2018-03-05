@@ -77,7 +77,7 @@ class AuthViews:
             email = form_data.get('email', None)
             password = form_data.get('password', None)
             if login:
-                token = User.user_login(email, password)
+                _, token = User.user_login(email, password)
                 log.debug(f"TOKEN: {token}")
                 success, user = User.check_password(email, password)
                 if success:

@@ -15,6 +15,7 @@ import (
 const (
 	userTable           = "User"
 	userProfileTable    = "UserProfile"
+	userGroupsTable     = "UserGroups"
 	basicUserRole       = 1234
 	userProfileName     = "What is your name?"
 	userProfileAge      = 4321
@@ -58,6 +59,18 @@ type UserProfile struct {
 	AboutMe     string `json:"AboutMe"`
 	Location    string `json:"Location"`
 	MemberSince string `json:"MemberSince"`
+}
+
+type UserGroup struct {
+	GroupID string `json:"GroupID"`
+	UserID  string `json:"UserID"`
+	Name    string `json:"Name"`
+}
+
+type UserInfo struct {
+	User        UserRef
+	UserProfile UserProfile
+	UserGroups  []UserGroup
 }
 
 var (
@@ -160,31 +173,103 @@ var (
 				"Email":  email,
 			}
 
-			foundRecord, getErr := utils.DynaResolveGetItem(p, userTable, keyData)
-			if getErr != nil {
-				return nil, fmt.Errorf("Could not log you in: %+v", getErr)
+			userInfo := UserInfo{}
+
+			var g group.Group
+			{
+				// Create User
+				g.Add(func() (err error) {
+					foundRecord, getErr := utils.DynaResolveGetItem(p, userTable, keyData)
+					if getErr != nil {
+						err = fmt.Errorf("Could not log you in: %+v", getErr)
+						return
+					}
+					user_logger.Debugf("Found Record: %+v", foundRecord)
+
+					var foundUser User
+					mapstructure.Decode(foundRecord, &foundUser)
+
+					user_logger.Debugf("Found User: %+v", foundUser)
+
+					// Checking user password
+					if checkErr := utils.CheckPasswordHash([]byte(foundUser.PasswordHash), []byte(password)); err != nil {
+						user_logger.Errorf("ERROR:::: %+v", checkErr)
+						err = fmt.Errorf("Wrong Email/Password Provided")
+						return
+					}
+
+					user_logger.Debugf("Logging in user with email: [%+v]", email)
+
+					userInfo.User = foundUser.asUserRef()
+
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
 			}
-			user_logger.Debugf("Found Record: %+v", foundRecord)
+			{
+				// Retrieve UserProfile
+				g.Add(func() (err error) {
+					queryInput, dslErr := utils.
+						DynaQueryDsl(p.Context, userProfileTable, "UserIDIndex").
+						WithParam("UserID", "EQ", userID).AsInput()
+					if dslErr != nil {
+						user_logger.Errorf("Could not rerieve User Group: %+v", err)
+						err = dslErr
+						return
+					}
+					foundRecord, getErr := utils.DynaResolveOneQuery(p, queryInput)
+					if getErr != nil {
+						user_logger.Errorf("Could not retrieve User Profile: %+v", getErr)
+						err = getErr
+						return
+					}
+					var foundUserProfile UserProfile
+					mapstructure.Decode(foundRecord, &foundUserProfile)
+					userInfo.UserProfile = foundUserProfile
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
+			}
+			{
+				// Retrieve UserGroup
+				g.Add(func() (err error) {
+					queryInput, dslErr := utils.
+						DynaQueryDsl(p.Context, userGroupsTable, "UserIDIndex").
+						WithParam("UserID", "EQ", userID).AsInput()
+					if dslErr != nil {
+						user_logger.Errorf("Could not rerieve User Group: %+v", err)
+						err = dslErr
+					}
+					_, rows, qErr := utils.DynaResolveQuery(p, queryInput)
+					if err != nil {
+						user_logger.Errorf("Could not log you in: %+v", err)
+						err = qErr
+					}
+					for row := range rows {
+						var foundUserGroup UserGroup
+						mapstructure.Decode(row, &foundUserGroup)
+						userInfo.UserGroups = append(userInfo.UserGroups, foundUserGroup)
+					}
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
+			}
 
-			var foundUser User
-			mapstructure.Decode(foundRecord, &foundUser)
-
-			user_logger.Debugf("Found User: %+v", foundUser)
-
-			// Checking user password
-			if err := utils.CheckPasswordHash([]byte(foundUser.PasswordHash), []byte(password)); err != nil {
+			err := g.Run()
+			if err != nil {
 				user_logger.Errorf("ERROR:::: %+v", err)
-				return nil, fmt.Errorf("Wrong Email/Password Provided")
+				return nil, err
 			}
-
-			user_logger.Debugf("Logging in user with email: [%+v]", email)
 
 			// Create a signer for rsa 256 and claim c
 			c := struct {
-				User UserRef
+				User UserInfo
 				jwt.StandardClaims
 			}{
-				foundUser.asUserRef(),
+				userInfo,
 				jwt.StandardClaims{
 					ExpiresAt: time.Now().Add(time.Minute * 20).Unix(),
 					Issuer:    "admin",

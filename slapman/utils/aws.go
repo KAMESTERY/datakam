@@ -504,7 +504,7 @@ func dynaGetItem(ctx context.Context, tableName string, keyData map[string]inter
 ///////////////////////////////////// QUERYING AWS DYNAMODB
 
 // DynaResolveQuery queries DynamoDB
-func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (int, interface{}, error) {
+func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (int, []map[string]interface{}, error) {
 
 	// Set the current context
 	ctx := p.Context
@@ -518,6 +518,24 @@ func DynaResolveQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) 
 	count := len(rows)
 
 	return count, rows, nil
+}
+
+func DynaResolveOneQuery(p graphql.ResolveParams, queryInput *dynamodb.QueryInput) (map[string]interface{}, error) {
+
+	// Set the current context
+	ctx := p.Context
+	ctx = context.WithValue(ctx, limitKey, p.Args["limit"])
+
+	rows, err := dynaQuery(ctx, queryInput)
+	if err != nil {
+		return nil, err
+	}
+
+	if count := len(rows); count >= 1 {
+		return rows[0], nil
+	} else {
+		return nil, nil
+	}
 }
 
 func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []map[string]interface{}, err error) {
@@ -646,6 +664,16 @@ func (qi *QueryDsl) Build(data []interface{}) *QueryDsl {
 // WithLimit sets the limit for the query being built
 func (qi *QueryDsl) WithLimit(limit int) *QueryDsl {
 	qi.QueryInput.Limit = aws.Int64(int64(limit))
+	return qi
+}
+
+// WithParam adds parameter to the Query DSL
+func (qi *QueryDsl) WithParam(field, operation string, value interface{}) *QueryDsl {
+	qi.with(
+		field,
+		operation,
+		value,
+	)
 	return qi
 }
 
