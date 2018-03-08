@@ -109,7 +109,9 @@ settings = {'pyramid.reload_templates': True,
                                'static_url': 'pyramid_jinja2.filters:static_url_filter'},
             'jinja2.globals': {'hello': 'views.ext.hello',
                                'has_cred': 'views.ext.has_cred',
-                               'now': 'datetime.datetime.now'}}
+                               'user_id': 'views.ext.user_id',
+                               'now': 'datetime.datetime.now',
+                               }}
 
 log.debug(f"Settings: {settings}")
 

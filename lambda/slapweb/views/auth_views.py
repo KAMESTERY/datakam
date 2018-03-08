@@ -11,6 +11,11 @@ try:
         User,
         UserProfile
     )
+    from slapweb.models.slapalicious_client import (
+        token_to_userid,
+        token_to_userprofile,
+        userprofile_update
+    )
 except:
     from forms.userforms import (
         get_user_login_form,
@@ -20,6 +25,11 @@ except:
     from models.userinfo import (
         User,
         UserProfile
+    )
+    from models.slapalicious_client import (
+        token_to_userid,
+        token_to_userprofile,
+        userprofile_update
     )
 
 import colander
@@ -77,34 +87,17 @@ class AuthViews:
             email = form_data.get('email', None)
             password = form_data.get('password', None)
             if login:
-                _, token = User.user_login(email, password)
-                log.debug(f"TOKEN: {token}")
-                success, user = User.check_password(email, password)
-                if success:
-                    log.info(f"Successfully logged in: {username or email}")
-                    user.update_last_seen()
-                    log.debug(f"Logged In User: {user}")
-                    return self.redirect_success(email, username)
-                else:
-                    err_msg = f"Could not login: {username or email}!"
-                    self.session.flash(err_msg)
-                    raise Exception(err_msg)
+                token = User.user_login(email, password)
+                log.info(f"Successfully logged in: {username or email}")
+                return self.redirect_success(email, username, token)
             else:
-                existing_user_ids = [user.user_id for user in User.query(email)]
-                user_exists = len(existing_user_ids) > 0
-                if user_exists:
-                    log.warning(f"Existing User IDs: {existing_user_ids}")
-                    err_msg = f"Could not register: {username or email}!"
-                    self.session.flash(err_msg)
-                    raise Exception(err_msg)
-                else:
-                    User.create(
-                        email=email,
-                        username=username,
-                        password=password
-                    )
-                    log.info(f"Successfully registered: {username or email}")
-                    return self.redirect_success(email, username)
+                User.user_create(
+                    email=email,
+                    username=username,
+                    password=password
+                )
+                log.info(f"Successfully registered: {username or email}")
+                return self.redirect_success(email, username)
         except deform.ValidationFailure as e:
             log.warning(f"WARNING:::: {e}")
             # Render a form version where errors are visible next to the fields,
@@ -122,13 +115,18 @@ class AuthViews:
             rendered_form = form.render()
         return rendered_form
 
-    def redirect_success(self, email, username):
+    def redirect_success(self, email, username, token=None):
         self.session.flash(f"Welcome {username or email}!")
-        headers = remember(self.request, userid=email)
-        raise HTTPFound(
-            location=self.came_from,
-            headers=headers
-        )
+        if token:
+            headers = remember(self.request, userid=token)
+            raise HTTPFound(
+                location=self.came_from,
+                headers=headers
+            )
+        else:
+            raise HTTPFound(
+                location=self.came_from
+            )
 
     @view_config(route_name='login', request_method='GET')
     @view_config(route_name='register', request_method='GET')
@@ -155,7 +153,7 @@ class AuthViews:
 
     @view_config(route_name='logout')
     def logout(self):
-        userid = self.request.authenticated_userid
+        userid = token_to_userid(self.request.authenticated_userid)
         self.request.session.flash(f"Goodbye {userid}!")
         headers = forget(self.request)
         return HTTPFound(location=self.request.route_url('home'),
@@ -168,23 +166,26 @@ class AuthViews:
 )
 def profile(request):
     session = request.session
-    userid = request.authenticated_userid
+    token = request.authenticated_userid
     rendered_form = None
     profile_form = get_user_profile_form(request)
-    profile = UserProfile.by_userid(userid)
+    profile = token_to_userprofile(token)
     if 'update' in request.POST:
         try:
             form_data = profile_form.validate(request.POST.items())
             log.debug(f"User Profile Data: {form_data}")
-            profile.do_update(**form_data)
+            userprofile_update(token, **form_data)
             session.flash(f"Profile Updated!")
         except deform.ValidationFailure as e:
             log.warning(f"WARNING:::: {e}")
             # Render a form version where errors are visible next to the fields,
             # and the submitted values are posted back
             rendered_form = e.render()
+        except Exception as e:
+            log.warning(f"ERROR:::: {e}")
+            session.flash(f"Failed to Update Profile")
     if rendered_form is None:
-        rendered_form = profile_form.render(profile.attribute_values)
+        rendered_form = profile_form.render(profile)
     return {
         'profile_form': rendered_form
     }

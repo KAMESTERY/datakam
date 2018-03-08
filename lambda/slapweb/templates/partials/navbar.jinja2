@@ -22,7 +22,8 @@
                             <i class="fas fa-user"></i>
                         </span>
                         <span>
-                            {{ request.authenticated_userid }}
+                            {{ user_id(request) }}
+{#                            {{ request.authenticated_userid }}#}
                         </span>
                         </a>
                     </p>

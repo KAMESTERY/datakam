@@ -1,6 +1,9 @@
 ;; https://projectile.readthedocs.io/en/latest/configuration/
 ;; Projectile Configuration
-((nil . ((eval . (setq projectile-project-root
+((nil . ((eval . (setq default-directory
+                       (locate-dominating-file buffer-file-name
+                                               ".dir-locals.el")))
+         (eval . (setq projectile-project-root
                        (locate-dominating-file buffer-file-name
                                                ".dir-locals.el")))
          (eval . (setq compile-command

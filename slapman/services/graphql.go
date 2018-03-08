@@ -43,6 +43,7 @@ var (
 		"gameScorePut":        &resolvers.GameScorePutFields,
 		"gameScoreUpdate":     &resolvers.GameScoreUpdateFields,
 		"userCreate":          &resolvers.UserCreateFields,
+		"userProfileUpdate":   &resolvers.UserProfileUpdateFields,
 		"userJwtTokenRefresh": &resolvers.UserJwtTokenRefreshFields,
 	}
 	rootMutation = graphql.ObjectConfig{Name: "RootMutation", Fields: mutationFields}

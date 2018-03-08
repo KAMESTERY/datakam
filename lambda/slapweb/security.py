@@ -1,4 +1,5 @@
 import bcrypt
+import jwt
 
 
 def hash_password(password, rounds=14):
@@ -21,7 +22,6 @@ def check_password_hash(password, hashed_password):
     """
     valid_password = bcrypt.checkpw(password.encode('utf8'), hashed_password.encode('utf8'))
     return valid_password
-
 
 from pyramid.security import (
     Allow,
@@ -52,21 +52,14 @@ class RootFactory(object):
 
 def groupfinder(userid, request):
     try:
-        from slapweb.models.userinfo import (
-            User,
-            UserGroup
+        from slapweb.models.slapalicious_client import (
+            token_to_usergroups
         )
     except:
-        from models.userinfo import (
-            User,
-            UserGroup
+        from models.slapalicious_client import (
+            token_to_usergroups
         )
-    user = None
-    user_list = [u for u in User.query(userid)]
-    if len(user_list) > 0:
-        user = next(iter(user_list))
-    if user:
-        groups = UserGroup.by_userid(user.user_id)
-        group_names = [g.name for g in groups]
-        return group_names
-    return ['user']
+    groups = ['user']
+    if userid:
+        groups = token_to_usergroups(userid)
+    return groups

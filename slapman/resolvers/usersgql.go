@@ -21,6 +21,8 @@ const (
 	userProfileAge      = 4321
 	userProfileAboutMe  = "What are some words about you?"
 	userProfileLocation = "What is your location?"
+	userGroupGroupID    = "user"
+	userGroupName       = "user"
 )
 
 // Note: Do not embed in User Struct as it creates some issues
@@ -68,9 +70,9 @@ type UserGroup struct {
 }
 
 type UserInfo struct {
-	User        UserRef
-	UserProfile UserProfile
-	UserGroups  []UserGroup
+	User        UserRef     `json:"User"`
+	UserProfile UserProfile `json:"UserProfile"`
+	UserGroups  []UserGroup `json:"UserGroups"`
 }
 
 var (
@@ -83,6 +85,55 @@ var (
 			"token": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The JWT Token",
+			},
+		},
+	})
+
+	// UserProfileRowType represents a UserProfile Row
+	UserProfileRowType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "UserProfileRow",
+		Fields: graphql.Fields{
+			"UserId": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The UserID of the Current UserProfile",
+			},
+			"AvatarHash": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The AvatarHash of the Current UserProfile",
+			},
+			"Name": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The Name of the Current UserProfile",
+			},
+			"Age": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The Age of the Current UserProfile",
+			},
+			"AboutMe": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The AboutMe of the Current UserProfile",
+			},
+			"Location": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The Location of the Current UserProfile",
+			},
+			"MemberSince": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The MemberSince of the Current UserProfile",
+			},
+		},
+	})
+
+	// UserProfileUpdateType represents the Update response to a UserProfile row
+	UserProfileUpdateType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "UserProfileUpdateType",
+		Fields: graphql.Fields{
+			"table": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Table to Scan",
+			},
+			"update": &graphql.Field{
+				Type: UserProfileRowType,
 			},
 		},
 	})
@@ -138,7 +189,7 @@ var (
 	// UserLoginFields represents the parameters and the resolver function to Login a user from the DynamoDB User Table
 	UserLoginFields = graphql.Field{
 		Type:        JwtTokenType,
-		Description: "Creates a new entry in DynamoDB User Table",
+		Description: "Authenticates the User and returns a JWT Token",
 		Args: graphql.FieldConfigArgument{
 			"region": &graphql.ArgumentConfig{
 				Type: graphql.String,
@@ -177,7 +228,7 @@ var (
 
 			var g group.Group
 			{
-				// Create User
+				// Validate User
 				g.Add(func() (err error) {
 					foundRecord, getErr := utils.DynaResolveGetItem(p, userTable, keyData)
 					if getErr != nil {
@@ -266,7 +317,7 @@ var (
 
 			// Create a signer for rsa 256 and claim c
 			c := struct {
-				User UserInfo
+				UserInfo UserInfo
 				jwt.StandardClaims
 			}{
 				userInfo,
@@ -403,6 +454,28 @@ var (
 					user_logger.Errorf("ERROR:::: %+v", err)
 				})
 			}
+			{
+				// Create User Group
+				g.Add(func() (err error) {
+
+					userGroup := UserGroup{
+						GroupID: userGroupGroupID,
+						UserID:  userID,
+						Name:    userGroupName,
+					}
+
+					user_logger.Debugf("Persisting User Group: %+v", userGroup)
+
+					_, err = utils.DynaResolvePutItem(p, userGroupsTable, userGroup)
+					if err != nil {
+						return
+					}
+
+					return
+				}, func(err error) {
+					user_logger.Errorf("ERROR:::: %+v", err)
+				})
+			}
 
 			err = g.Run()
 			if err != nil {
@@ -411,6 +484,91 @@ var (
 			}
 
 			return "success", nil
+		},
+	}
+
+	// UserProfileUpdateFields Updates the User Profile
+	UserProfileUpdateFields = graphql.Field{
+		Type:        UserProfileUpdateType,
+		Description: "Updates the UserProfile DynamoDB Table",
+		Args: graphql.FieldConfigArgument{
+			"userId": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"location": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"avatar_hash": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"name": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"age": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"about_me": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			user_logger.Debugf("Update Args: %+v", p.Args)
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
+
+			keyData := make(map[string]interface{})
+			data := make(map[string]interface{})
+
+			if userId, ok := p.Args["userId"].(string); ok {
+				keyData["UserId"] = userId
+				user_logger.Debugf("Updating UserProfile with UserId: %+v", userId)
+			}
+
+			if location, ok := p.Args["location"].(string); ok {
+				keyData["Location"] = location
+				user_logger.Debugf("Updating UserProfile with Location: %+v", location)
+			}
+
+			if avatarHash, ok := p.Args["avatar_hash"].(string); ok {
+				keyData["AvatarHash"] = avatarHash
+				user_logger.Debugf("Updating UserProfile with AvatarHash: %+v", avatarHash)
+			}
+
+			if name, ok := p.Args["name"].(string); ok {
+				keyData["Name"] = name
+				user_logger.Debugf("Updating UserProfile with Name: %+v", name)
+			}
+
+			age, err := utils.ParseInt64(p.Args["age"])
+			if err == nil { // There has to be a age
+				data["Age"] = age
+				user_logger.Debugf("Updating UserProfile with Age: %+v", age)
+			}
+
+			if aboutMe, ok := p.Args["about_me"].(string); ok {
+				keyData["AboutMe"] = aboutMe
+				user_logger.Debugf("Updating UserProfile with AboutMe: %+v", aboutMe)
+			}
+
+			updatedItem, err := utils.DynaResolveUpdateItem(p, userProfileTable, keyData, data)
+			if err != nil {
+				return nil, err
+			}
+			return struct {
+				Table  string      `json:"table"`
+				Update interface{} `json:"update"`
+			}{
+				userProfileTable,
+				updatedItem,
+			}, nil
 		},
 	}
 )
