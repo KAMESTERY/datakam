@@ -144,7 +144,7 @@ settings = {'pyramid.reload_templates': False,
                                'static_url': 'pyramid_jinja2.filters:static_url_filter'},
             'jinja2.globals': {'hello': 'slapweb.views.ext.hello',
                                'has_cred': 'slapweb.views.ext.has_cred',
-                               'user_id': 'views.ext.user_id',
+                               'user_id': 'slapweb.views.ext.user_id',
                                'now': 'datetime.datetime.now'}}
 
 app = configure_app(settings)

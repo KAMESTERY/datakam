@@ -261,15 +261,12 @@ var (
 			{
 				// Retrieve UserProfile
 				g.Add(func() (err error) {
-					queryInput, dslErr := utils.
-						DynaQueryDsl(p.Context, userProfileTable, "UserIDIndex").
-						WithParam("UserID", "EQ", userID).AsInput()
-					if dslErr != nil {
-						user_logger.Errorf("Could not rerieve User Group: %+v", err)
-						err = dslErr
-						return
-					}
-					foundRecord, getErr := utils.DynaResolveOneQuery(p, queryInput)
+					foundRecord, getErr := utils.DynaResolveGetItem(
+						p,
+						userProfileTable,
+						map[string]interface{}{
+							"UserID": userID,
+						})
 					if getErr != nil {
 						user_logger.Errorf("Could not retrieve User Profile: %+v", getErr)
 						err = getErr

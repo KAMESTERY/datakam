@@ -130,48 +130,41 @@ resource "aws_dynamodb_table" "userprofile-table" {
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "UserID"
-  range_key      = "MemberSince"
+
+  //  range_key      = "MemberSince"
 
   attribute {
     name = "UserID"
     type = "S"
   }
-
   attribute {
     name = "AvatarHash"
     type = "S"
   }
-
   attribute {
     name = "Name"
     type = "S"
   }
-
   attribute {
     name = "Age"
     type = "N"
   }
-
   attribute {
     name = "AboutMe"
     type = "S"
   }
-
   attribute {
     name = "Location"
     type = "S"
   }
-
   attribute {
     name = "MemberSince"
     type = "S"
   }
-
   ttl {
     attribute_name = "TimeToExist"
     enabled        = false
   }
-
   global_secondary_index {
     name            = "LocationIndex"
     hash_key        = "Location"
@@ -184,7 +177,6 @@ resource "aws_dynamodb_table" "userprofile-table" {
       "UserID",
     ]
   }
-
   global_secondary_index {
     name            = "AvatarHashIndex"
     hash_key        = "AvatarHash"
@@ -197,7 +189,6 @@ resource "aws_dynamodb_table" "userprofile-table" {
       "UserID",
     ]
   }
-
   global_secondary_index {
     name            = "NameIndex"
     hash_key        = "Name"

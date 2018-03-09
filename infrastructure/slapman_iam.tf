@@ -125,6 +125,14 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+      "Sid": "InvokePermission",
+      "Effect": "Allow",
+      "Action": [
+           "lambda:InvokeFunction"
+      ],
+       "Resource": "*"
     }
   ]
 }
