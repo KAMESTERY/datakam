@@ -26,6 +26,20 @@ func PublicRoutes() *mux.Router {
 			handlers.Home,
 		},
 		Route{
+			"Admin",
+			"GET",
+			"/admin",
+			make([]string, 0),
+			handlers.Admin,
+		},
+		Route{
+			"Static",
+			"GET",
+			"/static/{category}/{filePath}",
+			make([]string, 0),
+			handlers.Static,
+		},
+		Route{
 			"HelloFCGI",
 			"GET",
 			"/hellofcgi",
