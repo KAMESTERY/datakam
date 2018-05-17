@@ -19,6 +19,7 @@ func GetString(ctx context.Context, url string) (string, error) {
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		req = req.WithContext(ctx)
@@ -26,6 +27,7 @@ func GetString(ctx context.Context, url string) (string, error) {
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		defer res.Body.Close()
@@ -33,6 +35,7 @@ func GetString(ctx context.Context, url string) (string, error) {
 		bodyBytes, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			errChan <- err
+			return
 		} else {
 			respChan <- string(bodyBytes)
 		}
@@ -62,11 +65,13 @@ func GetClientIP(r *http.Request) (clientIP net.IP, err error) {
 		if err != nil {
 			httputils_logger.Errorf("ERROR:::: clientIP: [%+v] is not IP:port", r.RemoteAddr)
 			errChan <- err
+			return
 		}
 		clientIP = net.ParseIP(ip)
 		if clientIP == nil {
 			httputils_logger.Errorf("ERROR:::: clientIP: [%+v] is not IP:port", r.RemoteAddr)
 			errChan <- err
+			return
 		}
 
 		httputils_logger.Infof("Client IP: %+v", clientIP)
@@ -113,6 +118,7 @@ func GetJson(ctx context.Context, url string, target interface{}) error {
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		req = req.WithContext(ctx)
@@ -120,6 +126,7 @@ func GetJson(ctx context.Context, url string, target interface{}) error {
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		defer res.Body.Close()
@@ -127,6 +134,7 @@ func GetJson(ctx context.Context, url string, target interface{}) error {
 		err = DecodeJson(res.Body, target)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		respChan <- true
