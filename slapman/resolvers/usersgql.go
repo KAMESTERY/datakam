@@ -25,7 +25,7 @@ const (
 	userGroupName       = "user"
 )
 
-// Note: Do not embed in User Struct as it creates some issues
+// TODO: Note: Do not embed in User Struct as it creates some issues
 type UserRef struct {
 	UserID   string `json:"UserID"`
 	Email    string `json:"Email"`
