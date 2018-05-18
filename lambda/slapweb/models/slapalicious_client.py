@@ -64,18 +64,18 @@ def user_create(email, username, password, confirm_password: str):
     return success
 
 
-def userprofile_update(token, location=None, avatar_hash=None, name=None, age=None, about_me=None, **expected_values):
+def userprofile_update(token, Location=None, AvatarHash=None, Name=None, Age=None, AboutMe=None, **expected_values):
     userid = token_to_userid(token)
     userprofile = token_to_userprofile(token)
     response = invoke_gql(
         'mutation UserProfileUpdate { userProfileUpdate(userId: "%s", location: "%s", avatar_hash: "%s", name: "%s", age: %s, about_me: "%s", token: "%s") {table,update{UserId,AvatarHash,Name,Age,AboutMe,Location,MemberSince}} }'
         % (
             userid,
-            location or userprofile.get('location'),
-            avatar_hash or userprofile.get('avatar_hash'),
-            name or userprofile.get('name'),
-            age or userprofile.get('age'),
-            about_me or userprofile.get('about_me'),
+            Location or userprofile.get('Location'),
+            AvatarHash or userprofile.get('AvatarHash'),
+            Name or userprofile.get('Name'),
+            Age or userprofile.get('Age'),
+            AboutMe or userprofile.get('AboutMe'),
             token or userprofile.get('token')
         )
     )
