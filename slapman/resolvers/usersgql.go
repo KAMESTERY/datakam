@@ -295,7 +295,7 @@ var (
 						user_logger.Errorf("Could not log you in: %+v", err)
 						err = qErr
 					}
-					for row := range rows {
+					for _, row := range rows {
 						var foundUserGroup UserGroup
 						mapstructure.Decode(row, &foundUserGroup)
 						userInfo.UserGroups = append(userInfo.UserGroups, foundUserGroup)
