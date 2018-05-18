@@ -31,6 +31,20 @@ const (
 var (
 	aws_logger = NewLogger("utilsaws")
 
+	DynaParamInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+		Name: "DynaParam",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"field": &graphql.InputObjectFieldConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Parameter Field to Query",
+			},
+			"value": &graphql.InputObjectFieldConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Parameter Value to Use",
+			},
+		},
+	})
+
 	DynaQueryParamInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		Name: "DynaQueryParam",
 		Fields: graphql.InputObjectConfigFieldMap{
