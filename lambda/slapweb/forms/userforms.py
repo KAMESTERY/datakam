@@ -58,8 +58,10 @@ class UserLoginSchema(deform.schema.CSRFSchema):
         )
     )
 
+# TODO: All Read/Write Models have to be CamelCase because of Go/DynamoDB Backend
+
 class UserProfileSchema(deform.schema.CSRFSchema):
-    location = colander.SchemaNode(
+    Location = colander.SchemaNode(
         colander.String(allow_empty=False),
         widget=deform.widget.TextInputWidget(
             css_class='input is-large',
@@ -67,7 +69,7 @@ class UserProfileSchema(deform.schema.CSRFSchema):
             error_class='is-danger'
         )
     )
-    avatar_hash = colander.SchemaNode(
+    AvatarHash = colander.SchemaNode(
         colander.String(allow_empty=False),
         widget=deform.widget.TextInputWidget(
             css_class='input is-large',
@@ -75,7 +77,7 @@ class UserProfileSchema(deform.schema.CSRFSchema):
             error_class='is-danger'
         )
     )
-    name = colander.SchemaNode(
+    Name = colander.SchemaNode(
         colander.String(allow_empty=False),
         widget=deform.widget.TextInputWidget(
             css_class='input is-large',
@@ -83,7 +85,7 @@ class UserProfileSchema(deform.schema.CSRFSchema):
             error_class='is-danger'
         )
     )
-    age = colander.SchemaNode(
+    Age = colander.SchemaNode(
         colander.Int(),
         widget=deform.widget.TextInputWidget(
             css_class='input is-large',
@@ -91,7 +93,7 @@ class UserProfileSchema(deform.schema.CSRFSchema):
             error_class='is-danger'
         )
     )
-    about_me = colander.SchemaNode(
+    AboutMe = colander.SchemaNode(
         colander.String(allow_empty=False),
         widget=deform.widget.RichTextWidget(
             options=(('browser_spellcheck', True),),
