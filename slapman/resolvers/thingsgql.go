@@ -29,13 +29,13 @@ type Datum struct {
 	Value   string `json:"Value"`
 }
 
-type RealThing struct {
+type ActualThing struct {
 	thing Thing `json:"thing"`
 	data []Datum `json:"data"`
 }
 
-func (rt *RealThing) newThing(userID, name string) *RealThing {
-	rt.thing = Thing{
+func (athg *ActualThing) newThing(userID, name string) *ActualThing {
+	athg.thing = Thing{
 		ThingID: utils.GenerateUUID(),
 		UserID: userID,
 		Name: name,
@@ -44,17 +44,17 @@ func (rt *RealThing) newThing(userID, name string) *RealThing {
 		CreatedAt: time.Now().String(),
 		UpdatedAt: time.Now().String(),
 	}
-	return rt
+	return athg
 }
 
-func (rt *RealThing) withDatum(thingID, key, value string) *RealThing {
-	rt.data = append(rt.data, Datum{
+func (athg *ActualThing) withDatum(thingID, key, value string) *ActualThing {
+	athg.data = append(athg.data, Datum{
 		DataID: utils.GenerateUUID(),
 		ThingID: thingID,
 		Key: key,
 		Value: value,
 	})
-	return rt
+	return athg
 }
 
 var (
