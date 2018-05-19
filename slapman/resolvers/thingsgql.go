@@ -2,12 +2,12 @@ package resolvers
 
 import (
 	"fmt"
-	"github.com/graphql-go/graphql"
-	"github.com/mitchellh/mapstructure"
 	"reflect"
 	"slapman/utils"
 	"slapman/utils/group"
 	"time"
+
+	"github.com/graphql-go/graphql"
 )
 
 const (
@@ -53,27 +53,28 @@ func (athg *ActualThing) SaveThingData(p graphql.ResolveParams) (status string, 
 
 	if _, err = athg.Ok(); err != nil {
 		status = "Could not Persist Thing / Data"
+		return
 	}
 
 	var g group.Group
 	{
-		// Persit Thing
+		// Persist Thing
 		g.Add(func() (err error) {
-			utils.DynaResolvePutItem(p, thingsTable, athg.thing)
+			_, err = utils.DynaResolvePutItem(p, thingsTable, athg.thing)
 			return
 		}, func(err error) {
 			thing_logger.Errorf("ERROR:::: %+v", err)
 		})
 
-		for _, datum := range athg.data {
-			// Persist Datum
-			g.Add(func() (err error) {
-				utils.DynaResolvePutItem(p, dataTable, datum)
-				return
-			}, func(err error) {
-				thing_logger.Errorf("ERROR:::: %+v", err)
-			})
-		}
+		// Persist Datum
+		g.Add(func() (err error) {
+			for _, datum := range athg.data {
+				_, err = utils.DynaResolvePutItem(p, dataTable, datum)
+			}
+			return
+		}, func(err error) {
+			thing_logger.Errorf("ERROR:::: %+v", err)
+		})
 	}
 
 	err = g.Run()
@@ -90,7 +91,7 @@ func (athg *ActualThing) SaveThingData(p graphql.ResolveParams) (status string, 
 func (athg *ActualThing) newThing(userID, name string) *ActualThing {
 
 	if userID == "" || name == "" {
-		athg.errors = append(athg.errors, fmt.Errorf("Both a UserID and a Name are required!"))
+		athg.errors = append(athg.errors, fmt.Errorf("Both a UserID and a Name are required! [User:%+v, Name:%+v]", userID, name))
 		return athg
 	}
 
@@ -114,7 +115,7 @@ func (athg *ActualThing) withDatum(key, value string) *ActualThing {
 	}
 
 	if key == "" || value == "" {
-		athg.errors = append(athg.errors, fmt.Errorf("Both a Key and a Value are required!"))
+		athg.errors = append(athg.errors, fmt.Errorf("Both a Key and a Value are required! [%+v:%+v]", key, value))
 		return athg
 	}
 
@@ -175,17 +176,20 @@ var (
 				thing_logger.Errorf("ERROR:::: %+v", thingError)
 				return nil, thingError
 			}
+			thing_logger.Debugf("Data Params: %+v", params)
 
 			athg := ActualThing{}
 			athg.newThing(userID, name)
 
 			for _, param := range params {
-				var p struct {
-					Key   string
-					Value string
-				}
-				mapstructure.Decode(p, &param)
-				athg.withDatum(p.Key, p.Value)
+
+				p := param.(map[string]interface{})
+				key := p["field"].(string)
+				value := p["value"].(string)
+
+				thing_logger.Debugf("Adding Param [%+v:%+v] to Thing [%+v]", key, value, name)
+
+				athg.withDatum(key, value)
 			}
 
 			return athg.SaveThingData(p)
