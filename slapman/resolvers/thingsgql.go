@@ -21,13 +21,14 @@ const (
 )
 
 type Thing struct {
-	ThingID   string `json:"ThingID"`
-	UserID    string `json:"UserID"`
-	Name      string `json:"Name"`
-	Version   int    `json:"Version"`
-	Score     int    `json:"Score"`
-	CreatedAt string `json:"CreatedAt"`
-	UpdatedAt string `json:"UpdatedAt"`
+	ThingID   string  `json:"ThingID"`
+	UserID    string  `json:"UserID"`
+	Name      string  `json:"Name"`
+	Version   int     `json:"Version"`
+	Score     int     `json:"Score"`
+	CreatedAt string  `json:"CreatedAt"`
+	UpdatedAt string  `json:"UpdatedAt"`
+	Data      []Datum `json:"Data"`
 }
 
 type Datum struct {
@@ -197,6 +198,9 @@ var (
 		Type:        graphql.NewList(ThingType),
 		Description: "The DynamoDB Table Query Items",
 		Args: graphql.FieldConfigArgument{
+			"userID": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"names": &graphql.ArgumentConfig{
 				Type:        graphql.NewNonNull(graphql.NewList(graphql.String)),
 				Description: "The DynamoDB Query Parameters to Use",
@@ -225,6 +229,7 @@ var (
 			//mapstructure.Decode(userData, &user)
 			//thing_logger.Debugf("User: %+v", user)
 
+			userID := p.Args["userID"].(string)
 			names := p.Args["names"].([]interface{})
 			limit, ok := p.Args["limit"].(int)
 			if !ok {
@@ -237,6 +242,7 @@ var (
 				queryInput, dslErr := utils.
 					DynaQueryDsl(p.Context, thingsTable, thingsNameIndex).
 					WithLimit(limit).
+					WithParam("UserID", "EQ", userID).
 					WithParam("Name", "EQ", name).AsInput()
 				if dslErr != nil {
 					user_logger.Errorf("Could not retrieve Thing: %+v", err)
@@ -254,7 +260,38 @@ var (
 				things = append(things, thing)
 			}
 
+			//var realThings = []struct {ThingID   string  `json:"ThingID"`
+			//	UserID    string  `json:"UserID"`
+			//	Name      string  `json:"Name"`
+			//	Version   int     `json:"Version"`
+			//	Score     int     `json:"Score"`
+			//	CreatedAt string  `json:"CreatedAt"`
+			//	UpdatedAt string  `json:"UpdatedAt"`
+			//	Data      []Datum `json:"Data"`
+			//}{}
+
+			for _, thing := range things {
+				thingID := thing.ThingID
+				queryInput, dslErr := utils.
+					DynaQueryDsl(p.Context, dataTable, dataThingIDIndex).
+					WithLimit(limit).
+					WithParam("ThingID", "EQ", thingID).AsInput()
+				if dslErr != nil {
+					user_logger.Errorf("Could not retrieve Data: %+v", err)
+					err = dslErr
+				}
+
+				datumData, err := utils.DynaResolveOneQuery(p, queryInput)
+				if err != nil {
+					return nil, err
+				}
+
+				var datum Datum
+				mapstructure.Decode(datumData, &datum)
+			}
+
 			return things, nil
+			//return realThings, nil
 		},
 	}
 
