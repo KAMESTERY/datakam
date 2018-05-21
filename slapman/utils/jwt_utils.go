@@ -74,3 +74,24 @@ func RefreshRsa256JwtToken(tokenString string) (newToken JwtToken, claims jwt.Cl
 
 	return
 }
+
+func DecodeRsa256JwtToken(params map[string]interface{}) (claims jwt.MapClaims, err error) {
+
+	jwtutils_logger.Debug("Decoding JWT Token...")
+
+	tokenString := params["token"].(string)
+
+	claims = jwt.MapClaims{}
+	_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return VerifyKey, nil
+	})
+
+	//// do something with decoded claims
+	//for key, val := range claims {
+	//	jwtutils_logger.Debugf("Key: %v, value: %v\n", key, val)
+	//}
+
+	jwtutils_logger.Debugf("JWT Token has been Decoded")
+
+	return
+}

@@ -22,7 +22,7 @@ import (
 
 const (
 	defaultRegion  = endpoints.UsEast1RegionID
-	defaultLimit   = 24
+	DefaultLimit   = 24
 	defaultPageNum = 0
 	limitKey       = 17
 	pageKey        = 18
@@ -132,6 +132,7 @@ func newAwsSession() (sess *session.Session) {
 	// If config.Region is not set the region must come from the shared
 	// config or AWS_REGION
 	awsCfg := &aws.Config{}
+	//awsCfg := aws.NewConfig().WithMaxRetries(5)
 	if len(region) > 0 {
 		awsCfg.WithRegion(region)
 	}
@@ -180,8 +181,8 @@ func dynaScanItems(ctx context.Context, tableName string) ([]map[string]interfac
 
 	limit, ok := ctx.Value(limitKey).(int)
 	if !ok || limit < 0 {
-		limit = defaultLimit
-		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
+		limit = DefaultLimit
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", DefaultLimit)
 	}
 	params.Limit = aws.Int64(int64(limit))
 
@@ -254,8 +255,8 @@ func dynaScanPages(ctx context.Context, tableName string) (rows []map[string]int
 
 	limit, ok := ctx.Value(limitKey).(int)
 	if !ok || limit < 0 {
-		limit = defaultLimit
-		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
+		limit = DefaultLimit
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", DefaultLimit)
 	}
 	params.Limit = aws.Int64(int64(limit))
 
@@ -561,8 +562,8 @@ func dynaQuery(ctx context.Context, queryInput *dynamodb.QueryInput) (success []
 
 	limit, ok := ctx.Value(limitKey).(int)
 	if !ok || limit < 0 {
-		limit = defaultLimit
-		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", defaultLimit)
+		limit = DefaultLimit
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: %+v", DefaultLimit)
 	}
 	queryInput.Limit = aws.Int64(int64(limit))
 
@@ -636,8 +637,8 @@ func DynaQueryDsl(ctx context.Context, table, index string) *QueryDsl {
 	if ok && limit > 0 {
 		qi.Limit = aws.Int64(limit)
 	} else {
-		aws_logger.Warnf("WARNING:::: Using Default Limit of: +%v", defaultLimit)
-		qi.Limit = aws.Int64(defaultLimit)
+		aws_logger.Warnf("WARNING:::: Using Default Limit of: +%v", DefaultLimit)
+		qi.Limit = aws.Int64(DefaultLimit)
 	}
 
 	return qi

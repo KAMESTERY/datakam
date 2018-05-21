@@ -287,7 +287,7 @@ var (
 						DynaQueryDsl(p.Context, userGroupsTable, "UserIDIndex").
 						WithParam("UserID", "EQ", userID).AsInput()
 					if dslErr != nil {
-						user_logger.Errorf("Could not rerieve User Group: %+v", err)
+						user_logger.Errorf("Could not retrieve User Group: %+v", err)
 						err = dslErr
 					}
 					_, rows, qErr := utils.DynaResolveQuery(p, queryInput)

@@ -8,13 +8,16 @@ import (
 	"time"
 
 	"github.com/graphql-go/graphql"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
-	thingsTable    = "Things"
-	dataTable      = "Data"
-	defaultVersion = 0
-	defaultScore   = 0
+	thingsTable      = "Things"
+	dataTable        = "Data"
+	thingsNameIndex  = "NameIndex"
+	dataThingIDIndex = "ThingIDIndex"
+	defaultVersion   = 0
+	defaultScore     = 0
 )
 
 type Thing struct {
@@ -130,6 +133,130 @@ func (athg *ActualThing) withDatum(key, value string) *ActualThing {
 
 var (
 	thing_logger = utils.NewLogger("resolversthing")
+
+	// DatumType represents a single Thing
+	DatumType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "Datum",
+		Fields: graphql.Fields{
+			"DataID": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The DataID",
+			},
+			"ThingID": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The ThingID",
+			},
+			"Key": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The Name",
+			},
+			"Value": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The Version",
+			},
+		},
+	})
+
+	// ThingType represents a single Thing
+	ThingType = graphql.NewObject(graphql.ObjectConfig{
+		Name: "Thing",
+		Fields: graphql.Fields{
+			"ThingID": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The ThingID",
+			},
+			"UserId": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The UserID",
+			},
+			"Name": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The Name",
+			},
+			"Version": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "The Version",
+			},
+			"CreatedAt": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The CreatedAt",
+			},
+			"UpdatedAt": &graphql.Field{
+				Type:        graphql.String,
+				Description: "The UpdatedAt",
+			},
+			"data": &graphql.Field{
+				Type:        graphql.NewList(DatumType),
+				Description: "The Data",
+			},
+		},
+	})
+
+	// ThingsGetFields represents the parameters and the resolver function for a GraphQL DynamoDB Get Query
+	ThingsGetFields = graphql.Field{
+		Type:        graphql.NewList(ThingType),
+		Description: "The DynamoDB Table Query Items",
+		Args: graphql.FieldConfigArgument{
+			"names": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.NewList(graphql.String)),
+				Description: "The DynamoDB Query Parameters to Use",
+			},
+			"region": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"limit": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
+
+			//claims, _ := utils.DecodeRsa256JwtToken(p.Args)
+			//userData := claims["User"].(map[string]interface{})
+			//var user UserRef
+			//mapstructure.Decode(userData, &user)
+			//thing_logger.Debugf("User: %+v", user)
+
+			names := p.Args["names"].([]interface{})
+			limit, ok := p.Args["limit"].(int)
+			if !ok {
+				limit = utils.DefaultLimit
+			}
+
+			var things []Thing
+
+			for _, name := range names {
+				queryInput, dslErr := utils.
+					DynaQueryDsl(p.Context, thingsTable, thingsNameIndex).
+					WithLimit(limit).
+					WithParam("Name", "EQ", name).AsInput()
+				if dslErr != nil {
+					user_logger.Errorf("Could not retrieve Thing: %+v", err)
+					err = dslErr
+				}
+
+				thingData, err := utils.DynaResolveOneQuery(p, queryInput)
+				if err != nil {
+					return nil, err
+				}
+
+				var thing Thing
+				mapstructure.Decode(thingData, &thing)
+
+				things = append(things, thing)
+			}
+
+			return things, nil
+		},
+	}
 
 	// NewThingFields represents the parameters and the resolver function to create a New Thing and its Data
 	NewThingFields = graphql.Field{
