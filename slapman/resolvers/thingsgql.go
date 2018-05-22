@@ -232,10 +232,10 @@ var (
 
 			userID := p.Args["userID"].(string)
 			names := p.Args["names"].([]interface{})
-			//limit, ok := p.Args["limit"].(int)
-			//if !ok {
-			//	limit = utils.DefaultLimit
-			//}
+			limit, ok := p.Args["limit"].(int)
+			if !ok {
+				limit = utils.DefaultLimit
+			}
 
 			var things []Thing
 
@@ -258,20 +258,45 @@ var (
 
 			for _, thing := range things {
 
-				keyData := map[string]interface{}{
-					"DataID": thing.ThingID,
-					//"ThingID": thing.ThingID,
-				}
-				datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
+				queryInput, err := utils.DynaQueryDsl(p.Context, dataTable, dataThingIDIndex).
+					WithLimit(limit).
+					WithParam("ThingID", "EQ", thing.ThingID).
+					AsInput()
+
 				if err != nil {
 					return nil, err
 				}
 
-				var datum Datum
-				mapstructure.Decode(datumData, &datum)
+				_, rows, err := utils.DynaResolveQuery(p, queryInput)
+				if err != nil {
+					return nil, err
+				}
 
-				thing.Data = append(thing.Data, datum)
+				for _, datumData := range rows {
+
+					var datum Datum
+					mapstructure.Decode(datumData, &datum)
+
+					thing.Data = append(thing.Data, datum)
+				}
 			}
+
+			//for _, thing := range things {
+			//
+			//	keyData := map[string]interface{}{
+			//		"DataID": thing.ThingID,
+			//		//"ThingID": thing.ThingID,
+			//	}
+			//	datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
+			//	if err != nil {
+			//		return nil, err
+			//	}
+			//
+			//	var datum Datum
+			//	mapstructure.Decode(datumData, &datum)
+			//
+			//	thing.Data = append(thing.Data, datum)
+			//}
 
 			return things, nil
 		},
