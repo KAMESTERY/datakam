@@ -2,11 +2,11 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
   name           = "Things"
   read_capacity  = 1
   write_capacity = 1
-  hash_key       = "ThingID"
+  hash_key       = "Name"
   range_key      = "UserID"
 
   attribute {
-    name = "ThingID"
+    name = "Name"
     type = "S"
   }
 
@@ -16,7 +16,7 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
   }
 
   attribute {
-    name = "Name"
+    name = "ThingID"
     type = "S"
   }
 
@@ -54,20 +54,20 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     projection_type = "INCLUDE"
 
     non_key_attributes = [
-      "ThingID",
+      "Name",
     ]
   }
 
   global_secondary_index {
-    name            = "NameIndex"
-    hash_key        = "Name"
+    name            = "ThingIDIndex"
+    hash_key        = "ThingID"
     range_key       = "Version"
     write_capacity  = 1
     read_capacity   = 1
     projection_type = "INCLUDE"
 
     non_key_attributes = [
-      "ThingID",
+      "Name",
     ]
   }
 
@@ -80,7 +80,7 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     projection_type = "INCLUDE"
 
     non_key_attributes = [
-      "ThingID",
+      "Name",
     ]
   }
 
@@ -93,7 +93,7 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     projection_type = "INCLUDE"
 
     non_key_attributes = [
-      "ThingID",
+      "Name",
     ]
   }
 

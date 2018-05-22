@@ -124,7 +124,8 @@ func (athg *ActualThing) withDatum(key, value string) *ActualThing {
 	}
 
 	athg.data = append(athg.data, Datum{
-		DataID:  utils.GenerateUUID(),
+		DataID: athg.thing.ThingID, //TODO: Do this for now!
+		//DataID:  utils.GenerateUUID(),
 		ThingID: athg.thing.ThingID,
 		Key:     key,
 		Value:   value,
@@ -231,25 +232,20 @@ var (
 
 			userID := p.Args["userID"].(string)
 			names := p.Args["names"].([]interface{})
-			limit, ok := p.Args["limit"].(int)
-			if !ok {
-				limit = utils.DefaultLimit
-			}
+			//limit, ok := p.Args["limit"].(int)
+			//if !ok {
+			//	limit = utils.DefaultLimit
+			//}
 
 			var things []Thing
 
 			for _, name := range names {
-				queryInput, dslErr := utils.
-					DynaQueryDsl(p.Context, thingsTable, thingsNameIndex).
-					WithLimit(limit).
-					WithParam("UserID", "EQ", userID).
-					WithParam("Name", "EQ", name).AsInput()
-				if dslErr != nil {
-					user_logger.Errorf("Could not retrieve Thing: %+v", err)
-					err = dslErr
-				}
 
-				thingData, err := utils.DynaResolveOneQuery(p, queryInput)
+				keyData := map[string]interface{}{
+					"UserID": userID,
+					"Name":   name,
+				}
+				thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
 				if err != nil {
 					return nil, err
 				}
@@ -260,38 +256,24 @@ var (
 				things = append(things, thing)
 			}
 
-			//var realThings = []struct {ThingID   string  `json:"ThingID"`
-			//	UserID    string  `json:"UserID"`
-			//	Name      string  `json:"Name"`
-			//	Version   int     `json:"Version"`
-			//	Score     int     `json:"Score"`
-			//	CreatedAt string  `json:"CreatedAt"`
-			//	UpdatedAt string  `json:"UpdatedAt"`
-			//	Data      []Datum `json:"Data"`
-			//}{}
-
 			for _, thing := range things {
-				thingID := thing.ThingID
-				queryInput, dslErr := utils.
-					DynaQueryDsl(p.Context, dataTable, dataThingIDIndex).
-					WithLimit(limit).
-					WithParam("ThingID", "EQ", thingID).AsInput()
-				if dslErr != nil {
-					user_logger.Errorf("Could not retrieve Data: %+v", err)
-					err = dslErr
-				}
 
-				datumData, err := utils.DynaResolveOneQuery(p, queryInput)
+				keyData := map[string]interface{}{
+					"DataID": thing.ThingID,
+					//"ThingID": thing.ThingID,
+				}
+				datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
 				if err != nil {
 					return nil, err
 				}
 
 				var datum Datum
 				mapstructure.Decode(datumData, &datum)
+
+				thing.Data = append(thing.Data, datum)
 			}
 
 			return things, nil
-			//return realThings, nil
 		},
 	}
 
