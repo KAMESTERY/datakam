@@ -40,6 +40,11 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     type = "S"
   }
 
+  attribute {
+    name = "DataIDs"
+    type = "S"
+  }
+
   ttl {
     attribute_name = "TimeToExist"
     enabled        = false
@@ -87,6 +92,19 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
   global_secondary_index {
     name            = "UpdatedAtIndex"
     hash_key        = "UpdatedAt"
+    range_key       = "Name"
+    write_capacity  = 1
+    read_capacity   = 1
+    projection_type = "INCLUDE"
+
+    non_key_attributes = [
+      "Name",
+    ]
+  }
+
+  global_secondary_index {
+    name            = "DataIDsIndex"
+    hash_key        = "DataIDs"
     range_key       = "Name"
     write_capacity  = 1
     read_capacity   = 1

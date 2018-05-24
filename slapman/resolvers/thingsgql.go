@@ -21,14 +21,15 @@ const (
 )
 
 type Thing struct {
-	ThingID   string  `json:"ThingID"`
-	UserID    string  `json:"UserID"`
-	Name      string  `json:"Name"`
-	Version   int     `json:"Version"`
-	Score     int     `json:"Score"`
-	CreatedAt string  `json:"CreatedAt"`
-	UpdatedAt string  `json:"UpdatedAt"`
-	Data      []Datum `json:"Data"`
+	ThingID   string   `json:"ThingID"`
+	UserID    string   `json:"UserID"`
+	Name      string   `json:"Name"`
+	Version   int      `json:"Version"`
+	Score     int      `json:"Score"`
+	CreatedAt string   `json:"CreatedAt"`
+	UpdatedAt string   `json:"UpdatedAt"`
+	DataIDs   []string `json:"DataIDs"`
+	Data      []Datum  `json:"Data"`
 }
 
 type Datum struct {
@@ -123,9 +124,12 @@ func (athg *ActualThing) withDatum(key, value string) *ActualThing {
 		return athg
 	}
 
+	dataID := utils.GenerateUUID()
+
+	athg.thing.DataIDs = append(athg.thing.DataIDs, dataID)
+
 	athg.data = append(athg.data, Datum{
-		DataID: athg.thing.ThingID, //TODO: Do this for now!
-		//DataID:  utils.GenerateUUID(),
+		DataID:  dataID,
 		ThingID: athg.thing.ThingID,
 		Key:     key,
 		Value:   value,
@@ -187,7 +191,7 @@ var (
 				Type:        graphql.String,
 				Description: "The UpdatedAt",
 			},
-			"data": &graphql.Field{
+			"Data": &graphql.Field{
 				Type:        graphql.NewList(DatumType),
 				Description: "The Data",
 			},
@@ -209,9 +213,6 @@ var (
 			"region": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
-			"limit": &graphql.ArgumentConfig{
-				Type: graphql.Int,
-			},
 			"token": &graphql.ArgumentConfig{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The JWT Token",
@@ -224,79 +225,94 @@ var (
 				return nil, err
 			}
 
-			//claims, _ := utils.DecodeRsa256JwtToken(p.Args)
-			//userData := claims["User"].(map[string]interface{})
-			//var user UserRef
-			//mapstructure.Decode(userData, &user)
-			//thing_logger.Debugf("User: %+v", user)
-
 			userID := p.Args["userID"].(string)
 			names := p.Args["names"].([]interface{})
-			limit, ok := p.Args["limit"].(int)
-			if !ok {
-				limit = utils.DefaultLimit
-			}
 
+			thingsChan := make(chan Thing)
+			datumChan := make(chan map[string]interface{})
+			dataChan := make(chan Datum)
+			resultsChan := make(chan Thing, len(names))
 			var things []Thing
 
-			for _, name := range names {
+			var g group.Group
+			{
 
-				keyData := map[string]interface{}{
-					"UserID": userID,
-					"Name":   name,
-				}
-				thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
-				if err != nil {
-					return nil, err
-				}
+				g.Add(func() (err error) {
+					for _, name := range names {
+						keyData := map[string]interface{}{
+							"UserID": userID,
+							"Name":   name,
+						}
+						thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
+						if err != nil {
+							thing_logger.Errorf("ERROR:::: %+v", err)
+						}
+						var thing Thing
+						mapstructure.Decode(thingData, &thing)
+						thingsChan <- thing
+					}
+					return
+				}, func(err error) {
+					thing_logger.Errorf("ERROR:::: %+v", err)
+				})
 
-				var thing Thing
-				mapstructure.Decode(thingData, &thing)
+				g.Add(func() (err error) {
+					for thing := range thingsChan {
+						thing_logger.Debugf("Fetching Data for Thing with ID: %+v", thing.ThingID)
+						for _, dataID := range thing.DataIDs {
+							keyData := map[string]interface{}{
+								"DataID":  dataID,
+								"ThingID": thing.ThingID,
+							}
+							datumChan <- keyData
+						}
+						for datum := range dataChan {
 
-				things = append(things, thing)
+							thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
+
+							thing.Data = append(thing.Data, datum)
+						}
+						resultsChan <- thing
+					}
+					return
+				}, func(err error) {
+					thing_logger.Errorf("ERROR:::: %+v", err)
+				})
+
+				g.Add(func() (err error) {
+					for keyData := range datumChan {
+						thing_logger.Debugf("Retrieving Datum for Key Data: %+v", keyData)
+						datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
+						if err != nil {
+							thing_logger.Errorf("ERROR:::: %+v", err)
+						}
+						var datum Datum
+						mapstructure.Decode(datumData, &datum)
+						dataChan <- datum
+					}
+					return
+				}, func(err error) {
+					thing_logger.Errorf("ERROR:::: %+v", err)
+				})
+
+				g.Add(func() (err error) {
+					for thing := range resultsChan {
+						thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
+						things = append(things, thing)
+					}
+					return
+				}, func(err error) {
+					thing_logger.Errorf("ERROR:::: %+v", err)
+				})
 			}
 
-			for _, thing := range things {
-
-				queryInput, err := utils.DynaQueryDsl(p.Context, dataTable, dataThingIDIndex).
-					WithLimit(limit).
-					WithParam("ThingID", "EQ", thing.ThingID).
-					AsInput()
-
-				if err != nil {
-					return nil, err
-				}
-
-				_, rows, err := utils.DynaResolveQuery(p, queryInput)
-				if err != nil {
-					return nil, err
-				}
-
-				for _, datumData := range rows {
-
-					var datum Datum
-					mapstructure.Decode(datumData, &datum)
-
-					thing.Data = append(thing.Data, datum)
-				}
+			err = g.Run()
+			if err != nil {
+				thing_logger.Errorf("ERROR:::: %+v", err)
+				return nil, err
 			}
 
-			//for _, thing := range things {
-			//
-			//	keyData := map[string]interface{}{
-			//		"DataID": thing.ThingID,
-			//		//"ThingID": thing.ThingID,
-			//	}
-			//	datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
-			//	if err != nil {
-			//		return nil, err
-			//	}
-			//
-			//	var datum Datum
-			//	mapstructure.Decode(datumData, &datum)
-			//
-			//	thing.Data = append(thing.Data, datum)
-			//}
+			thing_logger.Debugf("Retrieved Things: %+v", things)
 
 			return things, nil
 		},
