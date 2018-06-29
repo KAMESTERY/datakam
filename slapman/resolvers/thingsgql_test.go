@@ -17,13 +17,14 @@ func (tgts *ThingGqlTestSuite) SetupSuite() {
 	loginP := graphql.ResolveParams{
 		Context: context.Background(),
 		Args: map[string]interface{}{
-			"email":    "",
-			"password": "",
+			"email":    "iiii@iiii.iii",
+			"password": "iiiiiiii",
 		},
 	}
 
 	result, err := UserLoginFields.Resolve(loginP)
 	if err != nil {
+		thing_logger.Errorf("ERROR:::: %+v", err)
 		panic(err)
 	}
 
@@ -46,5 +47,5 @@ func TestThingGqlTestSuite(t *testing.T) {
 }
 
 func (tgts *ThingGqlTestSuite) TestLogin() {
-	assert.Equal(1, 1, "One equals One")
+	assert.Equal(tgts.T(), 1, 1, "One equals One")
 }

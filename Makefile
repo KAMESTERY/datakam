@@ -97,8 +97,8 @@ prod-build-worker: rsa worker-link pack-assets go-fmt go-lint
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
-test-worker: worker-link go-fmt
-	cd $(GOPATH)/src/$(WORKER) && go test -v -cover ./...
+test-worker: rsa worker-link go-fmt
+	LOG_LEVEL=debug cd $(GOPATH)/src/$(WORKER) && go test -v -cover ./...
 
 #LDFLAGS=-linkmode external -extldflags -static
 #prod-build-worker: worker-link

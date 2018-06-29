@@ -508,9 +508,13 @@ func dynaGetItem(ctx context.Context, tableName string, keyData map[string]inter
 		getItem[itemKey] = itemVal
 	}
 
-	if len(getItem) > 0 {
-		success = getItem
+	if len(getItem) == 0 {
+		err = fmt.Errorf("Not Found")
+		return
 	}
+
+	success = getItem
+
 	aws_logger.Debugf("Get Item: %+v", success)
 
 	return

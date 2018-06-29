@@ -70,9 +70,34 @@ type UserGroup struct {
 }
 
 type UserInfo struct {
-	User        UserRef     `json:"User"`
-	UserProfile UserProfile `json:"UserProfile"`
-	UserGroups  []UserGroup `json:"UserGroups"`
+	User          UserRef     `json:"User"`
+	UserProfile   UserProfile `json:"UserProfile"`
+	UserGroups    []UserGroup `json:"UserGroups"`
+	userOk        bool
+	userProfileOk bool
+	userGroupsOk  bool
+}
+
+func (usri *UserInfo) Ok() bool {
+	return usri.userOk && usri.userProfileOk && usri.userGroupsOk
+}
+
+func (usri *UserInfo) SetUser(user UserRef) {
+	usri.User = user
+	usri.userOk = true
+	user_logger.Debugf("[UserInfo] User: %+v", user)
+}
+
+func (usri *UserInfo) SetUserProfile(userProfile UserProfile) {
+	usri.UserProfile = userProfile
+	usri.userProfileOk = true
+	user_logger.Debugf("[UserInfo] User Profile: %+v", userProfile)
+}
+
+func (usri *UserInfo) SetUserGroups(userGroups []UserGroup) {
+	usri.UserGroups = userGroups
+	usri.userGroupsOk = true
+	user_logger.Debugf("[UserInfo] User Groups: %+v", userGroups)
 }
 
 var (
@@ -251,7 +276,7 @@ var (
 
 					user_logger.Debugf("Logging in user with email: [%+v]", email)
 
-					userInfo.User = foundUser.asUserRef()
+					userInfo.SetUser(foundUser.asUserRef())
 
 					return
 				}, func(err error) {
@@ -274,7 +299,7 @@ var (
 					}
 					var foundUserProfile UserProfile
 					mapstructure.Decode(foundRecord, &foundUserProfile)
-					userInfo.UserProfile = foundUserProfile
+					userInfo.SetUserProfile(foundUserProfile)
 					return
 				}, func(err error) {
 					user_logger.Errorf("ERROR:::: %+v", err)
@@ -295,11 +320,13 @@ var (
 						user_logger.Errorf("Could not log you in: %+v", err)
 						err = qErr
 					}
+					userGroups := make([]UserGroup, len(rows))
 					for _, row := range rows {
 						var foundUserGroup UserGroup
 						mapstructure.Decode(row, &foundUserGroup)
-						userInfo.UserGroups = append(userInfo.UserGroups, foundUserGroup)
+						userGroups = append(userGroups, foundUserGroup)
 					}
+					userInfo.SetUserGroups(userGroups)
 					return
 				}, func(err error) {
 					user_logger.Errorf("ERROR:::: %+v", err)
@@ -310,6 +337,10 @@ var (
 			if err != nil {
 				user_logger.Errorf("ERROR:::: %+v", err)
 				return nil, err
+			}
+
+			if !userInfo.Ok() {
+				return nil, fmt.Errorf("Could Not Login User")
 			}
 
 			// Create a signer for rsa 256 and claim c
