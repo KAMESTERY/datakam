@@ -1,11 +1,11 @@
 package resolvers
 
 import (
-	"github.com/graphql-go/graphql"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
-	"testing"
 )
 
 type ThingGqlTestSuite struct {
@@ -14,15 +14,11 @@ type ThingGqlTestSuite struct {
 
 func (tgts *ThingGqlTestSuite) SetupSuite() {
 
-	loginP := graphql.ResolveParams{
-		Context: context.Background(),
-		Args: map[string]interface{}{
-			"email":    "iiii@iiii.iii",
-			"password": "iiiiiiii",
-		},
-	}
-
-	result, err := UserLoginFields.Resolve(loginP)
+	result, err := loginUser(
+		context.Background(),
+		"iiii@iiii.iii",
+		"iiiiiiii",
+	)
 	if err != nil {
 		thing_logger.Errorf("ERROR:::: %+v", err)
 		panic(err)

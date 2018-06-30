@@ -24,6 +24,7 @@
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
     "aws/credentials/stscreds",
+    "aws/csm",
     "aws/defaults",
     "aws/ec2metadata",
     "aws/endpoints",
@@ -42,10 +43,17 @@
     "private/protocol/xml/xmlutil",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
+    "service/dynamodb/dynamodbiface",
     "service/sts"
   ]
-  revision = "fad131ddc707880428615dc8bc1587b55fb46d74"
-  version = "v1.13.54"
+  revision = "852052a10992d92f68b9a60862a3312292524903"
+  version = "v1.14.17"
+
+[[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -77,20 +85,20 @@
 [[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
-  revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
-  version = "v1.36.0"
+  revision = "06f5f3d67269ccec1fe5fe4134ba6e982984f7f5"
+  version = "v1.37.0"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
-  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
-  version = "v1.3.0"
+  revision = "d523deb1b23d913de5bdada721a6071e71283618"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/gobuffalo/packr"
   packages = ["."]
-  revision = "7f4074995d431987caaa35088199f13c44b24440"
-  version = "v1.11.0"
+  revision = "bd47f2894846e32edcf9aa37290fef76c327883f"
+  version = "v1.11.1"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -145,6 +153,15 @@
   ]
   revision = "1e23489041ba90a66f317fe0deccb236a2fff3cb"
   version = "v0.7.5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/guregu/dynamo"
+  packages = [
+    ".",
+    "internal/exprs"
+  ]
+  revision = "e38c48c566f44b8dbaa18ec7c429e43194f7233a"
 
 [[projects]]
   branch = "master"
@@ -211,7 +228,7 @@
   branch = "master"
   name = "github.com/microcosm-cc/bluemonday"
   packages = ["."]
-  revision = "995366fdf961d03629cd17361bddd32745718e2c"
+  revision = "f0761eb8ed07c1cc892ef631b00c33463b9b6868"
 
 [[projects]]
   branch = "master"
@@ -228,8 +245,8 @@
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
-  version = "v1.1.0"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -273,8 +290,8 @@
     ".",
     "mem"
   ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
+  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -308,9 +325,13 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert"]
-  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
-  version = "v1.2.1"
+  packages = [
+    "assert",
+    "require",
+    "suite"
+  ]
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   branch = "master"
@@ -318,12 +339,13 @@
   packages = [
     "bcrypt",
     "blowfish",
+    "internal/subtle",
     "nacl/secretbox",
     "pbkdf2",
     "poly1305",
     "salsa20/salsa"
   ]
-  revision = "159ae71589f303f9fbfd7528413e0fe944b9c1cb"
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
@@ -333,13 +355,13 @@
     "html",
     "html/atom"
   ]
-  revision = "dfa909b99c79129e1100513e5cd36307665e5723"
+  revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "04b83988a018ef3ebffe1485df79d6499b76a4b4"
+  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -358,6 +380,7 @@
   name = "google.golang.org/appengine"
   packages = [
     ".",
+    "cloudsql",
     "internal",
     "internal/app_identity",
     "internal/base",
@@ -368,8 +391,8 @@
     "internal/remote_api",
     "memcache"
   ]
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
+  revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
+  version = "v1.1.0"
 
 [[projects]]
   name = "gopkg.in/igm/sockjs-go.v2"
@@ -386,6 +409,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5f15adcb8141a86c3f314effad28312b2aef5e0fc170b092c37196609501dea6"
+  inputs-digest = "6be914e841b43ddeca08d638f766a376bbad21fd04d2de4e5b7a84d7fa482b39"
   solver-name = "gps-cdcl"
   solver-version = 1

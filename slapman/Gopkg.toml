@@ -96,3 +96,7 @@
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/igm/sockjs-go.v2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/guregu/dynamo"
