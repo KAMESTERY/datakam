@@ -263,10 +263,10 @@ var (
 					thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
 
 					thing.Data = append(thing.Data, datum)
-
-					thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
-					things = append(things, thing)
 				}
+
+				thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
+				things = append(things, thing)
 			}
 
 			thing_logger.Debugf("Retrieved Things: %+v", things)
