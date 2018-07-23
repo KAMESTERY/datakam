@@ -157,7 +157,7 @@ var (
 				Description: "The Name",
 			},
 			"Value": &graphql.Field{
-				Type:        graphql.Int,
+				Type:        graphql.String,
 				Description: "The Version",
 			},
 		},
@@ -228,88 +228,45 @@ var (
 			userID := p.Args["userID"].(string)
 			names := p.Args["names"].([]interface{})
 
-			thingsChan := make(chan Thing)
-			datumChan := make(chan map[string]interface{})
-			dataChan := make(chan Datum)
-			resultsChan := make(chan Thing, len(names))
 			var things []Thing
 
-			var g group.Group
-			{
+			for _, name := range names {
+				keyData := map[string]interface{}{
+					"UserID": userID,
+					"Name":   name,
+				}
 
-				g.Add(func() (err error) {
-					for _, name := range names {
-						keyData := map[string]interface{}{
-							"UserID": userID,
-							"Name":   name,
-						}
-						thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
-						if err != nil {
-							thing_logger.Errorf("ERROR:::: %+v", err)
-						}
-						var thing Thing
-						mapstructure.Decode(thingData, &thing)
-						thingsChan <- thing
+				thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
+				if err != nil {
+					thing_logger.Errorf("THING_ERROR:::: %+v", err)
+				}
+				var thing Thing
+				mapstructure.Decode(thingData, &thing)
+
+				thing_logger.Debugf("Fetching Data for Thing with ID: %+v", thing.ThingID)
+				for _, dataID := range thing.DataIDs {
+					keyData := map[string]interface{}{
+						"DataID":  dataID,
+						"ThingID": thing.ThingID,
 					}
-					return
-				}, func(err error) {
-					thing_logger.Errorf("ERROR:::: %+v", err)
-				})
 
-				g.Add(func() (err error) {
-					for thing := range thingsChan {
-						thing_logger.Debugf("Fetching Data for Thing with ID: %+v", thing.ThingID)
-						for _, dataID := range thing.DataIDs {
-							keyData := map[string]interface{}{
-								"DataID":  dataID,
-								"ThingID": thing.ThingID,
-							}
-							datumChan <- keyData
-						}
-						for datum := range dataChan {
+					thing_logger.Debugf("Retrieving Datum for Key Data: %+v", keyData)
 
-							thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
-
-							thing.Data = append(thing.Data, datum)
-						}
-						resultsChan <- thing
+					datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
+					if err != nil {
+						thing_logger.Errorf("DATUM_ERROR:::: %+v", err)
 					}
-					return
-				}, func(err error) {
-					thing_logger.Errorf("ERROR:::: %+v", err)
-				})
 
-				g.Add(func() (err error) {
-					for keyData := range datumChan {
-						thing_logger.Debugf("Retrieving Datum for Key Data: %+v", keyData)
-						datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
-						if err != nil {
-							thing_logger.Errorf("ERROR:::: %+v", err)
-						}
-						var datum Datum
-						mapstructure.Decode(datumData, &datum)
-						dataChan <- datum
-					}
-					return
-				}, func(err error) {
-					thing_logger.Errorf("ERROR:::: %+v", err)
-				})
+					var datum Datum
+					mapstructure.Decode(datumData, &datum)
 
-				g.Add(func() (err error) {
-					for thing := range resultsChan {
-						thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
-						things = append(things, thing)
-					}
-					return
-				}, func(err error) {
-					thing_logger.Errorf("ERROR:::: %+v", err)
-				})
-			}
+					thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
 
-			err = g.Run()
-			if err != nil {
-				thing_logger.Errorf("ERROR:::: %+v", err)
-				return nil, err
+					thing.Data = append(thing.Data, datum)
+
+					thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
+					things = append(things, thing)
+				}
 			}
 
 			thing_logger.Debugf("Retrieved Things: %+v", things)
