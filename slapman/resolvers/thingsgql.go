@@ -198,6 +198,79 @@ var (
 		},
 	})
 
+	// ThingUpdateFields represents the parameters and the resolver function for a GraphQL DynamoDB Update Query
+	ThingUpdateFields = graphql.Field{
+		Type:        ThingType,
+		Description: "The DynamoDB Table Query Items",
+		Args: graphql.FieldConfigArgument{
+			"userID": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"name": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The DynamoDB Query Parameters to Use",
+			},
+			"parameters": &graphql.ArgumentConfig{
+				Type:        graphql.NewList(utils.DynaParamInputType),
+				Description: "The DynamoDB Parameters to Use",
+			},
+			"region": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"token": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The JWT Token",
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+			err := utils.ValidateRsa256JwtTokenInParams(p.Args)
+			if err != nil {
+				return nil, err
+			}
+
+			userID := p.Args["userID"].(string)
+			name := p.Args["name"].(string)
+
+			params, ok := p.Args["parameters"].([]interface{})
+			if !ok {
+				thing_logger.Debugf("PARAMETERS TYPE: %+v", reflect.TypeOf(p.Args["parameters"]))
+				thingError := fmt.Errorf("Could not Update the Thing with the Provided Arguments: %+v", p.Args)
+				thing_logger.Errorf("ERROR:::: %+v", thingError)
+				return nil, thingError
+			}
+			thing_logger.Debugf("Data Params: %+v", params)
+
+			thing := getThing(userID, name, p)
+
+			for _, param := range params {
+
+				d := param.(map[string]interface{})
+				key := d["field"].(string)
+				value := d["value"].(string)
+
+				thing_logger.Debugf("Updating Datum with Key [%+v] on Thing [%+v], setting Value to [%+v]", key, name, value)
+
+				for _, datum := range thing.Data {
+					if datum.Key == key {
+						keyData := map[string]interface{}{
+							"DataID":  datum.DataID,
+							"ThingID": thing.ThingID,
+						}
+						data := map[string]interface{}{"Key": key, "Value": value}
+						utils.DynaResolveUpdateItem(p, dataTable, keyData, data)
+					}
+				}
+			}
+
+			thing_logger.Debugf("Updated Thing with ID: %+v", thing.ThingID)
+
+			updatedThing := getThing(userID, name, p)
+
+			return updatedThing, nil
+		},
+	}
+
 	// ThingsGetFields represents the parameters and the resolver function for a GraphQL DynamoDB Get Query
 	ThingsGetFields = graphql.Field{
 		Type:        graphql.NewList(ThingType),
@@ -231,40 +304,7 @@ var (
 			var things []Thing
 
 			for _, name := range names {
-				keyData := map[string]interface{}{
-					"UserID": userID,
-					"Name":   name,
-				}
-
-				thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
-				if err != nil {
-					thing_logger.Errorf("THING_ERROR:::: %+v", err)
-				}
-				var thing Thing
-				mapstructure.Decode(thingData, &thing)
-
-				thing_logger.Debugf("Fetching Data for Thing with ID: %+v", thing.ThingID)
-				for _, dataID := range thing.DataIDs {
-					keyData := map[string]interface{}{
-						"DataID":  dataID,
-						"ThingID": thing.ThingID,
-					}
-
-					thing_logger.Debugf("Retrieving Datum for Key Data: %+v", keyData)
-
-					datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
-					if err != nil {
-						thing_logger.Errorf("DATUM_ERROR:::: %+v", err)
-					}
-
-					var datum Datum
-					mapstructure.Decode(datumData, &datum)
-
-					thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
-
-					thing.Data = append(thing.Data, datum)
-				}
-
+				thing := getThing(userID, name.(string), p)
 				thing_logger.Debugf("Adding Thing with ID: %+v to the Results", thing.ThingID)
 				things = append(things, thing)
 			}
@@ -327,9 +367,9 @@ var (
 
 			for _, param := range params {
 
-				p := param.(map[string]interface{})
-				key := p["field"].(string)
-				value := p["value"].(string)
+				d := param.(map[string]interface{})
+				key := d["field"].(string)
+				value := d["value"].(string)
 
 				thing_logger.Debugf("Adding Param [%+v:%+v] to Thing [%+v]", key, value, name)
 
@@ -340,3 +380,40 @@ var (
 		},
 	}
 )
+
+// Helper Methods
+
+func getThing(userID, name string, p graphql.ResolveParams) (thing Thing) {
+	keyData := map[string]interface{}{
+		"UserID": userID,
+		"Name":   name,
+	}
+	thingData, err := utils.DynaResolveGetItem(p, thingsTable, keyData)
+	if err != nil {
+		thing_logger.Errorf("THING_ERROR:::: %+v", err)
+	}
+	mapstructure.Decode(thingData, &thing)
+	thing_logger.Debugf("Fetching Data for Thing with ID: %+v", thing.ThingID)
+	for _, dataID := range thing.DataIDs {
+		keyData := map[string]interface{}{
+			"DataID":  dataID,
+			"ThingID": thing.ThingID,
+		}
+
+		thing_logger.Debugf("Retrieving Datum for Key Data: %+v", keyData)
+
+		datumData, err := utils.DynaResolveGetItem(p, dataTable, keyData)
+		if err != nil {
+			thing_logger.Errorf("DATUM_ERROR:::: %+v", err)
+		}
+
+		var datum Datum
+		mapstructure.Decode(datumData, &datum)
+
+		thing_logger.Debugf("Appending Datum %+v to Thing with ID: %+v", datum, thing.ThingID)
+
+		thing.Data = append(thing.Data, datum)
+	}
+
+	return
+}
