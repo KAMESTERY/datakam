@@ -46,3 +46,7 @@ Native development with Nim and Rust
 * [Rust and Rest](http://lucumr.pocoo.org/2016/7/10/rust-rest/)
 * [Conan Search for OpenSSL](https://www.conan.io/search?q=OpenSSL)
 * [Cobra is both a library for creating powerful modern CLI applications](go get -u github.com/spf13/cobra/cobra)
+* [Amazon.Lambda.Templates](https://dotnetnew.azurewebsites.net/pack/Amazon.Lambda.Templates)
+`dotnet new --install "Amazon.Lambda.Templates"`
+*[AWS Lambda templates for Microsoft Template Engine accessible with the dotnet CLI's new command](https://www.nuget.org/packages/Amazon.Lambda.Templates)
+`dotnet add package Amazon.Lambda.Templates --version 3.2.0`
