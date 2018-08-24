@@ -1,0 +1,6 @@
+[package]
+name = "lambda_fn"
+version = "0.1.0"
+authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
+
+[dependencies]
