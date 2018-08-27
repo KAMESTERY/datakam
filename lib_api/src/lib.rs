@@ -1,6 +1,4 @@
 
-extern crate actix;
-extern crate actix_web;
 extern crate env_logger;
 extern crate uuid;
 extern crate futures;
@@ -24,54 +22,32 @@ extern crate rusoto_dynamodb;
 extern crate jsonwebtoken as jwt;
 extern crate core;
 
-use actix::prelude::*;
-use actix_web::{
-    App, AsyncResponder, Error, FutureResponse, http, HttpRequest, HttpResponse, Json,
-    middleware, server, State,
-};
 use futures::future::Future;
-use juniper::http::GraphQLRequest;
+use juniper::http::{GraphQLRequest, GraphQLResponse};
 
 mod schema;
-mod app_state;
 mod dal;
 mod security;
 mod authentication;
 mod validation;
 
-use app_state::{AppState, GraphQLData, GraphQLExecutor};
 use schema::create_schema;
 use dal::{DynaDB};
 
-pub fn execute_query(query: String) -> FutureResponse<HttpResponse> {
-    ::std::env::set_var("RUST_LOG", "actix_web=debug");
-    env_logger::init();
-    let sys = actix::System::new("RustyWebApp_SystemRunner");
-
-    let schema = std::sync::Arc::new(create_schema());
-    let thread_count = num_cpus::get() * 2 + 1; // Choose just 3 by default ?
-    let addr = SyncArbiter::start(
-        thread_count,
-        move || GraphQLExecutor::new(schema.clone())
-    );
+#[no_mangle]
+pub unsafe extern "C" fn execute_query(query: String) -> Option<String> {
 
     println!("GQL Query: {}", query.clone());
 
-    let gql_request: GraphQLData = serde_json::from_str(query.as_ref()).unwrap();
-
+    let gql_request: GraphQLRequest = serde_json::from_str(query.as_ref()).unwrap();
     println!("GQL Request: {:?}", gql_request.clone());
 
-    let result = addr.send(gql_request)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(json_string) =>
-                Ok(HttpResponse::Ok()
-                    .content_type("application/json")
-                    .body(json_string)),
-            Err(_) => Ok(HttpResponse::InternalServerError().into()),
-        }).responder();
+    let schema = create_schema();
+    let result = gql_request.execute(&schema, &());
 
-    result
+    let json_string = serde_json::to_string(&result).ok();
+
+    json_string
 }
 
 #[cfg(test)]
@@ -87,18 +63,15 @@ mod tests {
 
     #[test]
     fn test_query_execution() {
-        execute_query(
-            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
-        );
 
-//        let result = execute_query(
-//            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
-//        );
-//
-//        result.and_then(|res| {
-//            println!("RESPONSE_JSON_STRING: {:?}", res.body())
-//        });
+        let gql_response = unsafe {
+            execute_query(
+                format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
+            )
+        };
 
-        assert_eq!(2 + 2, 4);
+        println!("GQL Response: {}", gql_response.clone().unwrap());
+
+        assert!(gql_response.is_some());
     }
 }

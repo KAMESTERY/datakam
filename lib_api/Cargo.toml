@@ -2,13 +2,19 @@
 name = "lib_api"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
+build = "build.rs"
+
+[lib]
+name = "lib_api"
+crate-type = ["cdylib"]
+
+[build-dependencies]
+cbindgen = "0.6.2"
 
 [dependencies]
 # Web
 env_logger = "0.5"
-actix = "0.7"
-actix-web = "0.7"
-uuid = "0.6.5"
+uuid = { version = "0.6", features = ["v4"] }
 validator = "0.7"
 validator_derive = "0.7"
 
