@@ -24,7 +24,7 @@ impl DynaDB {
         match client.list_tables(list_table_input).sync() {
             Ok(output) => output.table_names,
             Err(error) => {
-                println!("LIST_TABLE_ERROR:::: {}", error);
+                error!("LIST_TABLE_ERROR:::: {}", error);
                 None
             }
         }
@@ -48,7 +48,7 @@ impl DynaDB {
 
     // BatchGets Items Of A Single Table
     pub fn batchget_table<T: ModelDynaConv>(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Option<Vec<T>> {
-        println!("Batch Getting: {} => keys {:?}", table, keys);
+        debug!("Batch Getting: {} => keys {:?}", table, keys);
         let response = _batchget(table.clone(), keys);
         match response {
             Some(res) => match res.get(&table) {
@@ -92,7 +92,7 @@ fn _put(table: String, item: HashMap<String, AttributeValue>) -> Option<HashMap<
     let results = match client.put_item(put_input).sync() {
         Ok(output) => output.attributes,
         Err(error) => {
-            println!("TABLE_PUTITEM_ERROR:::: {}", error);
+            error!("TABLE_PUTITEM_ERROR:::: {}", error);
             None
         }
     };
@@ -110,7 +110,7 @@ fn _get(table: String, key: HashMap<String, AttributeValue>) -> Option<HashMap<S
     let results = match client.get_item(get_input).sync() {
         Ok(output) => output.item,
         Err(error) => {
-            println!("TABLE_GETITEM_ERROR:::: {}", error);
+            error!("TABLE_GETITEM_ERROR:::: {}", error);
             None
         }
     };
@@ -128,7 +128,7 @@ fn _batchget(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Optio
     let results = match client.batch_get_item(batchget_input).sync() {
         Ok(output) => output.responses,
         Err(error) => {
-            println!("TABLE_BATCHGETITEM_ERROR:::: {}", error);
+            error!("TABLE_BATCHGETITEM_ERROR:::: {}", error);
             None
         }
     };
@@ -147,7 +147,7 @@ fn _query(table: String, key_condition_expr: String, data: HashMap<String, Attri
     let results = match client.query(query_input).sync() {
         Ok(output) => output.items,
         Err(error) => {
-            println!("TABLE_QUERYITEMS_ERROR:::: {}", error);
+            error!("TABLE_QUERYITEMS_ERROR:::: {}", error);
             None
         }
     };
@@ -165,7 +165,7 @@ fn _delete(table: String, key: HashMap<String, AttributeValue>) -> Option<HashMa
     let results = match client.delete_item(delete_input).sync() {
         Ok(output) => output.attributes,
         Err(error) => {
-            println!("TABLE_DELETEITEM_ERROR:::: {}", error);
+            error!("TABLE_DELETEITEM_ERROR:::: {}", error);
             None
         }
     };

@@ -1,4 +1,6 @@
 
+#[macro_use]
+extern crate log;
 extern crate env_logger;
 extern crate uuid;
 extern crate futures;
@@ -37,10 +39,10 @@ use dal::{DynaDB};
 #[no_mangle]
 pub unsafe extern "C" fn execute_query(query: String) -> Option<String> {
 
-    println!("GQL Query: {}", query.clone());
+    debug!("GQL Query: {}", query.clone());
 
     let gql_request: GraphQLRequest = serde_json::from_str(query.as_ref()).unwrap();
-    println!("GQL Request: {:?}", gql_request.clone());
+    debug!("GQL Request: {:?}", gql_request.clone());
 
     let schema = create_schema();
     let result = gql_request.execute(&schema, &());
@@ -70,7 +72,7 @@ mod tests {
             )
         };
 
-        println!("GQL Response: {}", gql_response.clone().unwrap());
+        debug!("GQL Response: {}", gql_response.clone().unwrap());
 
         assert!(gql_response.is_some());
     }

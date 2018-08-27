@@ -71,11 +71,11 @@ impl User {
             .with_last_seen(String::from("today"))
             .drain();
 
-        println!("Put User Data: {:?}", user_data);
+        debug!("Put User Data: {:?}", user_data);
 
         let put_response = DynaDB::put(String::from("User"), user_data);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         put_response
     }
@@ -86,11 +86,11 @@ impl User {
             .with_email(email)
             .key();
 
-        println!("Get User Key: {:?}", key);
+        debug!("Get User Key: {:?}", key);
 
         let user: Option<User> = DynaDB::get(String::from("User"), key.clone());
 
-        println!("User: {:?}", user);
+        debug!("User: {:?}", user);
 
         user
     }
@@ -148,7 +148,7 @@ impl ModelDynaConv for User {
                 "Confirmed" => self.confirmed = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
                 "PasswordHash" => self.password_hash = value.s,
                 "LastSeen" => self.last_seen = value.s,
-                _ => println!("Unexpected Data: [{} => {:?}]", key, value)
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
         self.clone()
@@ -231,11 +231,11 @@ impl UserProfile {
             .with_member_since(member_since)
             .drain();
 
-        println!("Put UserProfile Data: {:?}", userprofile_data);
+        debug!("Put UserProfile Data: {:?}", userprofile_data);
 
         let put_response = DynaDB::put(String::from("UserProfile"), userprofile_data);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         put_response
     }
@@ -244,11 +244,11 @@ impl UserProfile {
             .with_user_id(user_id)
             .key();
 
-        println!("Get User Key: {:?}", key);
+        debug!("Get User Key: {:?}", key);
 
         let user_profile: Option<UserProfile> = DynaDB::get(String::from("UserProfile"), key.clone());
 
-        println!("UserProfile: {:?}", user_profile);
+        debug!("UserProfile: {:?}", user_profile);
 
         user_profile
     }
@@ -306,7 +306,7 @@ impl ModelDynaConv for UserProfile {
                 "AboutMe" => self.about_me = value.s,
                 "Location" => self.location = value.s,
                 "MemberSince" => self.member_since = value.s,
-                _ => println!("Unexpected Data: [{} => {:?}]", key, value)
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
         self.clone()
@@ -360,11 +360,11 @@ impl UserGroup {
             .with_name(name)
             .drain();
 
-        println!("Put UserGroup Data: {:?}", usergroup_data);
+        debug!("Put UserGroup Data: {:?}", usergroup_data);
 
         let put_response = DynaDB::put(String::from("UserGroups"), usergroup_data);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         put_response
     }
@@ -374,11 +374,11 @@ impl UserGroup {
             .with_user_id(user_id)
             .key();
 
-        println!("Get UserGroup Key: {:?}", key);
+        debug!("Get UserGroup Key: {:?}", key);
 
         let user_group: Option<UserGroup> = DynaDB::get(String::from("UserGroups"), key.clone());
 
-        println!("UserGroup: {:?}", user_group);
+        debug!("UserGroup: {:?}", user_group);
 
         user_group
     }
@@ -411,7 +411,7 @@ impl ModelDynaConv for UserGroup {
                 "GroupID" => self.group_id = value.s,
                 "UserID" => self.user_id = value.s,
                 "Name" => self.name = value.s,
-                _ => println!("Unexpected Data: [{} => {:?}]", key, value)
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
         self.clone()

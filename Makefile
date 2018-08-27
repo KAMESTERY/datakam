@@ -41,8 +41,9 @@ publish-website: deploy
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
+#build-lambda: deps-deploy package-lambda prod-build-worker-rusty
 #build-lambda: deps-deploy package-lambda
-build-lambda: deps-deploy prod-build-worker package-lambda
+build-lambda: deps-deploy prod-build-worker prod-build-worker-rusty package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:
@@ -84,6 +85,14 @@ PROJ_GOPATH = $(BASEDIR)/build
 OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -X "main.CryptoRsa=${WORKER}" -linkmode "internal" -extldflags "-static"'
+
+build-worker-rusty:
+	cargo build --release
+	cp $(BASEDIR)/target/lambda_fn $(OUTPUT_DIR)/
+
+prod-build-worker-rusty:
+	docker run --rm -it -v $(BASEDIR):/home/rust/src ekidd/rust-musl-builder cargo build --release
+	cp $(BASEDIR)/target/lambda_fn $(OUTPUT_DIR)/
 
 pack-assets:
 	packr -i $(BASEDIR)/$(WORKER)
