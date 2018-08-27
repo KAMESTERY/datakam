@@ -1,0 +1,1 @@
+query GetGThingsHHHH{ getLesChoses(userId: 'hhhh@hhhh.hhh', names: ['OneGThing', 'AnotherGThing']) { thing { name userId thingId version score createdAt updatedAt  } data { dataId thingId key value } } }

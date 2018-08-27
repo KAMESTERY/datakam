@@ -64,9 +64,10 @@ pub fn execute_query(query: String) -> FutureResponse<HttpResponse> {
     let result = addr.send(gql_request)
         .from_err()
         .and_then(|res| match res {
-            Ok(json_string) => Ok(HttpResponse::Ok()
-                .content_type("application/json")
-                .body(json_string)),
+            Ok(json_string) =>
+                Ok(HttpResponse::Ok()
+                    .content_type("application/json")
+                    .body(json_string)),
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         }).responder();
 
@@ -77,6 +78,8 @@ pub fn execute_query(query: String) -> FutureResponse<HttpResponse> {
 mod tests {
     use super::*;
 
+    static get_things_hhhh_query: &'static str = include_str!("get_things_hhhh_query.graphql");
+
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
@@ -85,31 +88,17 @@ mod tests {
     #[test]
     fn test_query_execution() {
         execute_query(
-            String::from("{{ \"query\": \"\
-                            query GetGThingsHHHH{{\
-                              getLesChoses(\
-                                userId: 'hhhh@hhhh.hhh',\
-                                names: ['OneGThing', 'AnotherGThing']\
-                              ) {{\
-                                thing {{\
-                                  name\
-                                  userId\
-                                  thingId\
-                                  version\
-                                  score\
-                                  createdAt\
-                                  updatedAt\
-                                }}\
-                                data {{\
-                                  dataId\
-                                  thingId\
-                                  key\
-                                  value\
-                                }}\
-                              }}\
-                            }}\
-            \"}}")
+            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
         );
+
+//        let result = execute_query(
+//            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
+//        );
+//
+//        result.and_then(|res| {
+//            println!("RESPONSE_JSON_STRING: {:?}", res.body())
+//        });
+
         assert_eq!(2 + 2, 4);
     }
 }
