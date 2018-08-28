@@ -16,10 +16,10 @@ static PRIVATE_KEY_PEM: &'static str = include_str!("private_rsa_key.pem");
 static PRIVATE_KEY_DER: &'static [u8] = include_bytes!("private_rsa_key.der");
 static PUBLIC_KEY_DER: &'static [u8] = include_bytes!("public_key.der");
 
-//    debug!("Private RSA Key Pem {:?}", PRIVATE_KEY_PEM);
-//    debug!("Private RSA Key Der {:?}", PRIVATE_KEY_DER);
-//    debug!("Public Key Der {:?}", PRIVATE_KEY_DER);
-//    debug!("Private KeyL {:#?}", PRIVATE_KEY_DER); // Pretty Print it!!
+//    println!("Private RSA Key Pem {:?}", PRIVATE_KEY_PEM);
+//    println!("Private RSA Key Der {:?}", PRIVATE_KEY_DER);
+//    println!("Public Key Der {:?}", PRIVATE_KEY_DER);
+//    println!("Private KeyL {:#?}", PRIVATE_KEY_DER); // Pretty Print it!!
 
 pub fn hash_password(password: String) -> String {
 
@@ -47,12 +47,12 @@ pub fn check_password(hashed_password: String, password: String) -> Result<bool,
 
     match res {
         Ok(_) => {
-            debug!("Verified password!");
+            println!("Verified password!");
             Ok(true)
         },
         _ => {
             let err = "Failed to verfiy password";
-            error!("PASSWORD_CHECK_ERROR {}", err);
+            println!("PASSWORD_CHECK_ERROR {}", err);
             Err(err)
         }
     }

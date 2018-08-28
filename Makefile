@@ -41,21 +41,24 @@ publish-website: deploy
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
-#build-lambda: deps-deploy package-lambda prod-build-worker-rusty
+build-lambda: deps-deploy prod-build-worker-rusty package-lambda
 #build-lambda: deps-deploy package-lambda
-build-lambda: deps-deploy prod-build-worker prod-build-worker-rusty package-lambda
+#build-lambda: deps-deploy prod-build-worker prod-build-worker-rusty package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-web.zip .
-	cd $(OUTPUT_DIR) && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-api.zip .
+#	cd $(OUTPUT_DIR) && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-api.zip .
 
 # Crypto
 
 rsa:
-	mkdir -p $(CRYPTO_OUTPUT_DIR)
-	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
-	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
+	openssl genrsa -out $(BASEDIR)/worker-exe/src/private_rsa_key.pem 4096
+	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.pem -outform DER -out $(BASEDIR)/worker-exe/src/private_rsa_key.der
+	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.der -inform DER -RSAPublicKey_out -outform DER -out $(BASEDIR)/worker-exe/src/public_key.der
+#	mkdir -p $(CRYPTO_OUTPUT_DIR)
+#	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
+#	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
 
 # PY3.6
 
@@ -88,11 +91,11 @@ LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISIO
 
 build-worker-rusty:
 	cargo build --release
-	cp $(BASEDIR)/target/lambda_fn $(OUTPUT_DIR)/
+	cp $(BASEDIR)/target/debug/worker-exe $(BASEDIR)/lambda/worker/
 
 prod-build-worker-rusty:
 	docker run --rm -it -v $(BASEDIR):/home/rust/src ekidd/rust-musl-builder cargo build --release
-	cp $(BASEDIR)/target/lambda_fn $(OUTPUT_DIR)/
+	cp $(BASEDIR)/target/x86_64-unknown-linux-musl/release/worker-exe $(BASEDIR)/lambda/worker/
 
 pack-assets:
 	packr -i $(BASEDIR)/$(WORKER)

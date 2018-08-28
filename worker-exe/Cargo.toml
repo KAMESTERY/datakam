@@ -1,21 +1,21 @@
+
+#cargo-features = ["edition"]
 [package]
-name = "lib_api"
+#edition = "2018"
+name = "worker-exe"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
-#build = "build.rs"
-#
-#[lib]
-#name = "lib_api"
-#crate-type = ["cdylib"]
-#
-#[build-dependencies]
-#cbindgen = "0.6.2"
 
 [dependencies]
 # Web
 env_logger = "0.5"
-log = { version = "0.4", features = ["std", "serde", "max_level_debug", "release_max_level_warn"] }
-uuid = { version = "0.6", features = ["v4"] }
+#actix = "0.6.1"
+#actix-web = "0.6.13"
+#actix = { git="https://github.com/actix/actix.git" }
+#actix-web = { git="https://github.com/actix/actix-web.git" }
+actix = "0.7"
+actix-web = "0.7"
+uuid = "0.6.5"
 validator = "0.7"
 validator_derive = "0.7"
 
