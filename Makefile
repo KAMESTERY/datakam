@@ -22,7 +22,8 @@ devops-init:
 deploy-everything: prod-deploy publish-website
 	@echo "All Done!"
 
-prod-deploy: clean build-lambda deploy
+prod-deploy: build-lambda deploy
+#prod-deploy: clean build-lambda deploy
 	@echo "Completed the Production Deployment of Lambda [$(WORKER)]! :-)"
 
 deploy:
@@ -41,14 +42,14 @@ publish-website: deploy
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
-build-lambda: deps-deploy prod-build-worker-rusty package-lambda
-#build-lambda: deps-deploy package-lambda
+#build-lambda: deps-deploy prod-build-worker-rusty package-lambda
+build-lambda: deps-deploy package-lambda
 #build-lambda: deps-deploy prod-build-worker prod-build-worker-rusty package-lambda
 	@echo "Completed Building Lambda"
 
 package-lambda:
 	cd $(BASEDIR)/lambda && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-web.zip .
-#	cd $(OUTPUT_DIR) && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-api.zip .
+	cd $(OUTPUT_DIR) && zip -9 -rq $(BASEDIR)/infrastructure/slapalicious-api.zip .
 
 # Crypto
 
@@ -56,9 +57,9 @@ rsa:
 	openssl genrsa -out $(BASEDIR)/worker-exe/src/private_rsa_key.pem 4096
 	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.pem -outform DER -out $(BASEDIR)/worker-exe/src/private_rsa_key.der
 	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.der -inform DER -RSAPublicKey_out -outform DER -out $(BASEDIR)/worker-exe/src/public_key.der
-#	mkdir -p $(CRYPTO_OUTPUT_DIR)
-#	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
-#	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
+	mkdir -p $(CRYPTO_OUTPUT_DIR)
+	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
+	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
 
 # PY3.6
 
@@ -103,7 +104,8 @@ pack-assets:
 build-worker: rsa worker-link pack-assets go-fmt
 	cd $(GOPATH)/src/$(WORKER) && go build $(LDFLAGS) -v -o $(OUTPUT_DIR)/$(WORKER)
 
-prod-build-worker: rsa worker-link pack-assets go-fmt go-lint
+prod-build-worker: rsa worker-link pack-assets go-fmt
+#prod-build-worker: rsa worker-link pack-assets go-fmt go-lint
 	cd $(GOPATH)/src/$(WORKER) && GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -v -o $(OUTPUT_DIR)/$(WORKER)
 
 # prod-build-worker: worker-link

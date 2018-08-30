@@ -85,5 +85,11 @@ case $1 in
     aws-delete-alarms)
         aws cloudwatch delete-alarms --alarm-names $2
         ;;
+    build_wasm_fn)
+        rustup override set nightly
+        cargo +nightly build --target wasm32-unknown-unknown --release
+        mkdir -p worker-fn/wasm
+        wasm-bindgen target/wasm32-unknown-unknown/debug/hello_world_wasm.wasm --nodejs --out-dir worker-fn/wasm
+        ;;
     esac
 exit 0

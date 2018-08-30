@@ -9,7 +9,7 @@ site.addsitedir(os.path.join(os.path.dirname(__file__), 'lib'))
 import pprint
 import logging
 
-from boltons.iterutils import remap
+# from boltons.iterutils import remap
 
 from slapweb import adapter_wsgi
 from slapweb.wsgi import app

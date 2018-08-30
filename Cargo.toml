@@ -2,5 +2,6 @@
 [workspace]
 
 members = [
-    "worker-exe",
+    "worker-lib",
+#    "worker-exe",
 ]

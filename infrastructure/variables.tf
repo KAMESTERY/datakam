@@ -14,6 +14,11 @@ variable "web-bucket" {
   default     = "slapman-web"
 }
 
+variable "slapman-bucket" {
+  description = "The S3 bucket name for the Website"
+  default     = "slapmanfuns"
+}
+
 variable "burst_limit" {
   default = 5
 }
