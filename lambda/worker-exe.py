@@ -34,8 +34,6 @@ def handle(event, context):
 
     # terminate()
 
-    json = response.json()
+    logger.info(f"{response}")
 
-    logger.info(f"{json}")
-
-    return json
+    return response

@@ -111,6 +111,9 @@ prod-build-worker: rsa worker-link pack-assets go-fmt
 # prod-build-worker: worker-link
 # 	cd $(GOPATH)/src/$(WORKER)/cmd/web && go build -v -o $(BASEDIR)/lambda/worker/$(WORKER)
 
+#wasm-build-worker: rsa worker-link pack-assets go-fmt
+#	cd $(GOPATH)/src/$(WORKER) && GOOS=js GOARCH=wasm go build $(LDFLAGS) -v -o $(OUTPUT_DIR)/$(WORKER).wasm
+
 test-worker: rsa worker-link go-fmt
 	LOG_LEVEL=debug cd $(GOPATH)/src/$(WORKER) && go test -v -cover ./...
 
