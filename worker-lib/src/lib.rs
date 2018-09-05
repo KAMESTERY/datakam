@@ -39,8 +39,8 @@ use juniper::http::GraphQLRequest;
 use schema::create_schema;
 
 //#[wasm_bindgen]
-//pub fn execute_query(query: String) -> String {
-pub unsafe extern "C" fn execute_query(query: String) -> String {
+pub fn execute_query(query: String) -> String {
+//pub unsafe extern "C" fn execute_query(query: String) -> String {
 
     debug!("GQL Query: {}", query.clone());
 
@@ -76,14 +76,14 @@ mod tests {
     #[test]
     fn test_query_execution() {
 
-//        let gql_response = execute_query(
-//            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
-//        );
-        let gql_response = unsafe {
-            execute_query(
-                format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
-            )
-        };
+        let gql_response = execute_query(
+            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
+        );
+//        let gql_response = unsafe {
+//            execute_query(
+//                format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
+//            )
+//        };
 
         debug!("GQL Response: {}", gql_response);
 

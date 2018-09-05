@@ -1,0 +1,10 @@
+[package]
+name = "worker-fn"
+version = "0.1.0"
+authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
+
+[dependencies]
+worker-lib = { path = "../worker-lib" }
+aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda", features = ["string-null-empty"] }
+failure = "0.1"
+serde_json = "1.0"
