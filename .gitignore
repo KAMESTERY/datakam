@@ -21,6 +21,7 @@ bin
 /*-init.clj
 /resources/public/js/compiled
 out
+cargo
 
 # Java related
 pom.xml

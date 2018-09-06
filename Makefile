@@ -3,6 +3,9 @@
 BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
 WORKER=slapman
+RUSTY_WORKER=worker-fn
+RUSTY_LIBWORKEREXT=workerext
+RUSTY_WORKER_LIB=worker-lib
 WEBSITE=slapman-web
 CRYPTO_OUTPUT_DIR=$(BASEDIR)/$(WORKER)/keys
 OUTPUT_DIR=$(BASEDIR)/bin
@@ -54,9 +57,9 @@ package-lambda:
 # Crypto
 
 rsa:
-	openssl genrsa -out $(BASEDIR)/worker-exe/src/private_rsa_key.pem 4096
-	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.pem -outform DER -out $(BASEDIR)/worker-exe/src/private_rsa_key.der
-	openssl rsa -in $(BASEDIR)/worker-exe/src/private_rsa_key.der -inform DER -RSAPublicKey_out -outform DER -out $(BASEDIR)/worker-exe/src/public_key.der
+	openssl genrsa -out $(BASEDIR)/$(RUSTY_WORKER_LIB)/src/private_rsa_key.pem 4096
+	openssl rsa -in $(BASEDIR)/$(RUSTY_WORKER_LIB)/src/private_rsa_key.pem -outform DER -out $(BASEDIR)/$(RUSTY_WORKER_LIB)/src/private_rsa_key.der
+	openssl rsa -in $(BASEDIR)/$(RUSTY_WORKER_LIB)/src/private_rsa_key.der -inform DER -RSAPublicKey_out -outform DER -out $(BASEDIR)/$(RUSTY_WORKER_LIB)/src/public_key.der
 	mkdir -p $(CRYPTO_OUTPUT_DIR)
 	openssl genrsa -out $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa 1024
 	openssl rsa -in $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa -pubout > $(CRYPTO_OUTPUT_DIR)/$(WORKER).rsa.pub
@@ -90,13 +93,17 @@ OS := $(shell uname)
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags '-s -w -X "main.Version=${VERSION}" -X "main.Revision=${REVISION}" -X "main.CryptoRsa=${WORKER}" -linkmode "internal" -extldflags "-static"'
 
-build-worker-rusty:
+build-worker-rusty: rsa
 	cargo build --release
-	cp $(BASEDIR)/target/debug/worker-exe $(BASEDIR)/lambda/worker/
+	cp $(BASEDIR)/target/debug/$(RUSTY_WORKER) $(BASEDIR)/lambda/worker/
 
-prod-build-worker-rusty:
-	docker run --rm -it -v $(BASEDIR):/home/rust/src ekidd/rust-musl-builder cargo build --release
-	cp $(BASEDIR)/target/x86_64-unknown-linux-musl/release/worker-exe $(BASEDIR)/lambda/worker/
+prod-build-worker-rusty: rsa
+	mkdir -p $(BASEDIR)/cargo; docker run --rm -v $(BASEDIR)/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v `pwd`:/code -w /code og-rust-lambda:latest cargo build --release
+	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(OUTPUT_DIR)/$(RUSTY_WORKER)
+	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
+
+lambda-rust-image:
+	docker build -t og-rust-lambda:latest $(BASEDIR)/infrastructure
 
 pack-assets:
 	packr -i $(BASEDIR)/$(WORKER)

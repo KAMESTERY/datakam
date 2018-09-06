@@ -1,5 +1,5 @@
 ### Worker
-worker-exe
+worker-ext.so
 ### Lambda
 *.h
 # Created by .ignore support plugin (hsz.mobi)

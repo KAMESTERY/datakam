@@ -3,6 +3,6 @@
 
 members = [
     "worker-fn",
+    "worker-ext",
     "worker-lib",
-#    "worker-exe",
 ]
