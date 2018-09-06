@@ -2,12 +2,12 @@
 #cargo-features = ["edition"]
 [package]
 #edition = "2018"
-name = "worker_lib"
+name = "worker-lib"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 
-[lib]
-crate-type = ["staticlib"]
+#[lib]
+#crate-type = ["staticlib"]
 #crate-type = ["cdylib"] # For WebAssembly
 
 [dependencies]
