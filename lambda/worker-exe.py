@@ -11,18 +11,33 @@ Lambda example with external dependency
 """
 
 import logging
-import requests
+from logging.config import dictConfig
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-from worker import (
-    launch,
-    terminate,
-    PORT
+logging_config = dict(
+    version = 1,
+    formatters = {
+        'f': {'format':
+                  '%(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s'}
+        # '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+    },
+    handlers = {
+        'h': {'class': 'logging.StreamHandler',
+              'formatter': 'f',
+              'level': logging.INFO}
+    },
+    root = {
+        'handlers': ['h'],
+        'level': logging.INFO,
+    },
 )
 
-launch()
+dictConfig(logging_config)
+
+import json
+
+from worker import (
+    handle_request
+)
 
 def handle(event, context):
     """
@@ -30,9 +45,10 @@ def handle(event, context):
     """
     logger.info(f"{event} - {context}")
 
-    response = requests.post(f"http://localhost:{PORT}/graphql", json=event)
-
-    # terminate()
+    request = event.get('query', '')
+    response = json.loads(
+        handle_request(request)
+    )
 
     logger.info(f"{response}")
 

@@ -11,14 +11,40 @@ extern crate aws_lambda as lambda;
 use failure::Error;
 use std::collections::HashMap;
 
+//pub fn handle_request(request: HashMap<String, String>) -> String {
+//    match request.get("query") {
+//        Some(gql_query) => {
+//            println!("Request: {}", gql_query.clone());
+//            let result = worker_lib::execute_query(gql_query.to_owned());
+//            println!("Response: {}", result.clone());
+//            result
+//        },
+//        None => "GraphQL Query Required".to_string()
+//    }
+//}
+
+//pub fn handle_request(request: HashMap<String, String>) -> Result<String, Error> {
+//    match request.get("query") {
+//        Some(gql_query) => {
+//            info!("Request: {}", gql_query.clone());
+//            let result = worker_lib::execute_query(gql_query.to_owned());
+//            info!("Response: {}", result.clone());
+//            Ok(result)
+//        },
+//        None => Ok("GraphQL Query Required".to_string())
+//    }
+//}
+
 pub fn handle_request(request: HashMap<String, String>) -> Result<serde_json::Value, Error> {
     match request.get("query") {
         Some(gql_query) => {
+            println!("Request: {}", gql_query.clone());
             let result = worker_lib::execute_query(gql_query.to_owned());
+            println!("Response: {}", result.clone());
             Ok(json!({
-                "statusCode": 200,
-                "data": result
-            }))
+                    "statusCode": 200,
+                    "data": result
+                }))
         },
         None => Ok(json!({
                     "statusCode": 500,
@@ -27,8 +53,27 @@ pub fn handle_request(request: HashMap<String, String>) -> Result<serde_json::Va
     }
 }
 
+//pub fn handle_request(request: HashMap<String, String>) -> Result<serde_json::Value, Error> {
+//    match request.get("query") {
+//        Some(gql_query) => {
+//            info!("Request: {}", gql_query.clone());
+//            let result = worker_lib::execute_query(gql_query.to_owned());
+//            let data: serde_json::Value = serde_json::from_str(result.as_ref())?;
+//            info!("Response: {:?}", data.clone());
+//            Ok(data)
+//        },
+//        None => Ok(json!({
+//                    "statusCode": 500,
+//                    "error": "GraphQL Query Required"
+//                }))
+//    }
+//}
+
 fn main() {
+    lambda::logger::init();
+
     lambda::start(|request: HashMap<String, String>| {
+//        Ok(handle_request(request))
         handle_request(request)
     })
 }
