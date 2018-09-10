@@ -34,7 +34,7 @@ juniper = "0.9.2"
 juniper_codegen = "0.9.2"
 
 # AWS
-rusoto_core = "0.33"
-rusoto_sqs = "0.33"
-rusoto_s3 = "0.33"
-rusoto_dynamodb = "0.33"
+rusoto_core = "0.34"
+rusoto_sqs = "0.34"
+rusoto_s3 = "0.34"
+rusoto_dynamodb = "0.34"

@@ -6,6 +6,7 @@ authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 [dependencies]
 worker-lib = { path = "../worker-lib" }
 aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda", features = ["string-null-empty"] }
+#aws_lambda_tower_web = { git = "https://github.com/srijs/rust-aws-lambda" }
 failure = "0.1"
 serde_json = "1.0"
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }

@@ -42,23 +42,29 @@ use schema::create_schema;
 pub fn execute_query(query: String) -> String {
 //pub unsafe extern "C" fn execute_query(query: String) -> String {
 
-    debug!("GQL Query: {}", query.clone());
+    info!("GQL Query: {}", query.clone());
 
     let gql_request: Option<GraphQLRequest> = serde_json::from_str(query.as_ref()).ok();
     match gql_request {
         Some(req) => {
-            debug!("GQL Request: {:?}", req.clone());
+            info!("GQL Request: {:?}", req.clone());
             let schema = create_schema();
             let result = req.execute(&schema, &());
 
             let json_string = serde_json::to_string(&result).ok();
 
             match json_string {
-                Some(json) => json,
+                Some(json) => {
+                    info!("GQL Response: {}", json.clone());
+                    json
+                },
                 None => "".to_string()
             }
         }
-        None => "".to_string()
+        None => {
+            info!("GQL Response is nada!!")
+            "".to_string()
+        }
     }
 }
 
@@ -85,7 +91,7 @@ mod tests {
 //            )
 //        };
 
-        debug!("GQL Response: {}", gql_response);
+        info!("GQL Response: {}", gql_response);
 
         assert!(!gql_response.is_empty());
     }

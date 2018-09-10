@@ -14,9 +14,9 @@ use std::collections::HashMap;
 //pub fn handle_request(request: HashMap<String, String>) -> String {
 //    match request.get("query") {
 //        Some(gql_query) => {
-//            println!("Request: {}", gql_query.clone());
+//            info!("Request: {}", gql_query.clone());
 //            let result = worker_lib::execute_query(gql_query.to_owned());
-//            println!("Response: {}", result.clone());
+//            info!("Response: {}", result.clone());
 //            result
 //        },
 //        None => "GraphQL Query Required".to_string()
@@ -38,9 +38,9 @@ use std::collections::HashMap;
 pub fn handle_request(request: HashMap<String, String>) -> Result<serde_json::Value, Error> {
     match request.get("query") {
         Some(gql_query) => {
-            println!("Request: {}", gql_query.clone());
+            info!("Request: {}", gql_query.clone());
             let result = worker_lib::execute_query(gql_query.to_owned());
-            println!("Response: {}", result.clone());
+            info!("Response: {}", result.clone());
             Ok(json!({
                     "statusCode": 200,
                     "data": result
@@ -93,7 +93,7 @@ mod tests {
 
         let lambda_response = handle_request(request);
 
-        println!("Lambda Response: {:?}", lambda_response);
+        info!("Lambda Response: {:?}", lambda_response);
 
         assert_eq!(1 + 1, 2);
     }
