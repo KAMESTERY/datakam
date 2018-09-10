@@ -98,7 +98,8 @@ build-worker-rusty: rsa
 	cp $(BASEDIR)/target/debug/$(RUSTY_WORKER) $(BASEDIR)/lambda/worker/
 
 prod-build-worker-rusty: rsa
-	mkdir -p $(BASEDIR)/cargo; docker run --rm -v $(BASEDIR)/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v `pwd`:/code -w /code og-rust-lambda:latest cargo build --release
+	mkdir -p $(BASEDIR)/{cargo,target/$(RUSTY_WORKER)_lambda}
+	docker run --rm -v $(BASEDIR)/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v `pwd`:/code -w /code og-rust-lambda:latest cargo build --release
 	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(OUTPUT_DIR)/$(RUSTY_WORKER)
 #	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
 

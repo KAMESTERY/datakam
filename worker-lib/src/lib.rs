@@ -36,7 +36,9 @@ mod validation;
 
 //use wasm_bindgen::prelude::*;
 use juniper::http::GraphQLRequest;
-use schema::create_schema;
+
+pub use schema::{create_schema, Schema};
+pub use dal::{DynaDB};
 
 //#[wasm_bindgen]
 pub fn execute_query(query: String) -> String {
@@ -62,7 +64,7 @@ pub fn execute_query(query: String) -> String {
             }
         }
         None => {
-            info!("GQL Response is nada!!")
+            info!("GQL Response is nada!!");
             "".to_string()
         }
     }

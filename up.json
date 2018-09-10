@@ -1,0 +1,47 @@
+{
+  "name": "rusty-webapp",
+  "profile": "default",
+  "regions": [
+    "us-east-1"
+  ],
+  "lambda": {
+    "memory": 1024,
+    "warm": true,
+    "warm_count": 10,
+    "warm_rate": "30m",
+    "policy": [
+      {
+        "Effect": "Allow",
+        "Resource": "*",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:BatchGetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:DescribeTable",
+          "dynamodb:DescribeLimits",
+          "dynamodb:DescribeTimeToLive",
+          "dynamodb:DescribeStream",
+          "dynamodb:ListStreams",
+          "dynamodb:TagResource",
+          "dynamodb:UntagResource",
+          "dynamodb:ListTagsOfResource",
+          "dynamodb:ListTables"
+        ]
+      }
+    ]
+  },
+  "hooks": {
+    "build": [
+      "mkdir -p /tmp/cargo && docker run --rm -v /tmp/cargo:/cargo -e CARGO_HOME='/cargo' -v $PWD:/volume -w /volume -t clux/muslrust cargo build --release",
+      "cp target/x86_64-unknown-linux-musl/release/rusty-webapp server"
+    ],
+    "clean": "rm server"
+  }
+}
