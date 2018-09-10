@@ -106,7 +106,7 @@ prod-build-worker-rusty: rsa lambda-rust-image
 	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(BASEDIR)/$(RUSTY_WORKER)/server
 #	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
 
-lambda-rust-image:
+lambda-binary-builder:
 	docker build -t og-rust-lambda:latest $(BASEDIR)/infrastructure
 
 pack-assets:
