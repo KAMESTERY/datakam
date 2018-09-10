@@ -15,7 +15,8 @@ authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 #wasm-bindgen = "0.2"
 # Web
 env_logger = "0.5"
-log = { version = "0.4", features = ["std", "serde", "max_level_debug", "release_max_level_warn"] }
+log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug"] }
+#log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 uuid = { version = "0.6", features = ["v4"] }
 validator = "0.7"
 validator_derive = "0.7"

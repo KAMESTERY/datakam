@@ -98,7 +98,7 @@ fn graphql(
 
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
-    ::std::env::set_var("RUST_LOG", "actix_web,worker_fn=debug");
+    ::std::env::set_var("RUST_LOG", "actix_web,worker_lib,worker_fn=debug");
 //    ::std::env::set_var("RUST_LOG", "rusoto,hyper,actix_web,worker_fn=debug");
     env_logger::init();
     let sys = actix::System::new("RustyWebApp_SystemRunner");
