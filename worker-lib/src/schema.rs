@@ -54,7 +54,7 @@ impl GThing {
                 .to_string();
             h.insert(k, v);
         });
-        println!("Transformed VecOfVec {:?} into Map {:?}", self.data, h);
+        debug!("Transformed VecOfVec {:?} into Map {:?}", self.data, h);
         Ok(h)
     }
 }
@@ -126,7 +126,7 @@ graphql_object!(MutationRoot: () |&self| {
 
         let put_response = create_complete_user(user_id, email, username, password);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         Ok(String::from("SUCCESS"))
 //        Ok(put_response)
@@ -140,7 +140,7 @@ graphql_object!(MutationRoot: () |&self| {
             data
         );
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         Ok(String::from("SUCCESS"))
     }

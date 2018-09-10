@@ -16,7 +16,7 @@ const CONFIRMED: i32 = -99;
 #[test]
 fn crud_user() {
 
-    println!("--------- Put User ----------------");
+    debug!("--------- Put User ----------------");
 
     let table_name = String::from("User");
 
@@ -32,9 +32,9 @@ fn crud_user() {
 
     let put_response = DynaDB::put(table_name.clone(), user_data);
 
-    println!("Put Response: {:?}", put_response);
+    debug!("Put Response: {:?}", put_response);
 
-    println!("--------- Get User ----------------");
+    debug!("--------- Get User ----------------");
 
     let key: HashMap<String, AttributeValue> =
         [
@@ -45,9 +45,9 @@ fn crud_user() {
 
     let user: Option<User> = DynaDB::get(table_name.clone(), key.clone());
 
-    println!("User: {:?}", user);
+    debug!("User: {:?}", user);
 
-    println!("--------- Query Users ----------------");
+    debug!("--------- Query Users ----------------");
 
     let key_condition_expr = String::from("UserID = :user_id AND Email = :email");
 
@@ -60,28 +60,28 @@ fn crud_user() {
 
     let users: Option<Vec<User>> = DynaDB::query(table_name.clone(), key_condition_expr, data);
 
-    println!("Users: {:?}", users);
+    debug!("Users: {:?}", users);
 
-    println!("--------- Delete User ----------------");
+    debug!("--------- Delete User ----------------");
 
     let delete_response = DynaDB::delete(table_name.clone(), key.clone());
 
-    println!("Delete Response: {:?}", delete_response);
+    debug!("Delete Response: {:?}", delete_response);
 
     assert_eq!(1, 1);
 }
 
 #[test]
 fn hash_check() {
-    println!("--------- Get Secret Words ----------------");
+    debug!("--------- Get Secret Words ----------------");
     let secret_words = String::from("haha, this is secret");
-    println!("Secret {}", secret_words);
+    debug!("Secret {}", secret_words);
 
-    println!("--------- Hash Secret Words ----------------");
+    debug!("--------- Hash Secret Words ----------------");
     let hashed_secret = hash_password(secret_words.clone());
-    println!("Hashed Secret {}", hashed_secret);
+    debug!("Hashed Secret {}", hashed_secret);
 
-    println!("--------- Check Secret Words ----------------");
+    debug!("--------- Check Secret Words ----------------");
     let right_secret = check_password(
         hashed_secret,
         secret_words
@@ -90,7 +90,7 @@ fn hash_check() {
     match right_secret {
         Ok(_) => assert_eq!(1, 1),
         Err(err) => {
-            println!("HASH_CHECK_ERROR {:?}", err);
+            debug!("HASH_CHECK_ERROR {:?}", err);
             assert_eq!(1, -1)
         }
     }
@@ -109,11 +109,11 @@ fn jwt_claims_check() {
 
     let token = jwt_encode(claims.clone());
     let token_string = token.unwrap();
-    println!("Token {}", token_string);
+    debug!("Token {}", token_string);
 
     let token_data: jwt::errors::Result<TokenData<Claims>> = jwt_decode(token_string);
     let retrieved_claims = token_data.unwrap().claims;
-    println!("Retrieved Claims: {:?}", retrieved_claims);
+    debug!("Retrieved Claims: {:?}", retrieved_claims);
 
     assert_eq!(retrieved_claims, claims);
 }

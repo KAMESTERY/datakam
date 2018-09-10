@@ -1,5 +1,5 @@
 {
-  "name": "rusty-webapp",
+  "name": "worker-fn",
   "profile": "default",
   "regions": [
     "us-east-1"
@@ -36,12 +36,5 @@
         ]
       }
     ]
-  },
-  "hooks": {
-    "build": [
-      "mkdir -p /tmp/cargo && docker run --rm -v /tmp/cargo:/cargo -e CARGO_HOME='/cargo' -v $PWD:/volume -w /volume -t clux/muslrust cargo build --release",
-      "cp target/x86_64-unknown-linux-musl/release/rusty-webapp server"
-    ],
-    "clean": "rm server"
   }
 }

@@ -37,13 +37,16 @@ deploy:
 
 prod-url:
 	terraform show | grep invoke_url
-	terraform show | grep $(WORKER)-api-url
+#	terraform show | grep $(WORKER)-api-url
 	terraform show | grep $(WEBSITE)-url
 
 publish-website: deploy
 	lein do clean, cljsbuild once min
 	aws s3 sync --acl public-read $(BASEDIR)/public s3://$(WEBSITE)
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
+
+deploy-functions: deploy
+	cd $(BASEDIR)/$(RUSTY_WORKER)/ && up -v
 
 #build-lambda: deps-deploy prod-build-worker-rusty package-lambda
 build-lambda: deps-deploy package-lambda
@@ -97,10 +100,10 @@ build-worker-rusty: rsa
 	cargo build --release
 	cp $(BASEDIR)/target/debug/$(RUSTY_WORKER) $(BASEDIR)/lambda/worker/
 
-prod-build-worker-rusty: rsa
+prod-build-worker-rusty: rsa lambda-rust-image
 	mkdir -p $(BASEDIR)/{cargo,target/$(RUSTY_WORKER)_lambda}
 	docker run --rm -v $(BASEDIR)/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v `pwd`:/code -w /code og-rust-lambda:latest cargo build --release
-	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(OUTPUT_DIR)/$(RUSTY_WORKER)
+	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(BASEDIR)/$(RUSTY_WORKER)/server
 #	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
 
 lambda-rust-image:

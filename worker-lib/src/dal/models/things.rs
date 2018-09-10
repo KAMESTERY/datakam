@@ -153,11 +153,11 @@ impl Thing {
             .with_data_ids(data_ids)
             .drain();
 
-        println!("Put Thing Values: {:?}", thing_values);
+        debug!("Put Thing Values: {:?}", thing_values);
 
         let put_response = DynaDB::put(String::from("Things"), thing_values);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         put_response
     }
@@ -167,11 +167,11 @@ impl Thing {
             .with_user_id(user_id)
             .key();
 
-        println!("Get User Key: {:?}", key);
+        debug!("Get User Key: {:?}", key);
 
         let thing: Option<Thing> = DynaDB::get(String::from("Things"), key.clone());
 
-        println!("Thing: {:?}", thing);
+        debug!("Thing: {:?}", thing);
 
         thing
     }
@@ -182,10 +182,10 @@ impl Thing {
             .with_user_id(user_id)
             .key();
 
-        println!("Delete Thing Key: {:?}", key);
+        debug!("Delete Thing Key: {:?}", key);
 
         let result = DynaDB::delete(String::from("Things"), key);
-        println!("Result: {:?}", result.clone());
+        debug!("Result: {:?}", result.clone());
 
         result
     }
@@ -249,7 +249,7 @@ impl ModelDynaConv for Thing {
                 "CreatedAt" => self.created_at= value.s,
                 "UpdatedAt" => self.updated_at = value.s,
                 "DataIDs" => self.data_ids = value.ss,
-                _ => println!("Unexpected Data: [{} => {:?}]", key, value)
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
         self.clone()
@@ -312,11 +312,11 @@ impl Data {
             .with_value(value)
             .drain();
 
-        println!("Put Data Values: {:?}", datum_values);
+        debug!("Put Data Values: {:?}", datum_values);
 
         let put_response = DynaDB::put(String::from("Data"), datum_values);
 
-        println!("Put Response: {:?}", put_response);
+        debug!("Put Response: {:?}", put_response);
 
         put_response
     }
@@ -326,11 +326,11 @@ impl Data {
             .with_data_id(data_id)
             .key();
 
-        println!("Get Data Key: {:?}", key.clone());
+        debug!("Get Data Key: {:?}", key.clone());
 
         let datum: Option<Data> = DynaDB::get(String::from("Data"), key);
 
-        println!("Data: {:?}", datum);
+        debug!("Data: {:?}", datum);
 
         datum
     }
@@ -340,10 +340,10 @@ impl Data {
             .with_data_id(data_id)
             .key();
 
-        println!("Delete Data Key: {:?}", key);
+        debug!("Delete Data Key: {:?}", key);
 
         let result = DynaDB::delete(String::from("Data"), key);
-        println!("Result: {:?}", result.clone());
+        debug!("Result: {:?}", result.clone());
 
         result
     }
@@ -383,7 +383,7 @@ impl ModelDynaConv for Data {
                 "ThingID" => self.thing_id = value.s,
                 "Key" => self.key = value.s,
                 "Value" => self.value = value.s,
-                _ => println!("Unexpected Data: [{} => {:?}]", key, value)
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
         self.clone()
