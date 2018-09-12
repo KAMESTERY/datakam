@@ -5,4 +5,5 @@ members = [
     "worker-fn",
 #    "worker-ext",
     "worker-lib",
+    "slapman-web",
 ]

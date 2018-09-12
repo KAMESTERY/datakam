@@ -4,6 +4,7 @@ BASEDIR := $(shell pwd)
 UNAME_S := $(shell uname -s)
 WORKER=slapman
 RUSTY_WORKER=worker-fn
+SLAPMAN_WEB=slapman-web
 RUSTY_LIBWORKEREXT=workerext
 RUSTY_WORKER_LIB=worker-lib
 WEBSITE=slapman-web
@@ -47,6 +48,7 @@ publish-website: deploy
 
 deploy-functions: deploy
 	cd $(BASEDIR)/$(RUSTY_WORKER)/ && up -v
+	cd $(BASEDIR)/$(SLAPMAN_WEB)/ && up -v
 
 #build-lambda: deps-deploy prod-build-worker-rusty package-lambda
 build-lambda: deps-deploy package-lambda
@@ -100,10 +102,11 @@ build-worker-rusty: rsa
 	cargo build --release
 	cp $(BASEDIR)/target/debug/$(RUSTY_WORKER) $(BASEDIR)/lambda/worker/
 
-prod-build-worker-rusty: rsa lambda-rust-image
+prod-build-worker-rusty: rsa lambda-binary-builder
 	mkdir -p $(BASEDIR)/{cargo,target/$(RUSTY_WORKER)_lambda}
 	docker run --rm -v $(BASEDIR)/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v `pwd`:/code -w /code og-rust-lambda:latest cargo build --release
 	cp $(BASEDIR)/target/release/$(RUSTY_WORKER) $(BASEDIR)/$(RUSTY_WORKER)/server
+	cp $(BASEDIR)/target/release/$(SLAPMAN_WEB) $(BASEDIR)/$(SLAPMAN_WEB)/server
 #	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
 
 lambda-binary-builder:

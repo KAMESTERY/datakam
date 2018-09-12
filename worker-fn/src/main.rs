@@ -97,8 +97,6 @@ fn main() {
             .middleware(middleware::Logger::default())
             .resource("/graphql", |r| r.method(http::Method::POST).with(graphql))
             .resource("/explorer", |r| r.method(http::Method::GET).h(graphiql))
-            .resource("/dynatables", |r| r.f(dyna_tbls))
-            .resource("/readtable", |r| r.f(read_tbl))
             .resource("/", |r| r.f(index))
     }).bind(host.clone())
         .unwrap()
