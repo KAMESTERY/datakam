@@ -35,40 +35,12 @@ use juniper::http::graphiql::graphiql_source;
 
 use app_state::{AppState, GraphQLData, GraphQLExecutor};
 use worker_lib::create_schema;
-use worker_lib::{DynaDB};
 use std::env;
 
-//fn index(_req: HttpRequest) -> &'static str {
 fn index(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body("Hello world!"))
-}
-
-fn counter(req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
-    let count = req.state().count.get() + 1; // <- get count
-    req.state().count.set(count); // <- store new count in state
-
-    Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(format!("Request number: {}", count))) // <- response with count
-}
-
-fn dyna_tbls(_req: &HttpRequest<AppState>) -> String {
-
-    let table_names = DynaDB::list_tables();
-
-    match table_names {
-        Some(table_names) => format!("Table names: {:?}", table_names),
-        None => String::from("No tables in database!")
-    }
-}
-
-fn read_tbl(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
-
-    Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body("fsgdfgf"))
+        .body("Hello from WorkerFn!"))
 }
 
 fn graphiql(req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
@@ -101,7 +73,7 @@ fn main() {
     ::std::env::set_var("RUST_LOG", "actix_web,worker_lib,worker_fn=debug");
 //    ::std::env::set_var("RUST_LOG", "rusoto,hyper,actix_web,worker_fn=debug");
     env_logger::init();
-    let sys = actix::System::new("RustyWebApp_SystemRunner");
+    let sys = actix::System::new("WorkerFn_SystemRunner");
 
     let schema = std::sync::Arc::new(create_schema());
     let thread_count = num_cpus::get() * 2 + 1; // Choose just 3 by default ?
@@ -125,7 +97,6 @@ fn main() {
             .middleware(middleware::Logger::default())
             .resource("/graphql", |r| r.method(http::Method::POST).with(graphql))
             .resource("/explorer", |r| r.method(http::Method::GET).h(graphiql))
-            .resource("/count", |r| r.method(http::Method::GET).f(counter))
             .resource("/dynatables", |r| r.f(dyna_tbls))
             .resource("/readtable", |r| r.f(read_tbl))
             .resource("/", |r| r.f(index))
