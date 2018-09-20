@@ -5,7 +5,7 @@
     "us-east-1"
   ],
   "lambda": {
-    "memory": 128,
+    "memory": 512,
     "warm": true,
     "warm_count": 10,
     "warm_rate": "30m",
@@ -36,11 +36,5 @@
         ]
       }
     ]
-  },
-  "hooks": {
-    "build": [
-      "docker run --rm -v $(pwd):/src -w /src crystallang/crystal:latest crystal build --link-flags -static -o server main.cr"
-    ],
-    "clean": "rm server"
   }
 }
