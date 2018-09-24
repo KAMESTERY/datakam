@@ -70,8 +70,8 @@ fn graphql(
 
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
-    match ::std::env::var("LOG_LEVEL").ok() {
-        Some(log_level) => ::std::env::set_var("RUST_LOG", log_level),
+    match ::std::env::var("RUST_LOG").ok() {
+        Some(rust_log) => ::std::env::set_var("RUST_LOG", rust_log),
         None => ::std::env::set_var("RUST_LOG", "actix_web,worker_lib,worker_fn=debug")
     }
 //    ::std::env::set_var("RUST_LOG", "rusoto,hyper,actix_web,worker_fn=debug");

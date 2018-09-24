@@ -59,6 +59,6 @@
     }
   },
   "environment": {
-    "LOG_LEVEL": "actix_web,worker_lib,worker_fn=debug"
+    "RUST_LOG": "actix_web,worker_lib,worker_fn=debug"
   }
 }
