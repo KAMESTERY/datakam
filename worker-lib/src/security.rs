@@ -1,7 +1,6 @@
-
-use data_encoding::{HEXUPPER};
+use data_encoding::HEXUPPER;
+use jwt::{self, Algorithm, Header, TokenData, Validation};
 use ring::{digest, pbkdf2};
-use jwt::{self, Header, Algorithm, Validation, TokenData};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 
@@ -59,16 +58,16 @@ pub fn check_password(hashed_password: String, password: String) -> Result<bool,
 }
 
 /// T is our claims struct, and it needs to derive `Serialize` and/or `Deserialize`
-pub fn jwt_encode<T>(claims: T) -> jwt::errors::Result<String>
+pub fn jwt_encode<T>(claims: T) -> Option<String>
     where T: Serialize
 {
     let mut header = Header::new(Algorithm::HS512); // TODO: Revisit this implementation to harden it using all the struct fields
     header.kid = Some(MULTI_GENIUS_KID.to_owned());
     let token = jwt::encode(&header, &claims, &PRIVATE_KEY_DER);
-    token
+    token.ok()
 }
 
-pub fn jwt_decode<T: DeserializeOwned>(token: String) -> jwt::errors::Result<TokenData<T>> {
+pub fn jwt_decode<T: DeserializeOwned>(token: String) -> Option<T> {
     let mut validation = Validation::new(Algorithm::HS512); // TODO: Revisit this implementation to harden it using all the struct fields
     validation.validate_exp = false;
     let token_data = jwt::decode::<T>(
@@ -76,5 +75,6 @@ pub fn jwt_decode<T: DeserializeOwned>(token: String) -> jwt::errors::Result<Tok
         &PRIVATE_KEY_DER,
         &validation
     );
-    token_data
+    let claims = token_data.ok()?.claims;
+    Some(claims)
 }

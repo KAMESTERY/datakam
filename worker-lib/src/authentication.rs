@@ -18,7 +18,7 @@ pub fn login(user_id: String, email: String, password: String) -> Option<String>
     let user = User::get_user(user_id, email)?;
     let password_hash = user.clone().password_hash?;
     check_password(password_hash, password).ok()?;
-    let token = jwt_encode(user.to_auth_data()).ok()?;
+    let token = jwt_encode(user.to_auth_data())?;
     Some(token)
 }
 

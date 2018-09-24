@@ -1,11 +1,10 @@
-
+use jwt::{self, TokenData};
+use security as sec;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use std::marker::Sized;
-use jwt::{self, TokenData};
 // A trait that the Validate derive will impl
 use validator::{Validate, ValidationError};
-use security as sec;
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct AuthData {
@@ -19,7 +18,23 @@ pub trait AuthTrait {
 }
 
 pub fn validate_token(token: Option<String>) -> Option<String> {
-    let token_data: TokenData<AuthData> = sec::jwt_decode(token?).ok()?;
-    let new_token = sec::jwt_encode(token_data.claims).ok();
+    let claims: AuthData = sec::jwt_decode(token?)?;
+    let new_token = sec::jwt_encode(claims);
     new_token
+}
+
+pub trait AuthDataTrait: Clone + Serialize + DeserializeOwned {
+    fn to_token(&self) -> Option<String> {
+        let new_token = sec::jwt_encode(self.clone());
+        new_token
+    }
+    fn from_token(&self, token: Option<String>) -> Option<Self> {
+        let claims: Self = sec::jwt_decode(token?)?;
+        Some(self.clone())
+    }
+    fn validate_token(&self, token: Option<String>) -> Option<String> {
+        let claims: Self = sec::jwt_decode(token?)?;
+        let new_token = sec::jwt_encode(claims);
+        new_token
+    }
 }
