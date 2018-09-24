@@ -5,7 +5,15 @@ use dal::dynatraits::{ModelDynaConv};
 use dal::dynamodb::{attr_n, attr_s, DynaDB};
 use security as sec;
 use validation as val;
-use validation::{AuthData, AuthTrait};
+use validation::{AuthTrait, AuthDataTrait};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UserAuthData {
+    pub user_id: Option<String>,
+    pub email: Option<String>
+}
+
+impl AuthDataTrait for UserAuthData {}
 
 pub fn create_complete_user(user_id: String, email: String, username: String, password: String) -> String {
     let password_hash = sec::hash_password(password);
@@ -180,15 +188,15 @@ impl ModelDynaConv for User {
     }
 }
 
-impl AuthTrait for User {
-    fn to_auth_data(&self) -> AuthData {
-        AuthData{
+impl AuthTrait<UserAuthData> for User {
+    fn to_auth_data(&self) -> UserAuthData {
+        UserAuthData{
             user_id: self.user_id.to_owned(),
             email: self.email.to_owned()
         }
     }
 
-    fn from_auth_data(&mut self, auth_data: AuthData) -> User {
+    fn from_auth_data(&mut self, auth_data: UserAuthData) -> User {
         let user = User::new()
             .with_user_id(auth_data.clone().user_id.unwrap())
             .with_username(auth_data.email.unwrap());

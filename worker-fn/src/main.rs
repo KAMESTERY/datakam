@@ -44,9 +44,9 @@ fn index(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
 }
 
 fn graphiql(req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
-    let port: &String = &req.state().port;
-    let html = graphiql_source(&format!("http://localhost:{}/graphql", port));
-//    let html = graphiql_source("/graphql");
+//    let port: &String = &req.state().port;
+//    let html = graphiql_source(&format!("http://localhost:{}/graphql", port));
+    let html = graphiql_source("/graphql");
 //    let html = graphiql_source("http://127.0.0.1:8088/graphql");
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -70,7 +70,10 @@ fn graphql(
 
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
-    ::std::env::set_var("RUST_LOG", "actix_web,worker_lib,worker_fn=debug");
+    match ::std::env::var("LOG_LEVEL").ok() {
+        Some(log_level) => ::std::env::set_var("RUST_LOG", log_level),
+        None => ::std::env::set_var("RUST_LOG", "actix_web,worker_lib,worker_fn=debug")
+    }
 //    ::std::env::set_var("RUST_LOG", "rusoto,hyper,actix_web,worker_fn=debug");
     env_logger::init();
     let sys = actix::System::new("WorkerFn_SystemRunner");

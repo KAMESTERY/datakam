@@ -34,7 +34,31 @@
           "dynamodb:ListTagsOfResource",
           "dynamodb:ListTables"
         ]
+      },
+      {
+        "Sid": "AllowCloudFrontUpdateDistribution",
+        "Effect": "Allow",
+        "Action": [
+          "cloudfront:updateDistribution"
+        ],
+        "Resource": [
+          "*"
+        ]
       }
     ]
+  },
+  "stages": {
+    "data_prod": {
+      "domain": "data.kamestery.com"
+    },
+    "data_stage": {
+      "domain": "data-stage.kamestery.com"
+    },
+    "data_dev": {
+      "domain": "data-dev.kamestery.com"
+    }
+  },
+  "environment": {
+    "LOG_LEVEL": "actix_web,worker_lib,worker_fn=debug"
   }
 }

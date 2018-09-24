@@ -6,21 +6,9 @@ use std::marker::Sized;
 // A trait that the Validate derive will impl
 use validator::{Validate, ValidationError};
 
-#[derive(Clone, Deserialize, Serialize)]
-pub struct AuthData {
-    pub user_id: Option<String>,
-    pub email: Option<String>
-}
-
-pub trait AuthTrait {
-    fn to_auth_data(&self) -> AuthData;
-    fn from_auth_data(&mut self, auth_data: AuthData) -> Self;
-}
-
-pub fn validate_token(token: Option<String>) -> Option<String> {
-    let claims: AuthData = sec::jwt_decode(token?)?;
-    let new_token = sec::jwt_encode(claims);
-    new_token
+pub trait AuthTrait<T: AuthDataTrait> {
+    fn to_auth_data(&self) -> T;
+    fn from_auth_data(&mut self, auth_data: T) -> Self;
 }
 
 pub trait AuthDataTrait: Clone + Serialize + DeserializeOwned {

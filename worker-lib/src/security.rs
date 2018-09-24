@@ -78,3 +78,57 @@ pub fn jwt_decode<T: DeserializeOwned>(token: String) -> Option<T> {
     let claims = token_data.ok()?.claims;
     Some(claims)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hash_check() {
+        println!("--------- Get Secret Words ----------------");
+        let secret_words = String::from("haha, this is secret");
+        println!("Secret {}", secret_words);
+
+        println!("--------- Hash Secret Words ----------------");
+        let hashed_secret = hash_password(secret_words.clone());
+        println!("Hashed Secret {}", hashed_secret);
+
+        println!("--------- Check Secret Words ----------------");
+        let right_secret = check_password(
+            hashed_secret,
+            secret_words
+        );
+
+        match right_secret {
+            Ok(_) => assert_eq!(1, 1),
+            Err(err) => {
+                println!("HASH_CHECK_ERROR {:?}", err);
+                assert_eq!(1, -1)
+            }
+        }
+    }
+
+    /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
+    #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+    struct Claims {
+        sub: String,
+        company: String
+    }
+
+    #[test]
+    fn jwt_claims_check() {
+        let claims = Claims{ sub: String::from("Sub"), company: String::from("Company") };
+
+        println!("--------- Generate Token from Claims ----------------");
+        let token = jwt_encode(claims.clone());
+        let token_string = token.unwrap();
+        println!("Token {}", token_string);
+
+        println!("--------- Retrieve Claims from Token ----------------");
+        let token_data: Option<Claims> = jwt_decode(token_string);
+        let retrieved_claims = token_data.unwrap();
+        println!("Retrieved Claims: {:?}", retrieved_claims);
+
+        assert_eq!(retrieved_claims, claims);
+    }
+}
