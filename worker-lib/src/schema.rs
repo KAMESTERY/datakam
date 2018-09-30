@@ -4,8 +4,18 @@ use juniper::{FieldResult, RootNode};
 use dal::{
     DynaDB, create_complete_user,
     create_complete_thing, delete_complete_thing,
-    User, UserProfile, UserGroup,
+    User, UserProfile, UserGroup, UserAuthData,
     Thing, Data, LaChose
+};
+use validation::{
+    AuthDataTrait,
+    from_token,
+    validate_token,
+    GUEST,
+    USER,
+    CONTRIBUTE,
+    MANAGE,
+    ADMINISTER
 };
 use authentication as auth;
 
@@ -69,9 +79,14 @@ graphql_object!(QueryRoot: () |&self| {
         let token = auth::login(user_id, email, password);
         Ok(token)
     }
-    field get_user(user_id: String, email: String) -> FieldResult<Option<User>> {
-        let user = User::get_user(user_id, email);
-        Ok(user)
+    field get_user(token: String, user_id: String, email: String) -> FieldResult<Option<User>> {
+        let user_auth: UserAuthData = from_token(token).unwrap();
+        if user_auth.can(user_id.clone(), MANAGE as i32) {
+            let user = User::get_user(user_id, email);
+            Ok(user)
+        } else {
+            Ok(None)
+        }
     }
     field get_userprofile(user_id: String) -> FieldResult<Option<UserProfile>> {
         let user_profile = UserProfile::get_userprofile(user_id);

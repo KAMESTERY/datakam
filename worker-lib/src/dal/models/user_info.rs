@@ -10,10 +10,19 @@ use validation::{AuthTrait, AuthDataTrait};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserAuthData {
     pub user_id: Option<String>,
-    pub email: Option<String>
+    pub email: Option<String>,
+    pub role: Option<i32>
 }
 
-impl AuthDataTrait for UserAuthData {}
+impl AuthDataTrait for UserAuthData {
+    fn get_id(&self) -> String {
+        self.clone().user_id.unwrap_or(String::from(""))
+    }
+
+    fn get_role(&self) -> i32 {
+        self.clone().role.unwrap_or(0x0).to_owned()
+    }
+}
 
 pub fn create_complete_user(user_id: String, email: String, username: String, password: String) -> String {
     let password_hash = sec::hash_password(password);
@@ -192,7 +201,8 @@ impl AuthTrait<UserAuthData> for User {
     fn to_auth_data(&self) -> UserAuthData {
         UserAuthData{
             user_id: self.user_id.to_owned(),
-            email: self.email.to_owned()
+            email: self.email.to_owned(),
+            role: self.role.to_owned()
         }
     }
 
