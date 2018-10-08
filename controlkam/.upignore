@@ -1,0 +1,21 @@
+## Project
+src
+tests
+tools
+.gitignore
+.upignore
+Dockerfile
+README.markdown
+README.org
+controlkam-test.asd
+controlkam.asd
+up.json
+## Lisp
+*.fasl
+*.dx32fsl
+*.dx64fsl
+*.lx32fsl
+*.lx64fsl
+*.x86f
+*~
+.#*
