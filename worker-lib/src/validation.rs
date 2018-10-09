@@ -26,7 +26,6 @@ pub trait AuthDataTrait: Clone + Serialize + DeserializeOwned {
     fn get_role(&self) -> i32;
     fn can(&self, id: String, role: i32) -> bool {
         let allowed = self.get_id() == id || self.get_role() >= role;
-        debug!("Operation Not Allowed!");
         allowed
     }
 }
@@ -35,6 +34,7 @@ pub fn from_token<T: AuthDataTrait>(token: String) -> Option<T> {
     let claims: T = sec::jwt_decode(token)?;
     Some(claims)
 }
+
 pub fn validate_token<T: AuthDataTrait>(token: String) -> Option<String> {
     let claims: T = sec::jwt_decode(token)?;
     let new_token = sec::jwt_encode(claims);

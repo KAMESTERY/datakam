@@ -80,30 +80,40 @@ graphql_object!(QueryRoot: () |&self| {
         Ok(token)
     }
     field get_user(token: String, user_id: String, email: String) -> FieldResult<Option<User>> {
-        let user_auth: UserAuthData = from_token(token).unwrap();
-        if user_auth.can(user_id.clone(), MANAGE as i32) {
-            let user = User::get_user(user_id, email);
-            Ok(user)
-        } else {
-            Ok(None)
-        }
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(User::get_user(user_id, email))
+        )
     }
-    field get_userprofile(user_id: String) -> FieldResult<Option<UserProfile>> {
-        let user_profile = UserProfile::get_userprofile(user_id);
-        Ok(user_profile)
+    field get_userprofile(token: String, user_id: String) -> FieldResult<Option<UserProfile>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(UserProfile::get_userprofile(user_id))
+        )
     }
-    field get_usergroup(group_id: String, user_id: String) -> FieldResult<Option<UserGroup>> {
-        let user_group = UserGroup::get_usergroup(group_id, user_id);
-        Ok(user_group)
+    field get_usergroup(token: String, group_id: String, user_id: String) -> FieldResult<Option<UserGroup>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(UserGroup::get_usergroup(group_id, user_id))
+        )
     }
-    field get_lachose(name: String, user_id: String) -> FieldResult<Option<LaChose>> {
-        let la_chose = LaChose::get_lachose(name, user_id);
-        Ok(la_chose)
+    field get_lachose(token: String, name: String, user_id: String) -> FieldResult<Option<LaChose>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(LaChose::get_lachose(name, user_id))
+        )
     }
 
-    field get_les_choses(user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<LaChose>>> {
-        let les_choses = LaChose::get_les_choses(user_id, names);
-        Ok(les_choses)
+    field get_les_choses(token: String, user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<LaChose>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(LaChose::get_les_choses(user_id, names))
+        )
     }
 
     field list_dynamodb_tables(&executor) -> FieldResult<Option<Vec<String>>> {
@@ -135,34 +145,36 @@ graphql_object!(MutationRoot: () |&self| {
     field register(user_id: String, email: String, username: String, password: String) -> FieldResult<String> {
         Ok(auth::register(user_id, email, username, password))
     }
-    field create_complete_user(user_id: String, email: String, username: String, password: String) -> FieldResult<String> {
-    //TODO: How to return AttributeValue struct?
-//    field create_user(user_id: String, email: String, username: String, password: String) -> FieldResult<Option<HashMap<String, AttributeValue>>> {
-
-        let put_response = create_complete_user(user_id, email, username, password);
-
-        debug!("Put Response: {:?}", put_response);
-
-        Ok(String::from("SUCCESS"))
-//        Ok(put_response)
+    field create_complete_user(token: String, user_id: String, email: String, username: String, password: String) -> FieldResult<Option<String>> {
+        secured!(
+            token,
+            user_id.clone(),
+            //TODO: How to return AttributeValue struct?
+            // field create_user(user_id: String, email: String, username: String, password: String) -> FieldResult<Option<HashMap<String, AttributeValue>>> {
+            Ok(Some(create_complete_user(user_id, email, username, password)))
+        )
     }
-    field create_complete_thing(thing: GThing) -> FieldResult<String> {
+    field create_complete_thing(token: String, thing: GThing) -> FieldResult<Option<String>> {
         let data: HashMap<String, String> = thing.data_as_hashmap()?;
-//        let data: HashMap<String, String> = thing.data.iter().cloned().collect();
-        let put_response = create_complete_thing(
-            thing.name,
-            thing.user_id,
-            data
-        );
-
-        debug!("Put Response: {:?}", put_response);
-
-        Ok(String::from("SUCCESS"))
+        secured!(
+            token,
+            thing.user_id.clone(),
+            Ok(Some(
+                create_complete_thing(
+                    thing.name,
+                    thing.user_id,
+                    data
+                )
+            ))
+        )
     }
 
-    field delete_complete_thing(name: String, user_id: String) -> FieldResult<Option<String>> {
-        let result = delete_complete_thing(name, user_id);
-        Ok(result)
+    field delete_complete_thing(token: String, name: String, user_id: String) -> FieldResult<Option<String>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(delete_complete_thing(name, user_id))
+        )
     }
 });
 
