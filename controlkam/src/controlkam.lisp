@@ -9,11 +9,14 @@
 @export
 (defapp app
   :middlewares (clack.middleware.accesslog:<clack-middleware-accesslog>
-                (clack.middleware.backtrace:<clack-middleware-backtrace>)))
+                (clack.middleware.backtrace:<clack-middleware-backtrace>)
+                (clack.middleware.static:<clack-middleware-static>
+                 :static "/static/"
+                 :root (asdf:system-relative-pathname :controlkam #p"static/"))))
 
 @route app "/"
 (defview hello ()
-  (respond "Hello, world!!"))
+  (respond "Hello, world!! :-) :-)"))
 
 @export
 (defun main()

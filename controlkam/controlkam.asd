@@ -23,6 +23,7 @@
                 :components
                 ((:file "package")
                  (:file "os")
+                 (:file "templates")
                  (:file "controlkam"))))
   :description ""
   :long-description
