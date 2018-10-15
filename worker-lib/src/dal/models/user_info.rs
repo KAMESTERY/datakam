@@ -25,31 +25,39 @@ impl AuthDataTrait for UserAuthData {
 }
 
 pub fn create_complete_user(user_id: String, email: String, username: String, password: String) -> String {
-    let password_hash = sec::hash_password(password);
-    User::create_user(
-        user_id.clone(),
-        email,
-        username,
-        password_hash
-    );
+    match User::get_user(user_id.clone(), email.clone()) {
+        Some(_user) => {
+            debug!("User already Exists!");
+            String::from("")
+        },
+        None => {
+            let password_hash = sec::hash_password(password);
+            User::create_user(
+                user_id.clone(),
+                email,
+                username,
+                password_hash
+            );
 
-    UserProfile::create_userprofile(
-        user_id.clone(),
-        String::from("spiuewropiewqrfhjdnlasjhdsiahudfas"),
-        String::from("What is your name?"),
-        9999,
-        String::from("What is it about you?"),
-        String::from("What is your location?"),
-        String::from("What is your location?"),
-    );
+            UserProfile::create_userprofile(
+                user_id.clone(),
+                String::from("spiuewropiewqrfhjdnlasjhdsiahudfas"),
+                String::from("What is your name?"),
+                9999,
+                String::from("What is it about you?"),
+                String::from("What is your location?"),
+                String::from("What is your location?"),
+            );
 
-    UserGroup::create_usergroup(
-        String::from("user"),
-        user_id,
-        String::from("user")
-    );
+            UserGroup::create_usergroup(
+                String::from("user"),
+                user_id,
+                String::from("user")
+            );
 
-    String::from("SUCCESS")
+            String::from("SUCCESS")
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject)]
