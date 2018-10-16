@@ -1,0 +1,19 @@
+
+
+<% deftemplate layout (header content footer) (:escape-html nil) %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <span>
+      <a class="href" href="/">Home</a>
+      <a class="href" href="/hello">Hello</a>
+    </span>
+    <%= header %>
+    </head>
+    <body>
+     <%= content %>
+     <%= footer %>
+    </body>
+</html>
+<% end %>
+

@@ -16,12 +16,13 @@
 
 @route app "/hello"
 (defview hello ()
-  (respond "Hello, world!! :-) :-)"))
+  (render "<h3>Hello, world!! :-) :-)</h3>"))
 
 @route app "/"
 (defview home ()
-  (respond
-   (eco-template:home "Home :-)")))
+  (render
+   (eco-template:home "Home :-)")
+   :title "Sweet Home"))
 
 
 @export

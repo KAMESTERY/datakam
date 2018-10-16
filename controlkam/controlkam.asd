@@ -23,11 +23,15 @@
   :entry-point "controlkam:main"
   :components ((:module "templates"
                 :components
-                ((:eco-template "home")))
+                ((:eco-template "header")
+                 (:eco-template "footer")
+                 (:eco-template "home")
+                 (:eco-template "layout")))
                (:module "src"
                 :components
                 ((:file "package")
                  (:file "os")
+                 (:file "templating")
                  (:file "controlkam"))))
   :description ""
   :long-description

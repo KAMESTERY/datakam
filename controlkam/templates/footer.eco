@@ -1,0 +1,8 @@
+
+<% deftemplate footer (script) () %>
+<script>
+  console.log("Hello Eco :-)")
+</script>
+<%= script %>
+<% end %>
+
