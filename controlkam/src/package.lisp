@@ -4,6 +4,7 @@
 (defpackage controlkam
   (:use :cl)
   (:use :lucerne)
+  (:use :eco)
   (:use :log4cl)
   (:use :alexandria)
   (:use :arrow-macros)

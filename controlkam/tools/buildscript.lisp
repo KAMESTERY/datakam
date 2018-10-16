@@ -8,6 +8,8 @@
                            :defaults *load-truename*)
             asdf:*central-registry*)
 
+;; Load Build Prerequisites
+#+(or sbcl ccl clisp) (ql:quickload :eco)
 #+(or sbcl ccl clisp) (ql:quickload :trivial-dump-core)
 
 (format t "~a~%" (lisp-implementation-type))
@@ -56,5 +58,5 @@
                                                    :move-here "./bin/"
                                                    :epilogue-code '(ext:quit 0))
 
-#+(or sbcl ccl clisp) (trivial-dump-core:save-executable #p"server" #'main)
+#+(or sbcl ccl clisp) (trivial-dump-core:save-executable #p"./server" #'main)
 

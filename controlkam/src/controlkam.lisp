@@ -11,12 +11,18 @@
   :middlewares (clack.middleware.accesslog:<clack-middleware-accesslog>
                 (clack.middleware.backtrace:<clack-middleware-backtrace>)
                 (clack.middleware.static:<clack-middleware-static>
-                 :static "/static/"
+                 :path "/static/"
                  :root (asdf:system-relative-pathname :controlkam #p"static/"))))
 
-@route app "/"
+@route app "/hello"
 (defview hello ()
   (respond "Hello, world!! :-) :-)"))
+
+@route app "/"
+(defview home ()
+  (respond
+   (eco-template:home "Home :-)")))
+
 
 @export
 (defun main()
