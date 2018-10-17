@@ -8,6 +8,9 @@
 (format t "~a~%" (lisp-implementation-version))
 (format t "~a~%" *runtime-pathname*)
 
+;; Load Build Prerequisites
+(ql:quickload :eco)
+
 (ql:quickload :controlkam)
 (ql:quickload :controlkam-test)
 

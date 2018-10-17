@@ -16,14 +16,17 @@
 
 @route app "/hello"
 (defview hello ()
-  (render "<h3>Hello, world!! :-) :-)</h3>"))
+  (render "<h3>Hello from Multi Genius!! :-) :-)</h3>"))
 
 @route app "/"
 (defview home ()
   (render
-   (eco-template:home "Home :-)")
+   (eco-template:home "Multi Genius")
    :title "Sweet Home"))
 
+@export
+(defun run (port &key (debug t))
+  (start app :port (parse-integer port) :server :hunchentoot :debug debug))
 
 @export
 (defun main()
@@ -36,6 +39,6 @@
   ;;`'(log:config :info)
   (let* ((port (or (uiop:getenv "PORT")
                    "1881")))
-    (start app :port (parse-integer port) :server :hunchentoot :debug t)
+    (run port :debug nil)
     (wait)))
 
