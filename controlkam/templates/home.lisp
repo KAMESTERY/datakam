@@ -1,6 +1,6 @@
 
 (PROGN
- (ECO-TEMPLATE:DEFTEMPLATE ECO-TEMPLATE::HOME (ECO-TEMPLATE::TITLE) NIL
+ (ECO-TEMPLATE:DEFTEMPLATE ECO-TEMPLATE:HOME (ECO-TEMPLATE::TITLE) NIL
                            (WRITE-STRING "
 
 <!-- Main jumbotron for a primary marketing message or call to action -->

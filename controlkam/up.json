@@ -65,6 +65,6 @@
     }
   },
   "environment": {
-    "CK_LOG": "debug"
+    "DEBUG": "true"
   }
 }

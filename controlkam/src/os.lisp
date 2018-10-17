@@ -1,3 +1,8 @@
+;;;; os.lisp
+
+;; Optimizations
+(declaim (optimize (speed 3) (space 0) (safety 0) (debug 0)))
+
 (in-package :controlkam)
 
 (annot:enable-annot-syntax)
