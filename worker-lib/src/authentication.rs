@@ -1,5 +1,5 @@
 
-use dal::{create_complete_user, User};
+use dal::{create_complete_user, User, UserAuthData};
 use security::{jwt_encode, jwt_decode, check_password};
 use validation::AuthTrait;
 
@@ -11,6 +11,12 @@ pub fn register(user_id: String, email: String, username: String, password: Stri
         username,
         password
     )
+}
+
+// Get Claims
+pub fn get_claims(token: String) -> Option<UserAuthData> {
+    let user_auth_data: Option<UserAuthData> = jwt_decode(token);
+    user_auth_data
 }
 
 // Login

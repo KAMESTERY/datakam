@@ -43,6 +43,7 @@ struct NewHuman {
     home_planet: String,
 }
 
+//TODO: Move things in domain (ThingInput and ThingOutput)
 #[derive(GraphQLInputObject)]
 #[graphql(description = "A GThing :-)")]
 struct GThing {
@@ -74,6 +75,10 @@ pub struct QueryRoot;
 graphql_object!(QueryRoot: () |&self| {
     field greet(&executor, name: String) -> FieldResult<String> {
         Ok(format!("Hello {}", name))
+    }
+    field get_claims(token: String) -> FieldResult<Option<UserAuthData>> {
+        let user_auth_data = auth::get_claims(token);
+        Ok(user_auth_data)
     }
     field login(user_id: String, email: String, password: String) -> FieldResult<Option<String>> {
         let token = auth::login(user_id, email, password);

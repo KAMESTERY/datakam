@@ -7,7 +7,8 @@ use security as sec;
 use validation as val;
 use validation::{AuthTrait, AuthDataTrait};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[graphql(description = "Claims")]
+#[derive(Clone, Debug, Serialize, Deserialize, GraphQLObject)]
 pub struct UserAuthData {
     pub user_id: Option<String>,
     pub email: Option<String>,

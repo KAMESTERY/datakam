@@ -7,6 +7,6 @@
   "author": "outcastgeek <outcastgeek+git@gmail.com>",
   "license": "proprietary",
   "dependencies": {
-    "graphiql": "^0.11.2"
+    "graphiql": "^0.12.0"
   }
 }
