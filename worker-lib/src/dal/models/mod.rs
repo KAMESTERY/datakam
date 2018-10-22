@@ -11,5 +11,5 @@ pub use self::user_info::{
 pub use self::things::{
     create_complete_thing,
     delete_complete_thing,
-    Thing, Data, LaChose
+    Thing, Data, ThingInput, ThingOutput
 };

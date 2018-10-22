@@ -5,18 +5,40 @@ use uuid::Uuid;
 use dal::dynatraits::{ModelDynaConv};
 use dal::dynamodb::{attr_n, attr_s, attr_ss, DynaDB};
 
-// TODO: Investigate this maybe later ;-)
-//#[derive(Clone, Debug, GraphQLObject)]
-//pub struct Thingy(Thing, Data);
+#[derive(GraphQLInputObject)]
+#[graphql(description = "A ThingInput :-)")]
+pub struct ThingInput {
+    pub name: String,
+    pub user_id: String,
+    pub data: Vec<Vec<String>>
+//    pub data: Vec<(String, String)>
+}
+
+impl ThingInput {
+    pub fn data_as_hashmap(&self) -> Result<HashMap<String, String>, &'static str> {
+        let mut h = HashMap::new();
+        self.data.clone().into_iter().for_each(|v| {
+            let k: String = v.get(0)
+                .expect("No Key Provided")
+                .to_string();
+            let v: String = v.get(1)
+                .expect("No Value Provided")
+                .to_string();
+            h.insert(k, v);
+        });
+        debug!("Transformed VecOfVec {:?} into Map {:?}", self.data, h);
+        Ok(h)
+    }
+}
 
 #[derive(Clone, Debug, GraphQLObject)]
-pub struct LaChose {
+pub struct ThingOutput {
     pub thing: Thing,
     pub data: Vec<Data>
 }
 
-impl LaChose {
-    pub fn get_les_choses(user_id: String, names: Vec<String>) -> Option<Vec<LaChose>> {
+impl ThingOutput {
+    pub fn get_les_choses(user_id: String, names: Vec<String>) -> Option<Vec<ThingOutput>> {
         let thing_keys = names.into_iter().map(|name| {
             [
                 (String::from("UserID"), attr_s(Some(user_id.clone()))),
@@ -33,7 +55,7 @@ impl LaChose {
                 ].iter().cloned().collect()
             }).collect();
             let data: Vec<Data> = DynaDB::batchget_table(String::from("Data"), data_keys)?;
-           Some( LaChose { thing: thing.to_owned(), data })
+           Some( ThingOutput { thing: thing.to_owned(), data })
         }).filter(|c| {
             c.is_some()
         }).map(|x| x.unwrap()).collect();
@@ -41,7 +63,7 @@ impl LaChose {
         Some(list_of_choses)
     }
 
-    pub fn get_lachose(name: String, user_id: String) -> Option<LaChose> {
+    pub fn get_ThingOutput(name: String, user_id: String) -> Option<ThingOutput> {
         let thing = Thing::get_thing(name, user_id)?;
         let data_ids = thing.clone().data_ids?;
         let keys = data_ids.into_iter().map(|id| {
@@ -52,7 +74,7 @@ impl LaChose {
         }).collect();
         let data: Vec<Data> = DynaDB::batchget_table(String::from("Data"), keys)?;
         Some(
-            LaChose { thing, data }
+            ThingOutput { thing, data }
         )
     }
 }

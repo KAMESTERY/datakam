@@ -5,7 +5,7 @@ use dal::{
     DynaDB, create_complete_user,
     create_complete_thing, delete_complete_thing,
     User, UserProfile, UserGroup, UserAuthData,
-    Thing, Data, LaChose
+    Thing, Data, ThingInput,ThingOutput
 };
 use validation::{
     AuthDataTrait,
@@ -43,33 +43,6 @@ struct NewHuman {
     home_planet: String,
 }
 
-//TODO: Move things in domain (ThingInput and ThingOutput)
-#[derive(GraphQLInputObject)]
-#[graphql(description = "A GThing :-)")]
-struct GThing {
-    name: String,
-    user_id: String,
-    data: Vec<Vec<String>>
-//    data: Vec<(String, String)>
-}
-
-impl GThing {
-    fn data_as_hashmap(&self) -> Result<HashMap<String, String>, &'static str> {
-        let mut h = HashMap::new();
-        self.data.clone().into_iter().for_each(|v| {
-            let k: String = v.get(0)
-                .expect("No Key Provided")
-                .to_string();
-            let v: String = v.get(1)
-                .expect("No Value Provided")
-                .to_string();
-            h.insert(k, v);
-        });
-        debug!("Transformed VecOfVec {:?} into Map {:?}", self.data, h);
-        Ok(h)
-    }
-}
-
 pub struct QueryRoot;
 
 graphql_object!(QueryRoot: () |&self| {
@@ -105,19 +78,19 @@ graphql_object!(QueryRoot: () |&self| {
             Ok(UserGroup::get_usergroup(group_id, user_id))
         )
     }
-    field get_lachose(token: String, name: String, user_id: String) -> FieldResult<Option<LaChose>> {
+    field get_ThingOutput(token: String, name: String, user_id: String) -> FieldResult<Option<ThingOutput>> {
         secured!(
             token,
             user_id.clone(),
-            Ok(LaChose::get_lachose(name, user_id))
+            Ok(ThingOutput::get_ThingOutput(name, user_id))
         )
     }
 
-    field get_les_choses(token: String, user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<LaChose>>> {
+    field get_les_choses(token: String, user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<ThingOutput>>> {
         secured!(
             token,
             user_id.clone(),
-            Ok(LaChose::get_les_choses(user_id, names))
+            Ok(ThingOutput::get_les_choses(user_id, names))
         )
     }
 
@@ -159,7 +132,7 @@ graphql_object!(MutationRoot: () |&self| {
             Ok(Some(create_complete_user(user_id, email, username, password)))
         )
     }
-    field create_complete_thing(token: String, thing: GThing) -> FieldResult<Option<String>> {
+    field create_complete_thing(token: String, thing: ThingInput) -> FieldResult<Option<String>> {
         let data: HashMap<String, String> = thing.data_as_hashmap()?;
         secured!(
             token,
