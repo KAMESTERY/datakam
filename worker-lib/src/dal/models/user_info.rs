@@ -32,7 +32,7 @@ pub fn create_complete_user(user_id: String, email: String, username: String, pa
             String::from("")
         },
         None => {
-            let password_hash = sec::hash_password(password);
+            let password_hash = sec::hash_password(user_id.clone(), password);
             User::create_user(
                 user_id.clone(),
                 email,

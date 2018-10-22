@@ -46,7 +46,7 @@ publish-website: deploy
 	@echo "Completed Publishing [$(WEBSITE)] to Production! :-)"
 
 deploy-functions: deploy
-	cd $(BASEDIR)/$(RUSTY_WORKER)/ && up -v
+	cd $(BASEDIR)/$(RUSTY_WORKER)/ && up data_dev -v
 
 #build-lambda: deps-deploy prod-build-worker-rusty package-lambda
 build-lambda: deps-deploy package-lambda

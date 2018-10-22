@@ -21,9 +21,9 @@ pub fn get_claims(token: String) -> Option<UserAuthData> {
 
 // Login
 pub fn login(user_id: String, email: String, password: String) -> Option<String> {
-    let user = User::get_user(user_id, email)?;
+    let user = User::get_user(user_id.clone(), email)?;
     let password_hash = user.clone().password_hash?;
-    check_password(password_hash, password).ok()?;
+    check_password(user_id, password_hash, password).ok()?;
     let token = jwt_encode(user.to_auth_data())?;
     Some(token)
 }

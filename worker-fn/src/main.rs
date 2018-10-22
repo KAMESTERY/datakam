@@ -43,7 +43,7 @@ fn index(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
         .body("Hello from WorkerFn!"))
 }
 
-fn graphiql(req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
+fn graphiql(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
 //    let port: &String = &req.state().port;
 //    let html = graphiql_source(&format!("http://localhost:{}/graphql", port));
     let html = graphiql_source("/graphql");

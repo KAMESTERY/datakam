@@ -20,12 +20,13 @@ static PUBLIC_KEY_DER: &'static [u8] = include_bytes!("public_key.der");
 //    debug!("Public Key Der {:?}", PRIVATE_KEY_DER);
 //    debug!("Private KeyL {:#?}", PRIVATE_KEY_DER); // Pretty Print it!!
 
-pub fn hash_password(password: String) -> String {
+pub fn hash_password(tlas: String, password: String) -> String {
 
     let mut pbkdf2_hash = [0u8; CREDENTIAL_LEN];
+    let seasalt = tlas.chars().rev().collect::<String>();
 
     // Create salted password
-    pbkdf2::derive(DIGEST_ALG, N_ITER, PRIVATE_KEY_DER, password.as_bytes(),
+    pbkdf2::derive(DIGEST_ALG, N_ITER, seasalt.as_bytes(), password.as_bytes(),
                    &mut pbkdf2_hash);
 
     let hashed_password = HEXUPPER.encode(&pbkdf2_hash);
@@ -33,13 +34,15 @@ pub fn hash_password(password: String) -> String {
     hashed_password
 }
 
-pub fn check_password(hashed_password: String, password: String) -> Result<bool, &'static str> {
+pub fn check_password(tlas: String, hashed_password: String, password: String) -> Result<bool, &'static str> {
+
+    let seasalt = tlas.chars().rev().collect::<String>();
 
     // verify the hash
     let res = pbkdf2::verify(
         DIGEST_ALG,
         N_ITER,
-        PRIVATE_KEY_DER,
+        seasalt.as_bytes(),
         password.as_bytes(),
         &HEXUPPER.decode(hashed_password.as_bytes()).unwrap()
     );
@@ -49,9 +52,9 @@ pub fn check_password(hashed_password: String, password: String) -> Result<bool,
             debug!("Verified password!");
             Ok(true)
         },
-        _ => {
+        Err(check_err) => {
             let err = "Failed to verfiy password";
-            debug!("PASSWORD_CHECK_ERROR {}", err);
+            debug!("PASSWORD_CHECK_ERROR {}", check_err);
             Err(err)
         }
     }
@@ -86,15 +89,17 @@ mod tests {
     #[test]
     fn hash_check() {
         println!("--------- Get Secret Words ----------------");
+        let pinksalt = "itstablesalt".to_string();
         let secret_words = String::from("haha, this is secret");
         println!("Secret {}", secret_words);
 
         println!("--------- Hash Secret Words ----------------");
-        let hashed_secret = hash_password(secret_words.clone());
+        let hashed_secret = hash_password(pinksalt.clone(),secret_words.clone());
         println!("Hashed Secret {}", hashed_secret);
 
         println!("--------- Check Secret Words ----------------");
         let right_secret = check_password(
+            pinksalt,
             hashed_secret,
             secret_words
         );
