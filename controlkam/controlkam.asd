@@ -11,6 +11,7 @@
                :cl-json
                :lucerne
                :eco
+               :clack-middleware-csrf
                :lparallel
                :dyna
                :zs3
@@ -26,12 +27,15 @@
                 ((:eco-template "header")
                  (:eco-template "footer")
                  (:eco-template "home")
+                 (:eco-template "login")
                  (:eco-template "layout")))
                (:module "src"
                 :components
                 ((:file "package")
                  (:file "os")
+                 (:file "auth")
                  (:file "templating")
+                 (:file "publicviews")
                  (:file "controlkam"))))
   :description ""
   :long-description

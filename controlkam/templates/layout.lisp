@@ -54,6 +54,11 @@
                     <input class=\"form-control mr-sm-2\" type=\"search\" placeholder=\"Search\" aria-label=\"Search\">
                     <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Search</button>
                 </form>
+                <ul class=\"navbar-nav mr-auto\">
+                    <li class=\"nav-item\">
+                        <a class=\"nav-link\" href=\"/user/login\">Login</a>
+                    </li>
+                </ul>
             </div>
         </nav>
         <main role=\"main\">
@@ -67,7 +72,7 @@
                            (WRITE-STRING "
         </main><!-- /.container -->
         <footer class=\"container\">
-          <p>&copy; Company 2017-2018</p>
+          <p class=\"mt-5 mb-3 text-muted\">&copy; ControlKam 2017-2018</p>
         </footer>
     </body>
 
