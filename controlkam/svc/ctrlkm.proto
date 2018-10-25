@@ -1,0 +1,24 @@
+
+syntax = "proto3";
+
+package ctrlkm;
+
+// The ControlKam Service Definition.
+service ControlKam {
+    // Sends a greeting
+    rpc Login (UserCredentials) returns (AuthClaims) {}
+}
+
+// The login request message containing the user's credentials
+message UserCredentials {
+    string email = 1;
+    string password = 2;
+}
+
+// The response message containing the user's authentication claims
+message AuthClaims {
+    string token = 1;
+    string userid = 2;
+	string email = 3;
+	int64 role = 4;
+}
