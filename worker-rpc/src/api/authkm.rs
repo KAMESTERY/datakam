@@ -230,7 +230,7 @@ impl ::protobuf::reflect::ProtobufValue for UserCredentialsReq {
 pub struct AuthClaimsResp {
     // message fields
     pub token: ::std::string::String,
-    pub userid: ::std::string::String,
+    pub user_id: ::std::string::String,
     pub email: ::std::string::String,
     pub role: i32,
     // special fields
@@ -269,30 +269,30 @@ impl AuthClaimsResp {
         &self.token
     }
 
-    // string userid = 2;
+    // string user_id = 2;
 
-    pub fn clear_userid(&mut self) {
-        self.userid.clear();
+    pub fn clear_user_id(&mut self) {
+        self.user_id.clear();
     }
 
     // Param is passed by value, moved
-    pub fn set_userid(&mut self, v: ::std::string::String) {
-        self.userid = v;
+    pub fn set_user_id(&mut self, v: ::std::string::String) {
+        self.user_id = v;
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_userid(&mut self) -> &mut ::std::string::String {
-        &mut self.userid
+    pub fn mut_user_id(&mut self) -> &mut ::std::string::String {
+        &mut self.user_id
     }
 
     // Take field
-    pub fn take_userid(&mut self) -> ::std::string::String {
-        ::std::mem::replace(&mut self.userid, ::std::string::String::new())
+    pub fn take_user_id(&mut self) -> ::std::string::String {
+        ::std::mem::replace(&mut self.user_id, ::std::string::String::new())
     }
 
-    pub fn get_userid(&self) -> &str {
-        &self.userid
+    pub fn get_user_id(&self) -> &str {
+        &self.user_id
     }
 
     // string email = 3;
@@ -350,7 +350,7 @@ impl ::protobuf::Message for AuthClaimsResp {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.token)?;
                 },
                 2 => {
-                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.userid)?;
+                    ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.user_id)?;
                 },
                 3 => {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.email)?;
@@ -377,8 +377,8 @@ impl ::protobuf::Message for AuthClaimsResp {
         if !self.token.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.token);
         }
-        if !self.userid.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.userid);
+        if !self.user_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.user_id);
         }
         if !self.email.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.email);
@@ -395,8 +395,8 @@ impl ::protobuf::Message for AuthClaimsResp {
         if !self.token.is_empty() {
             os.write_string(1, &self.token)?;
         }
-        if !self.userid.is_empty() {
-            os.write_string(2, &self.userid)?;
+        if !self.user_id.is_empty() {
+            os.write_string(2, &self.user_id)?;
         }
         if !self.email.is_empty() {
             os.write_string(3, &self.email)?;
@@ -452,9 +452,9 @@ impl ::protobuf::Message for AuthClaimsResp {
                     |m: &mut AuthClaimsResp| { &mut m.token },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
-                    "userid",
-                    |m: &AuthClaimsResp| { &m.userid },
-                    |m: &mut AuthClaimsResp| { &mut m.userid },
+                    "user_id",
+                    |m: &AuthClaimsResp| { &m.user_id },
+                    |m: &mut AuthClaimsResp| { &mut m.user_id },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
                     "email",
@@ -489,7 +489,7 @@ impl ::protobuf::Message for AuthClaimsResp {
 impl ::protobuf::Clear for AuthClaimsResp {
     fn clear(&mut self) {
         self.clear_token();
-        self.clear_userid();
+        self.clear_user_id();
         self.clear_email();
         self.clear_role();
         self.unknown_fields.clear();
@@ -956,9 +956,9 @@ impl ::protobuf::reflect::ProtobufValue for EnrollStatusResp {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x10svc/authkm.proto\x12\x06authkm\"F\n\x12UserCredentialsReq\x12\x14\
     \n\x05email\x18\x01\x20\x01(\tR\x05email\x12\x1a\n\x08password\x18\x02\
-    \x20\x01(\tR\x08password\"h\n\x0eAuthClaimsResp\x12\x14\n\x05token\x18\
-    \x01\x20\x01(\tR\x05token\x12\x16\n\x06userid\x18\x02\x20\x01(\tR\x06use\
-    rid\x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05email\x12\x12\n\x04role\
+    \x20\x01(\tR\x08password\"i\n\x0eAuthClaimsResp\x12\x14\n\x05token\x18\
+    \x01\x20\x01(\tR\x05token\x12\x17\n\x07user_id\x18\x02\x20\x01(\tR\x06us\
+    erId\x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05email\x12\x12\n\x04role\
     \x18\x04\x20\x01(\x05R\x04role\"]\n\rUserEnrollReq\x12\x1a\n\x08username\
     \x18\x01\x20\x01(\tR\x08username\x12\x14\n\x05email\x18\x02\x20\x01(\tR\
     \x05email\x12\x1a\n\x08password\x18\x03\x20\x01(\tR\x08password\"F\n\x10\

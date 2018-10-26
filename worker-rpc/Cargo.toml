@@ -8,11 +8,15 @@ worker-lib = { path = "../worker-lib" }
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug"] }
 #log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 env_logger = "0.5"
+openssl-probe = "0.1"
 # RPC
-protobuf        = "~2"
-futures         = "~0.1"
-futures-cpupool = "~0.1"
+protobuf        = "2"
+futures         = "0.1"
+futures-cpupool = "0.1"
+num_cpus = "1.0"
 grpc = "0.6.0"
+tls-api            = "0.1"
+tls-api-native-tls = "0.1"
 
 [build-dependencies]
 protoc-rust-grpc = "0.6.0"
