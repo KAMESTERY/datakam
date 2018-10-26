@@ -31,9 +31,9 @@ extern crate core;
 #[macro_use]
 mod macros;
 mod schema;
-mod dal;
+pub mod dal;
 mod security;
-mod authentication;
+pub mod authentication;
 mod validation;
 
 //use wasm_bindgen::prelude::*;

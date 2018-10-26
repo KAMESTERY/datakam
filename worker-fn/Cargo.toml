@@ -5,7 +5,7 @@ authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
 
 [dependencies]
 worker-lib = { path = "../worker-lib" }
-aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda", features = ["string-null-empty"] }
+#aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda", features = ["string-null-empty"] }
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug"] }
 #log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 env_logger = "0.5"

@@ -78,11 +78,11 @@ graphql_object!(QueryRoot: () |&self| {
             Ok(UserGroup::get_usergroup(group_id, user_id))
         )
     }
-    field get_ThingOutput(token: String, name: String, user_id: String) -> FieldResult<Option<ThingOutput>> {
+    field get_thing_output(token: String, name: String, user_id: String) -> FieldResult<Option<ThingOutput>> {
         secured!(
             token,
             user_id.clone(),
-            Ok(ThingOutput::get_ThingOutput(name, user_id))
+            Ok(ThingOutput::get_thing_output(name, user_id))
         )
     }
 

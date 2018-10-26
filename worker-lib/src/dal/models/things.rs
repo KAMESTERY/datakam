@@ -63,7 +63,7 @@ impl ThingOutput {
         Some(list_of_choses)
     }
 
-    pub fn get_ThingOutput(name: String, user_id: String) -> Option<ThingOutput> {
+    pub fn get_thing_output(name: String, user_id: String) -> Option<ThingOutput> {
         let thing = Thing::get_thing(name, user_id)?;
         let data_ids = thing.clone().data_ids?;
         let keys = data_ids.into_iter().map(|id| {
