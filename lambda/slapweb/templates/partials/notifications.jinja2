@@ -1,7 +1,0 @@
-
-{% for notification in request.session.pop_flash() %}
-    <div class="notification has-text-centered">
-        <button class="delete"></button>
-        {{ notification }}
-    </div>
-{% endfor %}

@@ -1,5 +1,0 @@
-# Controlkam
-
-## Usage
-
-## Installation

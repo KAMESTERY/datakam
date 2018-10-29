@@ -1,7 +1,0 @@
-
-<% deftemplate header (title) () %>
-
-<title><%= title %></title>
-
-<% end %>
-
