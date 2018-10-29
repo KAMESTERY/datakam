@@ -1,80 +1,37 @@
 #!/bin/bash
 
 BASEDIR=`pwd`
-ENV_NAME=SLAPENV
 unamestr=`uname`
+RUSTY_WORKER=worker-fn
+RUSTY_WORKER_RPC=worker-rpc
+RUSTY_LIBWORKEREXT=workerext
+RUSTY_WORKER_LIB=worker-lib
 
-upgrade_all_deps() {
-    pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
-}
-
-clean_all() {
-  rm -rf **/*.pyc
-}
-
-create_py3env() {
-    conda create -n $ENV_NAME python=3 -y
-}
-
-activate_env() {
-    source activate $ENV_NAME
-}
-
-install_openssl_dev() {
-    curl -O https://www.openssl.org/source/openssl-1.1.0e.tar.gz
-    tar xf openssl-1.1.0e.tar.gz
-    cd openssl-1.1.0e
-    export CC=gcc
-    ./Configure --prefix=`pwd` linux-x86_64 -fPIC
-    make -j$(nproc)
-    sudo make install
+genRsa() {
+    openssl genrsa -out $BASEDIR/$RUSTY_WORKER_LIB/src/private_rsa_key.pem 4096
+    openssl rsa -in $BASEDIR/$RUSTY_WORKER_LIB/src/private_rsa_key.pem -outform DER -out $BASEDIR/$RUSTY_WORKER_LIB/src/private_rsa_key.der
+    openssl rsa -in $BASEDIR/$RUSTY_WORKER_LIB/src/private_rsa_key.der -inform DER -RSAPublicKey_out -outform DER -out $BASEDIR/$RUSTY_WORKER_LIB/src/public_key.der
 }
 
 case $1 in
-    py3.create)
-        create_py3env
+    devops.init)
+        rm -rf .terraform
+        terraform init infrastructure
         ;;
-    py.delete)
-        conda env remove -n $ENV_NAME -y
+    gen.rsa)
+        genRsa
         ;;
-    py.activate)
-        activate_env
+    sub.update)
+        git submodule update --recursive --remote
         ;;
-    deps.upgrade)
-        activate_env
-        upgrade_all_deps
+    build.workers)
+        docker run --rm -v $BASEDIR/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v $BASEDIR:/code -w /code og-rust-lambda:latest cargo build --release
         ;;
-    deps.list)
-        activate_env
-        pip list
+    build.webkam)
+        cd $BASEDIR/webkam; make build-ui; GOOS=linux GOARCH=amd64 go build -o server *.go
         ;;
-    deps.outdated)
-        activate_env
-        pip list --outdated
-        ;;
-    deps.freeze)
-        activate_env
-        pip freeze > $2/requirements.txt
-        ;;
-    deps.install)
-        activate_env
-        pip install -r $2/requirements.txt -q --upgrade
-        ;;
-    deps.deploy)
-        if [[ "$unamestr" == 'Linux' ]]; then
-           echo 'Using Python 3...'
-           activate_env
-           pip install -r $2/requirements.txt -q -t $2/lib
-        elif [[ "$unamestr" == 'Darwin' ]]; then
-           echo 'Using Docker Python 3...'
-           docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp python:3.6 pip install -r $2/requirements.txt -q -t $2/lib
-        fi
-        ;;
-    clean)
-        clean_all
-        ;;
-    install_openssl_dev)
-        install_openssl_dev
+    deploy.function)
+        cd $2; up $3
         ;;
     dyna.tbl.create)
         aws dynamodb create-table --table-name $2 --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url $3

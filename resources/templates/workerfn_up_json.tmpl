@@ -1,0 +1,68 @@
+
+{{ define "workerfn_up_json.tmpl" }}
+{
+  "name": "worker-fn",
+  "profile": "default",
+  "regions": [
+    "us-east-1"
+  ],
+  "lambda": {
+    "memory": 1024,
+    "warm": true,
+    "warm_count": 10,
+    "warm_rate": "30m",
+    "policy": [
+      {
+        "Effect": "Allow",
+        "Resource": "*",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:BatchGetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:DescribeTable",
+          "dynamodb:DescribeLimits",
+          "dynamodb:DescribeTimeToLive",
+          "dynamodb:DescribeStream",
+          "dynamodb:ListStreams",
+          "dynamodb:TagResource",
+          "dynamodb:UntagResource",
+          "dynamodb:ListTagsOfResource",
+          "dynamodb:ListTables"
+        ]
+      },
+      {
+        "Sid": "AllowCloudFrontUpdateDistribution",
+        "Effect": "Allow",
+        "Action": [
+          "cloudfront:updateDistribution"
+        ],
+        "Resource": [
+          "*"
+        ]
+      }
+    ]
+  },
+  "stages": {
+    "data_prod": {
+      "domain": "data.kamestery.com"
+    },
+    "data_stage": {
+      "domain": "data-stage.kamestery.com"
+    },
+    "data_dev": {
+      "domain": "data-dev.kamestery.com"
+    }
+  },
+  "environment": {
+    "LAST_DEPLOYED": "{{Now "Mon, 02 Jan 2006 15:04:05 -0700"}}",
+    "RUST_LOG": "{{ .log_level }}"
+  }
+}
+{{ end }}

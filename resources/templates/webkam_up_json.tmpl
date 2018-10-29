@@ -1,0 +1,45 @@
+
+{{ define "webkam_up_json.tmpl" }}
+{
+  "name": "webkam",
+  "profile": "default",
+  "regions": [
+    "us-east-1"
+  ],
+  "lambda": {
+    "memory": 128,
+    "policy": [
+      {
+        "Sid": "AllowCloudFrontUpdateDistribution",
+        "Effect": "Allow",
+        "Action": [
+          "cloudfront:updateDistribution"
+        ],
+        "Resource": [
+          "*"
+        ]
+      }
+    ]
+  },
+  "stages": {
+    "prod": {
+      "domain": "kamestery.com"
+    },
+    "stage": {
+      "domain": "stage.kamestery.com"
+    },
+    "dev": {
+      "domain": "dev.kamestery.com"
+    }
+  },
+  "environment": {
+    "LAST_DEPLOYED": "{{Now "Mon, 02 Jan 2006 15:04:05 -0700"}}",
+    "LOG_LEVEL": "{{ .log_level }}{{with .backend_key }}",
+    "BACKEND": "https://{{ . }}.kamestery.com"
+    {{ end }}
+  },
+  "error_pages": {
+    "disable": true
+  }
+}
+{{ end }}

@@ -1,0 +1,3 @@
+[submodule "webkam"]
+	path = webkam
+	url = https://github.com/KAMESTERY/webkam.git
