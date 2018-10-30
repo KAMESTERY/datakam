@@ -21,32 +21,50 @@
 
 // interface
 
-pub trait AuthKam {
+pub trait ContentKam {
     fn create(&self, o: ::grpc::RequestOptions, p: super::contentkm::Content) -> ::grpc::SingleResponse<super::contentkm::ContentHandles>;
 
     fn update(&self, o: ::grpc::RequestOptions, p: super::contentkm::Content) -> ::grpc::SingleResponse<super::contentkm::ContentHandles>;
+
+    fn get(&self, o: ::grpc::RequestOptions, p: super::contentkm::ContentHandles) -> ::grpc::SingleResponse<super::contentkm::Content>;
+
+    fn delete(&self, o: ::grpc::RequestOptions, p: super::contentkm::ContentHandles) -> ::grpc::SingleResponse<super::contentkm::ContentHandles>;
 }
 
 // client
 
-pub struct AuthKamClient {
+pub struct ContentKamClient {
     grpc_client: ::std::sync::Arc<::grpc::Client>,
     method_Create: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::contentkm::Content, super::contentkm::ContentHandles>>,
     method_Update: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::contentkm::Content, super::contentkm::ContentHandles>>,
+    method_Get: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::contentkm::ContentHandles, super::contentkm::Content>>,
+    method_Delete: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::contentkm::ContentHandles, super::contentkm::ContentHandles>>,
 }
 
-impl ::grpc::ClientStub for AuthKamClient {
+impl ::grpc::ClientStub for ContentKamClient {
     fn with_client(grpc_client: ::std::sync::Arc<::grpc::Client>) -> Self {
-        AuthKamClient {
+        ContentKamClient {
             grpc_client: grpc_client,
             method_Create: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                name: "/contentkm.AuthKam/Create".to_string(),
+                name: "/grpc.ContentKam/Create".to_string(),
                 streaming: ::grpc::rt::GrpcStreaming::Unary,
                 req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                 resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
             }),
             method_Update: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                name: "/contentkm.AuthKam/Update".to_string(),
+                name: "/grpc.ContentKam/Update".to_string(),
+                streaming: ::grpc::rt::GrpcStreaming::Unary,
+                req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+            }),
+            method_Get: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                name: "/grpc.ContentKam/Get".to_string(),
+                streaming: ::grpc::rt::GrpcStreaming::Unary,
+                req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+            }),
+            method_Delete: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                name: "/grpc.ContentKam/Delete".to_string(),
                 streaming: ::grpc::rt::GrpcStreaming::Unary,
                 req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                 resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -55,7 +73,7 @@ impl ::grpc::ClientStub for AuthKamClient {
     }
 }
 
-impl AuthKam for AuthKamClient {
+impl ContentKam for ContentKamClient {
     fn create(&self, o: ::grpc::RequestOptions, p: super::contentkm::Content) -> ::grpc::SingleResponse<super::contentkm::ContentHandles> {
         self.grpc_client.call_unary(o, p, self.method_Create.clone())
     }
@@ -63,21 +81,29 @@ impl AuthKam for AuthKamClient {
     fn update(&self, o: ::grpc::RequestOptions, p: super::contentkm::Content) -> ::grpc::SingleResponse<super::contentkm::ContentHandles> {
         self.grpc_client.call_unary(o, p, self.method_Update.clone())
     }
+
+    fn get(&self, o: ::grpc::RequestOptions, p: super::contentkm::ContentHandles) -> ::grpc::SingleResponse<super::contentkm::Content> {
+        self.grpc_client.call_unary(o, p, self.method_Get.clone())
+    }
+
+    fn delete(&self, o: ::grpc::RequestOptions, p: super::contentkm::ContentHandles) -> ::grpc::SingleResponse<super::contentkm::ContentHandles> {
+        self.grpc_client.call_unary(o, p, self.method_Delete.clone())
+    }
 }
 
 // server
 
-pub struct AuthKamServer;
+pub struct ContentKamServer;
 
 
-impl AuthKamServer {
-    pub fn new_service_def<H : AuthKam + 'static + Sync + Send + 'static>(handler: H) -> ::grpc::rt::ServerServiceDefinition {
+impl ContentKamServer {
+    pub fn new_service_def<H : ContentKam + 'static + Sync + Send + 'static>(handler: H) -> ::grpc::rt::ServerServiceDefinition {
         let handler_arc = ::std::sync::Arc::new(handler);
-        ::grpc::rt::ServerServiceDefinition::new("/contentkm.AuthKam",
+        ::grpc::rt::ServerServiceDefinition::new("/grpc.ContentKam",
             vec![
                 ::grpc::rt::ServerMethod::new(
                     ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                        name: "/contentkm.AuthKam/Create".to_string(),
+                        name: "/grpc.ContentKam/Create".to_string(),
                         streaming: ::grpc::rt::GrpcStreaming::Unary,
                         req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                         resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -89,7 +115,7 @@ impl AuthKamServer {
                 ),
                 ::grpc::rt::ServerMethod::new(
                     ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                        name: "/contentkm.AuthKam/Update".to_string(),
+                        name: "/grpc.ContentKam/Update".to_string(),
                         streaming: ::grpc::rt::GrpcStreaming::Unary,
                         req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                         resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -97,6 +123,30 @@ impl AuthKamServer {
                     {
                         let handler_copy = handler_arc.clone();
                         ::grpc::rt::MethodHandlerUnary::new(move |o, p| handler_copy.update(o, p))
+                    },
+                ),
+                ::grpc::rt::ServerMethod::new(
+                    ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                        name: "/grpc.ContentKam/Get".to_string(),
+                        streaming: ::grpc::rt::GrpcStreaming::Unary,
+                        req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                        resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                    }),
+                    {
+                        let handler_copy = handler_arc.clone();
+                        ::grpc::rt::MethodHandlerUnary::new(move |o, p| handler_copy.get(o, p))
+                    },
+                ),
+                ::grpc::rt::ServerMethod::new(
+                    ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                        name: "/grpc.ContentKam/Delete".to_string(),
+                        streaming: ::grpc::rt::GrpcStreaming::Unary,
+                        req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                        resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                    }),
+                    {
+                        let handler_copy = handler_arc.clone();
+                        ::grpc::rt::MethodHandlerUnary::new(move |o, p| handler_copy.delete(o, p))
                     },
                 ),
             ],

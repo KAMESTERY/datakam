@@ -49,13 +49,17 @@ graphql_object!(QueryRoot: () |&self| {
     field greet(&executor, name: String) -> FieldResult<String> {
         Ok(format!("Hello {}", name))
     }
-    field get_claims(token: String) -> FieldResult<Option<UserAuthData>> {
-        let user_auth_data = auth::get_claims(token);
+//    field get_claims(token: String) -> FieldResult<Option<UserAuthData>> {
+//        let user_auth_data = auth::get_claims(token);
+//        Ok(user_auth_data)
+//    }
+//    field login(user_id: String, email: String, password: String) -> FieldResult<Option<String>> {
+//        let token = auth::login(user_id, email, password);
+//        Ok(token)
+//    }
+    field authenticate(user_id: String, email: String, password: String) -> FieldResult<Option<UserAuthData>> {
+        let user_auth_data = auth::authenticate(user_id, email, password);
         Ok(user_auth_data)
-    }
-    field login(user_id: String, email: String, password: String) -> FieldResult<Option<String>> {
-        let token = auth::login(user_id, email, password);
-        Ok(token)
     }
     field get_user(token: String, user_id: String, email: String) -> FieldResult<Option<User>> {
         secured!(
@@ -120,8 +124,8 @@ graphql_object!(MutationRoot: () |&self| {
             home_planet: new_human.home_planet,
         })
     }
-    field register(user_id: String, email: String, username: String, password: String) -> FieldResult<String> {
-        Ok(auth::register(user_id, email, username, password))
+    field enroll(user_id: String, email: String, username: String, password: String) -> FieldResult<String> {
+        Ok(auth::enroll(user_id, email, username, password))
     }
     field create_complete_user(token: String, user_id: String, email: String, username: String, password: String) -> FieldResult<Option<String>> {
         secured!(

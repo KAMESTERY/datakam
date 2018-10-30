@@ -10,6 +10,31 @@
     "memory": 128,
     "policy": [
       {
+        "Effect": "Allow",
+        "Resource": "*",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:BatchGetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:DescribeTable",
+          "dynamodb:DescribeLimits",
+          "dynamodb:DescribeTimeToLive",
+          "dynamodb:DescribeStream",
+          "dynamodb:ListStreams",
+          "dynamodb:TagResource",
+          "dynamodb:UntagResource",
+          "dynamodb:ListTagsOfResource",
+          "dynamodb:ListTables"
+        ]
+      },
+      {
         "Sid": "AllowCloudFrontUpdateDistribution",
         "Effect": "Allow",
         "Action": [
@@ -34,8 +59,10 @@
   },
   "environment": {
     "LAST_DEPLOYED": "{{Now "Mon, 02 Jan 2006 15:04:05 -0700"}}",
-    "LOG_LEVEL": "{{ .log_level }}{{with .backend_key }}",
+    "LOG_LEVEL": "{{ .log_level }}"{{with .backend_key }},
     "BACKEND": "https://{{ . }}.kamestery.com"
+    {{ end }}{{with .rpc_backend_key}},
+    "RPC_BACKEND": "{{ . }}"
     {{ end }}
   },
   "error_pages": {

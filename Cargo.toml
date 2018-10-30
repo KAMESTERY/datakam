@@ -2,7 +2,7 @@
 [workspace]
 
 members = [
-    "worker-rpc",
+#    "worker-rpc",
     "worker-fn",
 #    "worker-ext",
     "worker-lib",

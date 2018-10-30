@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,8 +20,10 @@ import (
 // Flags
 var (
 	devopsInit         = flag.Bool("devops:init", false, "Initializes DevOps Tooling.")
-	workerBuilderImage = flag.Bool("worker:builder:image", false, "Build Worker Docker Image.")
-	deployFunctions    = flag.Bool("deploy:functions", true, "Deploy all Lambda Functions.")
+	workerBuilderImage = flag.Bool("worker:builder:images", false, "Build Worker Docker Image.")
+	prepDeploy         = flag.Bool("prep:deploy", false, "Prepare Deployment Assets.")
+	compileWorkers     = flag.Bool("compile:workers", false, "Cross Compile Workers for Lambda/Ubuntu Target Platforms.")
+	deployFunctions    = flag.Bool("deploy:functions", false, "Deploy all Lambda Functions.")
 )
 
 // Directories
@@ -51,15 +54,25 @@ func main() {
 		buildWorkerDockerImage()
 	}
 
+	if *prepDeploy {
+		deploymentAssets := baseDir + "/deployment_assets"
+		cleanupDeploymentAssets(deploymentAssets)
+		prepDeploymentAssets(deploymentAssets)
+	}
+
+	if *compileWorkers {
+		buildWorkers()
+	}
+
 	if *deployFunctions {
 		preBuild()
 		deploymentAssets := baseDir + "/deployment_assets"
 		defer cleanupDeploymentAssets(deploymentAssets)
 		prepDeploymentAssets(deploymentAssets)
-		buildWorkerDockerImage()
+		// buildWorkerDockerImage()
 		var wg sync.WaitGroup
 		wg.Add(1)
-		go buildWorkers(&wg, deploymentAssets)
+		go buildWorkersForDeploy(&wg, deploymentAssets)
 		wg.Add(1)
 		go buildWebKam(&wg, deploymentAssets)
 		wg.Wait()
@@ -82,19 +95,50 @@ func terraformInit() {
 }
 
 func buildWorkerDockerImage() {
-	log.Printf("Building Woker Docker Image")
-	cmd := exec.Command("docker", "build", "-t", "og-rust-lambda:latest", baseDir+"/infrastructure")
-	execute(cmd)
+	log.Printf("Building Worker Docker Images")
+	var wgDockerBuilder sync.WaitGroup
+	wgDockerBuilder.Add(1)
+	go func(wg *sync.WaitGroup) {
+		lambdaWorkerBuilderCmd := exec.Command("docker", "build", "-t", "og-rust-lambda:0.1", "-f", baseDir+"/infrastructure/Dockerfile.lambda", baseDir+"/infrastructure")
+		execute(lambdaWorkerBuilderCmd)
+		wg.Done()
+	}(&wgDockerBuilder)
+	// wgDockerBuilder.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	ubuntuWorkerBuildermd := exec.Command("docker", "build", "-t", "kamestery/worker_rpc:0.1", "-f", baseDir+"/infrastructure/Dockerfile.ubuntu", baseDir)
+	// 	execute(ubuntuWorkerBuildermd)
+	// 	wg.Done()
+	// }(&wgDockerBuilder)
+	wgDockerBuilder.Wait()
 }
 
-func buildWorkers(wg *sync.WaitGroup, distBase string) {
-	log.Print("Building Workers...")
-	buildWorkerCmd := exec.Command("sh", baseDir+"/cmd.sh", "build.workers")
-	execute(buildWorkerCmd)
+func buildWorkers() {
+	log.Print("Cross Compiling Workers...")
+	var wgWorker sync.WaitGroup
+	wgWorker.Add(1)
+	go func(wg *sync.WaitGroup) {
+		log.Print("Cross Compiling Lambda Workers...")
+		buildWorkerLambdaCmd := exec.Command("sh", baseDir+"/cmd.sh", "build.workers.lambda")
+		execute(buildWorkerLambdaCmd)
+		wg.Done()
+	}(&wgWorker)
+	// wgWorker.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	log.Print("Cross Compiling Ubuntu Workers...")
+	// 	buildWorkerUbuntuCmd := exec.Command("sh", baseDir+"/cmd.sh", "build.workers.ubuntu")
+	// 	execute(buildWorkerUbuntuCmd)
+	// 	wg.Done()
+	// }(&wgWorker)
+	wgWorker.Wait()
+}
+
+func buildWorkersForDeploy(wg *sync.WaitGroup, distBase string) {
+	log.Print("Building Workers for Deployment...")
+	buildWorkers()
 	publishBinaryCmd := exec.Command("cp", baseDir+"/target/release/worker-fn", distBase+"/workerfn/server")
 	execute(publishBinaryCmd)
-	publishBinaryCmd = exec.Command("cp", baseDir+"/target/release/worker-rpc", distBase+"/workerfn/worker-rpc")
-	execute(publishBinaryCmd)
+	// publishBinaryCmd = exec.Command("cp", baseDir+"/target/release/worker-rpc", distBase+"/webkam/worker-rpc")
+	// execute(publishBinaryCmd)
 	deployCmd := exec.Command("sh", baseDir+"/cmd.sh", "deploy.function", distBase+"/workerfn/", "data_dev")
 	execute(deployCmd)
 	wg.Done()
@@ -120,7 +164,7 @@ func prepDeploymentAssets(deploymentAssets string) {
 	cleanupDeploymentAssets(deploymentAssets)
 	assetsFoldersCmd := exec.Command("mkdir", "-p", deploymentAssets+"/workerfn")
 	execute(assetsFoldersCmd)
-	assetsFoldersCmd = exec.Command("mkdir", deploymentAssets+"/webkam")
+	assetsFoldersCmd = exec.Command("mkdir", "-p", deploymentAssets+"/webkam")
 	execute(assetsFoldersCmd)
 	cargoFolderCmd := exec.Command("mkdir", "-p", baseDir+"/cargo")
 	execute(cargoFolderCmd)
@@ -136,8 +180,9 @@ func prepDeploymentAssets(deploymentAssets string) {
 	upWebkam := renderTmpl(
 		"webkam_up_json.tmpl",
 		map[string]string{
-			"log_level":   "DEBUG",
-			"backend_key": "data-dev",
+			"log_level":       "DEBUG",
+			"backend_key":     "data-dev",
+			"rpc_backend_key": "35.175.245.161:80",
 		},
 	)
 	writeFile(deploymentAssets+"/webkam/up.json", upWebkam)
@@ -150,10 +195,25 @@ func cleanupDeploymentAssets(deploymentAssets string) {
 
 func execute(cmd *exec.Cmd) {
 	log.Print("......................................................................")
-	var buf bytes.Buffer
-	cmd.Stderr = &buf
-	if err := cmd.Run(); err != nil {
-		log.Fatal(fmt.Errorf("ERROR:::: %v, %v", err, buf.String()))
+	stdout, err := cmd.StdoutPipe()
+	checkError(err)
+	stderr, err := cmd.StderrPipe()
+	checkError(err)
+
+	// Start command
+	err = cmd.Start()
+	checkError(err)
+
+	defer cmd.Wait() // Doesn't block
+
+	// Non-blockingly echo command output to terminal
+	go io.Copy(os.Stdout, stdout)
+	go io.Copy(os.Stderr, stderr)
+}
+
+func checkError(err error) {
+	if err != nil {
+		log.Fatalf("ERROR:::: %+v", err)
 	}
 }
 

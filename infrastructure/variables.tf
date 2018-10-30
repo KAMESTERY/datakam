@@ -26,3 +26,32 @@ variable "burst_limit" {
 variable "rate_limit" {
   default = 10
 }
+
+###### VPS Variables
+
+## Docker
+variable "docker_compose_version" {
+  default = "1.23.1"
+}
+
+## Lightsail Master Instance
+variable "lightsail_master_bundle_id" {
+  default = "nano_1_0"
+}
+
+variable "lightsail_master_blueprint_id" {
+  default = "ubuntu_18_04"
+}
+
+## Lightsail Worker Instances
+variable "lightsail_worker_count" {
+  default = 3
+}
+
+variable "lightsail_worker_bundle_id" {
+  default = "nano_1_0"
+}
+
+variable "lightsail_worker_blueprint_id" {
+  default = "ubuntu_18_04"
+}

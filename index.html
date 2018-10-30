@@ -38,8 +38,8 @@
       copy them directly into your environment, or perhaps include them in your
       favored resource bundler.
      -->
-    <link rel="stylesheet" href="./node_modules/graphiql/graphiql.css" />
-    <script src="./node_modules/graphiql/graphiql.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.js"></script>
 
   </head>
   <body>
@@ -136,10 +136,11 @@
         // Change this to point wherever you host your GraphQL server.
         return $.post({
           // url: 'http://localhost:8088/graphql',
-          url: 'https://diaxkbqc1f.execute-api.us-east-1.amazonaws.com/staging/graphql',
+          // url: 'https://diaxkbqc1f.execute-api.us-east-1.amazonaws.com/staging/graphql',
           // url: 'https://poqjiv6lv0.execute-api.us-east-1.amazonaws.com/production/worker',
           // url: 'https://gq8unuo8h0.execute-api.us-east-1.amazonaws.com/production/slapalicious',
           // url: 'http://localhost:1112/api/graphql',
+          url: 'https://data-dev.kamestery.com/graphql',
           data: JSON.stringify(graphQLParams),
           contentType: 'application/json'
         }).done(function(response) {

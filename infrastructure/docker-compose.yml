@@ -1,0 +1,38 @@
+
+version: '3.7'
+
+services:
+  worker_rpc_proxy:
+    depends_on:
+      - worker_rpc_kam
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/logs:/etc/nginx/logs
+    environment:
+    - affinity:service!=worker_rpc_kam
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+  worker_rpc_kam:
+    image: kamestery/worker_rpc:0.1
+    restart: always
+    volumes:
+      - ./.aws:/root/.aws
+    environment:
+    - affinity:service!=worker_rpc_proxy
+    deploy:
+      mode: replicated
+      replicas: 9
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]

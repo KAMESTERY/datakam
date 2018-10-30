@@ -9,6 +9,7 @@ extern crate tls_api_native_tls;
 extern crate futures;
 extern crate futures_cpupool;
 extern crate num_cpus;
+#[macro_use]
 extern crate worker_lib;
 extern crate openssl_probe;
 
@@ -21,10 +22,10 @@ mod api;
 mod services;
 
 use api::{
-    AuthKamServer
+    AuthKamServer, ContentKamServer
 };
 use services::{
-    AuthKamImpl
+    AuthKamImpl, ContentKamImpl
 };
 
 fn main() {
@@ -44,6 +45,7 @@ fn main() {
     let mut server = grpc::ServerBuilder::new_plain();
     server.http.set_port(port.clone());
     server.add_service(AuthKamServer::new_service_def(AuthKamImpl));
+    server.add_service(ContentKamServer::new_service_def(ContentKamImpl));
     server.http.set_cpu_pool_threads(thread_count);
 
     let _server = server.build().expect("server");

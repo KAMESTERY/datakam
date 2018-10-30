@@ -1,5 +1,5 @@
-resource "aws_iam_role" "iam_for_slapman" {
-  name = "iam_for_slapman"
+resource "aws_iam_role" "iam_for_kamworks" {
+  name = "iam_for_kamworks"
 
   assume_role_policy = <<EOF
 {
@@ -44,15 +44,23 @@ resource "aws_iam_role" "iam_for_slapman" {
       },
       "Effect": "Allow",
       "Sid": ""
+    },
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lightsail.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
     }
   ]
 }
 EOF
 }
 
-resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
-  name = "iam_for_slapman-added-lambda-iam-role-policy"
-  role = "${aws_iam_role.iam_for_slapman.id}"
+resource "aws_iam_role_policy" "iam_for_kamworks-added-lambda-iam-role-policy" {
+  name = "iam_for_kamworks-added-lambda-iam-role-policy"
+  role = "${aws_iam_role.iam_for_kamworks.id}"
 
   policy = <<EOF
 {
@@ -133,6 +141,12 @@ resource "aws_iam_role_policy" "iam_for_slapman-added-lambda-iam-role-policy" {
            "lambda:InvokeFunction"
       ],
        "Resource": "*"
+    },
+    {
+      "Sid": "",
+      "Action": "lightsail:*",
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }

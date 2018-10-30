@@ -36,7 +36,7 @@ impl Content {
         ::std::default::Default::default()
     }
 
-    // repeated .contentkm.Document documents = 1;
+    // repeated .grpc.Document documents = 1;
 
     pub fn clear_documents(&mut self) {
         self.documents.clear();
@@ -61,7 +61,7 @@ impl Content {
         &self.documents
     }
 
-    // repeated .contentkm.Media media_items = 2;
+    // repeated .grpc.Media media_items = 2;
 
     pub fn clear_media_items(&mut self) {
         self.media_items.clear();
@@ -243,7 +243,7 @@ impl ::protobuf::reflect::ProtobufValue for Content {
 #[derive(PartialEq,Clone,Default)]
 pub struct ContentHandles {
     // message fields
-    pub document_ids: ::protobuf::RepeatedField<Identification>,
+    pub item_ids: ::protobuf::RepeatedField<Identification>,
     pub message: ::std::string::String,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -255,29 +255,29 @@ impl ContentHandles {
         ::std::default::Default::default()
     }
 
-    // repeated .contentkm.Identification document_ids = 1;
+    // repeated .grpc.Identification item_ids = 1;
 
-    pub fn clear_document_ids(&mut self) {
-        self.document_ids.clear();
+    pub fn clear_item_ids(&mut self) {
+        self.item_ids.clear();
     }
 
     // Param is passed by value, moved
-    pub fn set_document_ids(&mut self, v: ::protobuf::RepeatedField<Identification>) {
-        self.document_ids = v;
+    pub fn set_item_ids(&mut self, v: ::protobuf::RepeatedField<Identification>) {
+        self.item_ids = v;
     }
 
     // Mutable pointer to the field.
-    pub fn mut_document_ids(&mut self) -> &mut ::protobuf::RepeatedField<Identification> {
-        &mut self.document_ids
+    pub fn mut_item_ids(&mut self) -> &mut ::protobuf::RepeatedField<Identification> {
+        &mut self.item_ids
     }
 
     // Take field
-    pub fn take_document_ids(&mut self) -> ::protobuf::RepeatedField<Identification> {
-        ::std::mem::replace(&mut self.document_ids, ::protobuf::RepeatedField::new())
+    pub fn take_item_ids(&mut self) -> ::protobuf::RepeatedField<Identification> {
+        ::std::mem::replace(&mut self.item_ids, ::protobuf::RepeatedField::new())
     }
 
-    pub fn get_document_ids(&self) -> &[Identification] {
-        &self.document_ids
+    pub fn get_item_ids(&self) -> &[Identification] {
+        &self.item_ids
     }
 
     // string message = 2;
@@ -309,7 +309,7 @@ impl ContentHandles {
 
 impl ::protobuf::Message for ContentHandles {
     fn is_initialized(&self) -> bool {
-        for v in &self.document_ids {
+        for v in &self.item_ids {
             if !v.is_initialized() {
                 return false;
             }
@@ -322,7 +322,7 @@ impl ::protobuf::Message for ContentHandles {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.document_ids)?;
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.item_ids)?;
                 },
                 2 => {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.message)?;
@@ -339,7 +339,7 @@ impl ::protobuf::Message for ContentHandles {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        for value in &self.document_ids {
+        for value in &self.item_ids {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
@@ -352,7 +352,7 @@ impl ::protobuf::Message for ContentHandles {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
-        for v in &self.document_ids {
+        for v in &self.item_ids {
             os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
@@ -403,9 +403,9 @@ impl ::protobuf::Message for ContentHandles {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
                 fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Identification>>(
-                    "document_ids",
-                    |m: &ContentHandles| { &m.document_ids },
-                    |m: &mut ContentHandles| { &mut m.document_ids },
+                    "item_ids",
+                    |m: &ContentHandles| { &m.item_ids },
+                    |m: &mut ContentHandles| { &mut m.item_ids },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
                     "message",
@@ -434,7 +434,7 @@ impl ::protobuf::Message for ContentHandles {
 
 impl ::protobuf::Clear for ContentHandles {
     fn clear(&mut self) {
-        self.clear_document_ids();
+        self.clear_item_ids();
         self.clear_message();
         self.unknown_fields.clear();
     }
@@ -459,9 +459,9 @@ pub struct Document {
     pub slug: ::std::string::String,
     pub publish: bool,
     pub body: ::std::string::String,
-    pub language: Document_Language,
-    pub importance: Document_Importance,
-    pub media_filter: Document_MediaFilter,
+    pub langue: Document_Langue,
+    pub niveau: Document_Niveau,
+    pub filtre_visuel: Document_FiltreVisuel,
     pub metadata: ::protobuf::SingularPtrField<MetaData>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -566,52 +566,52 @@ impl Document {
         &self.body
     }
 
-    // .contentkm.Document.Language language = 5;
+    // .grpc.Document.Langue langue = 5;
 
-    pub fn clear_language(&mut self) {
-        self.language = Document_Language::ENGLISH;
+    pub fn clear_langue(&mut self) {
+        self.langue = Document_Langue::ENGLISH;
     }
 
     // Param is passed by value, moved
-    pub fn set_language(&mut self, v: Document_Language) {
-        self.language = v;
+    pub fn set_langue(&mut self, v: Document_Langue) {
+        self.langue = v;
     }
 
-    pub fn get_language(&self) -> Document_Language {
-        self.language
+    pub fn get_langue(&self) -> Document_Langue {
+        self.langue
     }
 
-    // .contentkm.Document.Importance importance = 6;
+    // .grpc.Document.Niveau niveau = 6;
 
-    pub fn clear_importance(&mut self) {
-        self.importance = Document_Importance::LOW;
-    }
-
-    // Param is passed by value, moved
-    pub fn set_importance(&mut self, v: Document_Importance) {
-        self.importance = v;
-    }
-
-    pub fn get_importance(&self) -> Document_Importance {
-        self.importance
-    }
-
-    // .contentkm.Document.MediaFilter media_filter = 7;
-
-    pub fn clear_media_filter(&mut self) {
-        self.media_filter = Document_MediaFilter::IG_WILLOW;
+    pub fn clear_niveau(&mut self) {
+        self.niveau = Document_Niveau::LOW;
     }
 
     // Param is passed by value, moved
-    pub fn set_media_filter(&mut self, v: Document_MediaFilter) {
-        self.media_filter = v;
+    pub fn set_niveau(&mut self, v: Document_Niveau) {
+        self.niveau = v;
     }
 
-    pub fn get_media_filter(&self) -> Document_MediaFilter {
-        self.media_filter
+    pub fn get_niveau(&self) -> Document_Niveau {
+        self.niveau
     }
 
-    // .contentkm.MetaData metadata = 8;
+    // .grpc.Document.FiltreVisuel filtre_visuel = 7;
+
+    pub fn clear_filtre_visuel(&mut self) {
+        self.filtre_visuel = Document_FiltreVisuel::IG_WILLOW;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_filtre_visuel(&mut self, v: Document_FiltreVisuel) {
+        self.filtre_visuel = v;
+    }
+
+    pub fn get_filtre_visuel(&self) -> Document_FiltreVisuel {
+        self.filtre_visuel
+    }
+
+    // .grpc.MetaData metadata = 8;
 
     pub fn clear_metadata(&mut self) {
         self.metadata.clear();
@@ -676,13 +676,13 @@ impl ::protobuf::Message for Document {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.body)?;
                 },
                 5 => {
-                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.language, 5, &mut self.unknown_fields)?
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.langue, 5, &mut self.unknown_fields)?
                 },
                 6 => {
-                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.importance, 6, &mut self.unknown_fields)?
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.niveau, 6, &mut self.unknown_fields)?
                 },
                 7 => {
-                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.media_filter, 7, &mut self.unknown_fields)?
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.filtre_visuel, 7, &mut self.unknown_fields)?
                 },
                 8 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.metadata)?;
@@ -711,14 +711,14 @@ impl ::protobuf::Message for Document {
         if !self.body.is_empty() {
             my_size += ::protobuf::rt::string_size(4, &self.body);
         }
-        if self.language != Document_Language::ENGLISH {
-            my_size += ::protobuf::rt::enum_size(5, self.language);
+        if self.langue != Document_Langue::ENGLISH {
+            my_size += ::protobuf::rt::enum_size(5, self.langue);
         }
-        if self.importance != Document_Importance::LOW {
-            my_size += ::protobuf::rt::enum_size(6, self.importance);
+        if self.niveau != Document_Niveau::LOW {
+            my_size += ::protobuf::rt::enum_size(6, self.niveau);
         }
-        if self.media_filter != Document_MediaFilter::IG_WILLOW {
-            my_size += ::protobuf::rt::enum_size(7, self.media_filter);
+        if self.filtre_visuel != Document_FiltreVisuel::IG_WILLOW {
+            my_size += ::protobuf::rt::enum_size(7, self.filtre_visuel);
         }
         if let Some(ref v) = self.metadata.as_ref() {
             let len = v.compute_size();
@@ -742,14 +742,14 @@ impl ::protobuf::Message for Document {
         if !self.body.is_empty() {
             os.write_string(4, &self.body)?;
         }
-        if self.language != Document_Language::ENGLISH {
-            os.write_enum(5, self.language.value())?;
+        if self.langue != Document_Langue::ENGLISH {
+            os.write_enum(5, self.langue.value())?;
         }
-        if self.importance != Document_Importance::LOW {
-            os.write_enum(6, self.importance.value())?;
+        if self.niveau != Document_Niveau::LOW {
+            os.write_enum(6, self.niveau.value())?;
         }
-        if self.media_filter != Document_MediaFilter::IG_WILLOW {
-            os.write_enum(7, self.media_filter.value())?;
+        if self.filtre_visuel != Document_FiltreVisuel::IG_WILLOW {
+            os.write_enum(7, self.filtre_visuel.value())?;
         }
         if let Some(ref v) = self.metadata.as_ref() {
             os.write_tag(8, ::protobuf::wire_format::WireTypeLengthDelimited)?;
@@ -818,20 +818,20 @@ impl ::protobuf::Message for Document {
                     |m: &Document| { &m.body },
                     |m: &mut Document| { &mut m.body },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_Language>>(
-                    "language",
-                    |m: &Document| { &m.language },
-                    |m: &mut Document| { &mut m.language },
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_Langue>>(
+                    "langue",
+                    |m: &Document| { &m.langue },
+                    |m: &mut Document| { &mut m.langue },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_Importance>>(
-                    "importance",
-                    |m: &Document| { &m.importance },
-                    |m: &mut Document| { &mut m.importance },
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_Niveau>>(
+                    "niveau",
+                    |m: &Document| { &m.niveau },
+                    |m: &mut Document| { &mut m.niveau },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_MediaFilter>>(
-                    "media_filter",
-                    |m: &Document| { &m.media_filter },
-                    |m: &mut Document| { &mut m.media_filter },
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Document_FiltreVisuel>>(
+                    "filtre_visuel",
+                    |m: &Document| { &m.filtre_visuel },
+                    |m: &mut Document| { &mut m.filtre_visuel },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<MetaData>>(
                     "metadata",
@@ -864,9 +864,9 @@ impl ::protobuf::Clear for Document {
         self.clear_slug();
         self.clear_publish();
         self.clear_body();
-        self.clear_language();
-        self.clear_importance();
-        self.clear_media_filter();
+        self.clear_langue();
+        self.clear_niveau();
+        self.clear_filtre_visuel();
         self.clear_metadata();
         self.unknown_fields.clear();
     }
@@ -885,7 +885,7 @@ impl ::protobuf::reflect::ProtobufValue for Document {
 }
 
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
-pub enum Document_Language {
+pub enum Document_Langue {
     ENGLISH = 0,
     FRENCH = 1,
     PORTUGUESE = 2,
@@ -893,29 +893,29 @@ pub enum Document_Language {
     SWAHILI = 4,
 }
 
-impl ::protobuf::ProtobufEnum for Document_Language {
+impl ::protobuf::ProtobufEnum for Document_Langue {
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<Document_Language> {
+    fn from_i32(value: i32) -> ::std::option::Option<Document_Langue> {
         match value {
-            0 => ::std::option::Option::Some(Document_Language::ENGLISH),
-            1 => ::std::option::Option::Some(Document_Language::FRENCH),
-            2 => ::std::option::Option::Some(Document_Language::PORTUGUESE),
-            3 => ::std::option::Option::Some(Document_Language::SPANISH),
-            4 => ::std::option::Option::Some(Document_Language::SWAHILI),
+            0 => ::std::option::Option::Some(Document_Langue::ENGLISH),
+            1 => ::std::option::Option::Some(Document_Langue::FRENCH),
+            2 => ::std::option::Option::Some(Document_Langue::PORTUGUESE),
+            3 => ::std::option::Option::Some(Document_Langue::SPANISH),
+            4 => ::std::option::Option::Some(Document_Langue::SWAHILI),
             _ => ::std::option::Option::None
         }
     }
 
     fn values() -> &'static [Self] {
-        static values: &'static [Document_Language] = &[
-            Document_Language::ENGLISH,
-            Document_Language::FRENCH,
-            Document_Language::PORTUGUESE,
-            Document_Language::SPANISH,
-            Document_Language::SWAHILI,
+        static values: &'static [Document_Langue] = &[
+            Document_Langue::ENGLISH,
+            Document_Langue::FRENCH,
+            Document_Langue::PORTUGUESE,
+            Document_Langue::SPANISH,
+            Document_Langue::SWAHILI,
         ];
         values
     }
@@ -927,56 +927,56 @@ impl ::protobuf::ProtobufEnum for Document_Language {
         };
         unsafe {
             descriptor.get(|| {
-                ::protobuf::reflect::EnumDescriptor::new("Document_Language", file_descriptor_proto())
+                ::protobuf::reflect::EnumDescriptor::new("Document_Langue", file_descriptor_proto())
             })
         }
     }
 }
 
-impl ::std::marker::Copy for Document_Language {
+impl ::std::marker::Copy for Document_Langue {
 }
 
-impl ::std::default::Default for Document_Language {
+impl ::std::default::Default for Document_Langue {
     fn default() -> Self {
-        Document_Language::ENGLISH
+        Document_Langue::ENGLISH
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for Document_Language {
+impl ::protobuf::reflect::ProtobufValue for Document_Langue {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Enum(self.descriptor())
     }
 }
 
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
-pub enum Document_Importance {
+pub enum Document_Niveau {
     LOW = 0,
     MEDIUM = 1,
     HIGH = 2,
     CRITICAL = 3,
 }
 
-impl ::protobuf::ProtobufEnum for Document_Importance {
+impl ::protobuf::ProtobufEnum for Document_Niveau {
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<Document_Importance> {
+    fn from_i32(value: i32) -> ::std::option::Option<Document_Niveau> {
         match value {
-            0 => ::std::option::Option::Some(Document_Importance::LOW),
-            1 => ::std::option::Option::Some(Document_Importance::MEDIUM),
-            2 => ::std::option::Option::Some(Document_Importance::HIGH),
-            3 => ::std::option::Option::Some(Document_Importance::CRITICAL),
+            0 => ::std::option::Option::Some(Document_Niveau::LOW),
+            1 => ::std::option::Option::Some(Document_Niveau::MEDIUM),
+            2 => ::std::option::Option::Some(Document_Niveau::HIGH),
+            3 => ::std::option::Option::Some(Document_Niveau::CRITICAL),
             _ => ::std::option::Option::None
         }
     }
 
     fn values() -> &'static [Self] {
-        static values: &'static [Document_Importance] = &[
-            Document_Importance::LOW,
-            Document_Importance::MEDIUM,
-            Document_Importance::HIGH,
-            Document_Importance::CRITICAL,
+        static values: &'static [Document_Niveau] = &[
+            Document_Niveau::LOW,
+            Document_Niveau::MEDIUM,
+            Document_Niveau::HIGH,
+            Document_Niveau::CRITICAL,
         ];
         values
     }
@@ -988,29 +988,29 @@ impl ::protobuf::ProtobufEnum for Document_Importance {
         };
         unsafe {
             descriptor.get(|| {
-                ::protobuf::reflect::EnumDescriptor::new("Document_Importance", file_descriptor_proto())
+                ::protobuf::reflect::EnumDescriptor::new("Document_Niveau", file_descriptor_proto())
             })
         }
     }
 }
 
-impl ::std::marker::Copy for Document_Importance {
+impl ::std::marker::Copy for Document_Niveau {
 }
 
-impl ::std::default::Default for Document_Importance {
+impl ::std::default::Default for Document_Niveau {
     fn default() -> Self {
-        Document_Importance::LOW
+        Document_Niveau::LOW
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for Document_Importance {
+impl ::protobuf::reflect::ProtobufValue for Document_Niveau {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Enum(self.descriptor())
     }
 }
 
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
-pub enum Document_MediaFilter {
+pub enum Document_FiltreVisuel {
     IG_WILLOW = 0,
     IG_WALDEN = 1,
     IG_VALENCIA = 2,
@@ -1031,55 +1031,55 @@ pub enum Document_MediaFilter {
     IG_1977 = 17,
 }
 
-impl ::protobuf::ProtobufEnum for Document_MediaFilter {
+impl ::protobuf::ProtobufEnum for Document_FiltreVisuel {
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<Document_MediaFilter> {
+    fn from_i32(value: i32) -> ::std::option::Option<Document_FiltreVisuel> {
         match value {
-            0 => ::std::option::Option::Some(Document_MediaFilter::IG_WILLOW),
-            1 => ::std::option::Option::Some(Document_MediaFilter::IG_WALDEN),
-            2 => ::std::option::Option::Some(Document_MediaFilter::IG_VALENCIA),
-            3 => ::std::option::Option::Some(Document_MediaFilter::IG_TOASTER),
-            4 => ::std::option::Option::Some(Document_MediaFilter::IG_SUTRO),
-            5 => ::std::option::Option::Some(Document_MediaFilter::IG_SIERRA),
-            6 => ::std::option::Option::Some(Document_MediaFilter::IG_RISE),
-            7 => ::std::option::Option::Some(Document_MediaFilter::IG_NASHVILLE),
-            8 => ::std::option::Option::Some(Document_MediaFilter::IG_MAYFAIR),
-            9 => ::std::option::Option::Some(Document_MediaFilter::IG_LOFI),
-            10 => ::std::option::Option::Some(Document_MediaFilter::IG_KELVIN),
-            11 => ::std::option::Option::Some(Document_MediaFilter::IG_INKWELL),
-            12 => ::std::option::Option::Some(Document_MediaFilter::IG_HUDSON),
-            13 => ::std::option::Option::Some(Document_MediaFilter::IG_HEFE),
-            14 => ::std::option::Option::Some(Document_MediaFilter::IG_EARLYBIRD),
-            15 => ::std::option::Option::Some(Document_MediaFilter::IG_BRANNAN),
-            16 => ::std::option::Option::Some(Document_MediaFilter::IG_AMARO),
-            17 => ::std::option::Option::Some(Document_MediaFilter::IG_1977),
+            0 => ::std::option::Option::Some(Document_FiltreVisuel::IG_WILLOW),
+            1 => ::std::option::Option::Some(Document_FiltreVisuel::IG_WALDEN),
+            2 => ::std::option::Option::Some(Document_FiltreVisuel::IG_VALENCIA),
+            3 => ::std::option::Option::Some(Document_FiltreVisuel::IG_TOASTER),
+            4 => ::std::option::Option::Some(Document_FiltreVisuel::IG_SUTRO),
+            5 => ::std::option::Option::Some(Document_FiltreVisuel::IG_SIERRA),
+            6 => ::std::option::Option::Some(Document_FiltreVisuel::IG_RISE),
+            7 => ::std::option::Option::Some(Document_FiltreVisuel::IG_NASHVILLE),
+            8 => ::std::option::Option::Some(Document_FiltreVisuel::IG_MAYFAIR),
+            9 => ::std::option::Option::Some(Document_FiltreVisuel::IG_LOFI),
+            10 => ::std::option::Option::Some(Document_FiltreVisuel::IG_KELVIN),
+            11 => ::std::option::Option::Some(Document_FiltreVisuel::IG_INKWELL),
+            12 => ::std::option::Option::Some(Document_FiltreVisuel::IG_HUDSON),
+            13 => ::std::option::Option::Some(Document_FiltreVisuel::IG_HEFE),
+            14 => ::std::option::Option::Some(Document_FiltreVisuel::IG_EARLYBIRD),
+            15 => ::std::option::Option::Some(Document_FiltreVisuel::IG_BRANNAN),
+            16 => ::std::option::Option::Some(Document_FiltreVisuel::IG_AMARO),
+            17 => ::std::option::Option::Some(Document_FiltreVisuel::IG_1977),
             _ => ::std::option::Option::None
         }
     }
 
     fn values() -> &'static [Self] {
-        static values: &'static [Document_MediaFilter] = &[
-            Document_MediaFilter::IG_WILLOW,
-            Document_MediaFilter::IG_WALDEN,
-            Document_MediaFilter::IG_VALENCIA,
-            Document_MediaFilter::IG_TOASTER,
-            Document_MediaFilter::IG_SUTRO,
-            Document_MediaFilter::IG_SIERRA,
-            Document_MediaFilter::IG_RISE,
-            Document_MediaFilter::IG_NASHVILLE,
-            Document_MediaFilter::IG_MAYFAIR,
-            Document_MediaFilter::IG_LOFI,
-            Document_MediaFilter::IG_KELVIN,
-            Document_MediaFilter::IG_INKWELL,
-            Document_MediaFilter::IG_HUDSON,
-            Document_MediaFilter::IG_HEFE,
-            Document_MediaFilter::IG_EARLYBIRD,
-            Document_MediaFilter::IG_BRANNAN,
-            Document_MediaFilter::IG_AMARO,
-            Document_MediaFilter::IG_1977,
+        static values: &'static [Document_FiltreVisuel] = &[
+            Document_FiltreVisuel::IG_WILLOW,
+            Document_FiltreVisuel::IG_WALDEN,
+            Document_FiltreVisuel::IG_VALENCIA,
+            Document_FiltreVisuel::IG_TOASTER,
+            Document_FiltreVisuel::IG_SUTRO,
+            Document_FiltreVisuel::IG_SIERRA,
+            Document_FiltreVisuel::IG_RISE,
+            Document_FiltreVisuel::IG_NASHVILLE,
+            Document_FiltreVisuel::IG_MAYFAIR,
+            Document_FiltreVisuel::IG_LOFI,
+            Document_FiltreVisuel::IG_KELVIN,
+            Document_FiltreVisuel::IG_INKWELL,
+            Document_FiltreVisuel::IG_HUDSON,
+            Document_FiltreVisuel::IG_HEFE,
+            Document_FiltreVisuel::IG_EARLYBIRD,
+            Document_FiltreVisuel::IG_BRANNAN,
+            Document_FiltreVisuel::IG_AMARO,
+            Document_FiltreVisuel::IG_1977,
         ];
         values
     }
@@ -1091,22 +1091,22 @@ impl ::protobuf::ProtobufEnum for Document_MediaFilter {
         };
         unsafe {
             descriptor.get(|| {
-                ::protobuf::reflect::EnumDescriptor::new("Document_MediaFilter", file_descriptor_proto())
+                ::protobuf::reflect::EnumDescriptor::new("Document_FiltreVisuel", file_descriptor_proto())
             })
         }
     }
 }
 
-impl ::std::marker::Copy for Document_MediaFilter {
+impl ::std::marker::Copy for Document_FiltreVisuel {
 }
 
-impl ::std::default::Default for Document_MediaFilter {
+impl ::std::default::Default for Document_FiltreVisuel {
     fn default() -> Self {
-        Document_MediaFilter::IG_WILLOW
+        Document_FiltreVisuel::IG_WILLOW
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for Document_MediaFilter {
+impl ::protobuf::reflect::ProtobufValue for Document_FiltreVisuel {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Enum(self.descriptor())
     }
@@ -1116,7 +1116,7 @@ impl ::protobuf::reflect::ProtobufValue for Document_MediaFilter {
 pub struct Media {
     // message fields
     pub name: ::std::string::String,
-    pub field_type: Media_Type,
+    pub categorie: Media_Categorie,
     pub file_url: ::std::string::String,
     pub metadata: ::protobuf::SingularPtrField<MetaData>,
     // special fields
@@ -1155,19 +1155,19 @@ impl Media {
         &self.name
     }
 
-    // .contentkm.Media.Type type = 2;
+    // .grpc.Media.Categorie categorie = 2;
 
-    pub fn clear_field_type(&mut self) {
-        self.field_type = Media_Type::AUDIO;
+    pub fn clear_categorie(&mut self) {
+        self.categorie = Media_Categorie::AUDIO;
     }
 
     // Param is passed by value, moved
-    pub fn set_field_type(&mut self, v: Media_Type) {
-        self.field_type = v;
+    pub fn set_categorie(&mut self, v: Media_Categorie) {
+        self.categorie = v;
     }
 
-    pub fn get_field_type(&self) -> Media_Type {
-        self.field_type
+    pub fn get_categorie(&self) -> Media_Categorie {
+        self.categorie
     }
 
     // string file_url = 3;
@@ -1196,7 +1196,7 @@ impl Media {
         &self.file_url
     }
 
-    // .contentkm.MetaData metadata = 4;
+    // .grpc.MetaData metadata = 4;
 
     pub fn clear_metadata(&mut self) {
         self.metadata.clear();
@@ -1248,7 +1248,7 @@ impl ::protobuf::Message for Media {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.name)?;
                 },
                 2 => {
-                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.field_type, 2, &mut self.unknown_fields)?
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.categorie, 2, &mut self.unknown_fields)?
                 },
                 3 => {
                     ::protobuf::rt::read_singular_proto3_string_into(wire_type, is, &mut self.file_url)?;
@@ -1271,8 +1271,8 @@ impl ::protobuf::Message for Media {
         if !self.name.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.name);
         }
-        if self.field_type != Media_Type::AUDIO {
-            my_size += ::protobuf::rt::enum_size(2, self.field_type);
+        if self.categorie != Media_Categorie::AUDIO {
+            my_size += ::protobuf::rt::enum_size(2, self.categorie);
         }
         if !self.file_url.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.file_url);
@@ -1290,8 +1290,8 @@ impl ::protobuf::Message for Media {
         if !self.name.is_empty() {
             os.write_string(1, &self.name)?;
         }
-        if self.field_type != Media_Type::AUDIO {
-            os.write_enum(2, self.field_type.value())?;
+        if self.categorie != Media_Categorie::AUDIO {
+            os.write_enum(2, self.categorie.value())?;
         }
         if !self.file_url.is_empty() {
             os.write_string(3, &self.file_url)?;
@@ -1348,10 +1348,10 @@ impl ::protobuf::Message for Media {
                     |m: &Media| { &m.name },
                     |m: &mut Media| { &mut m.name },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Media_Type>>(
-                    "type",
-                    |m: &Media| { &m.field_type },
-                    |m: &mut Media| { &mut m.field_type },
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<Media_Categorie>>(
+                    "categorie",
+                    |m: &Media| { &m.categorie },
+                    |m: &mut Media| { &mut m.categorie },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
                     "file_url",
@@ -1386,7 +1386,7 @@ impl ::protobuf::Message for Media {
 impl ::protobuf::Clear for Media {
     fn clear(&mut self) {
         self.clear_name();
-        self.clear_field_type();
+        self.clear_categorie();
         self.clear_file_url();
         self.clear_metadata();
         self.unknown_fields.clear();
@@ -1406,34 +1406,34 @@ impl ::protobuf::reflect::ProtobufValue for Media {
 }
 
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
-pub enum Media_Type {
+pub enum Media_Categorie {
     AUDIO = 0,
     DOCUMENT = 1,
     IMAGE = 2,
     VIDEO = 3,
 }
 
-impl ::protobuf::ProtobufEnum for Media_Type {
+impl ::protobuf::ProtobufEnum for Media_Categorie {
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<Media_Type> {
+    fn from_i32(value: i32) -> ::std::option::Option<Media_Categorie> {
         match value {
-            0 => ::std::option::Option::Some(Media_Type::AUDIO),
-            1 => ::std::option::Option::Some(Media_Type::DOCUMENT),
-            2 => ::std::option::Option::Some(Media_Type::IMAGE),
-            3 => ::std::option::Option::Some(Media_Type::VIDEO),
+            0 => ::std::option::Option::Some(Media_Categorie::AUDIO),
+            1 => ::std::option::Option::Some(Media_Categorie::DOCUMENT),
+            2 => ::std::option::Option::Some(Media_Categorie::IMAGE),
+            3 => ::std::option::Option::Some(Media_Categorie::VIDEO),
             _ => ::std::option::Option::None
         }
     }
 
     fn values() -> &'static [Self] {
-        static values: &'static [Media_Type] = &[
-            Media_Type::AUDIO,
-            Media_Type::DOCUMENT,
-            Media_Type::IMAGE,
-            Media_Type::VIDEO,
+        static values: &'static [Media_Categorie] = &[
+            Media_Categorie::AUDIO,
+            Media_Categorie::DOCUMENT,
+            Media_Categorie::IMAGE,
+            Media_Categorie::VIDEO,
         ];
         values
     }
@@ -1445,22 +1445,22 @@ impl ::protobuf::ProtobufEnum for Media_Type {
         };
         unsafe {
             descriptor.get(|| {
-                ::protobuf::reflect::EnumDescriptor::new("Media_Type", file_descriptor_proto())
+                ::protobuf::reflect::EnumDescriptor::new("Media_Categorie", file_descriptor_proto())
             })
         }
     }
 }
 
-impl ::std::marker::Copy for Media_Type {
+impl ::std::marker::Copy for Media_Categorie {
 }
 
-impl ::std::default::Default for Media_Type {
+impl ::std::default::Default for Media_Categorie {
     fn default() -> Self {
-        Media_Type::AUDIO
+        Media_Categorie::AUDIO
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for Media_Type {
+impl ::protobuf::reflect::ProtobufValue for Media_Categorie {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Enum(self.descriptor())
     }
@@ -1482,7 +1482,7 @@ impl MetaData {
         ::std::default::Default::default()
     }
 
-    // .contentkm.Identification identification = 1;
+    // .grpc.Identification identification = 1;
 
     pub fn clear_identification(&mut self) {
         self.identification.clear();
@@ -1515,7 +1515,7 @@ impl MetaData {
         self.identification.as_ref().unwrap_or_else(|| Identification::default_instance())
     }
 
-    // .contentkm.TimeStamps timestamps = 2;
+    // .grpc.TimeStamps timestamps = 2;
 
     pub fn clear_timestamps(&mut self) {
         self.timestamps.clear();
@@ -1548,7 +1548,7 @@ impl MetaData {
         self.timestamps.as_ref().unwrap_or_else(|| TimeStamps::default_instance())
     }
 
-    // repeated .contentkm.MetaData.MEntry m = 3;
+    // repeated .grpc.MetaData.MEntry m = 3;
 
     pub fn clear_m(&mut self) {
         self.m.clear();
@@ -2220,51 +2220,52 @@ impl ::protobuf::reflect::ProtobufValue for TimeStamps {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x13svc/contentkm.proto\x12\tcontentkm\x1a\x19google/protobuf/any.prot\
-    o\x1a\x1fgoogle/protobuf/timestamp.proto\"o\n\x07Content\x121\n\tdocumen\
-    ts\x18\x01\x20\x03(\x0b2\x13.contentkm.DocumentR\tdocuments\x121\n\x0bme\
-    dia_items\x18\x02\x20\x03(\x0b2\x10.contentkm.MediaR\nmediaItems\"h\n\
-    \x0eContentHandles\x12<\n\x0cdocument_ids\x18\x01\x20\x03(\x0b2\x19.cont\
-    entkm.IdentificationR\x0bdocumentIds\x12\x18\n\x07message\x18\x02\x20\
-    \x01(\tR\x07message\"\xfb\x05\n\x08Document\x12\x14\n\x05title\x18\x01\
-    \x20\x01(\tR\x05title\x12\x12\n\x04slug\x18\x02\x20\x01(\tR\x04slug\x12\
-    \x18\n\x07publish\x18\x03\x20\x01(\x08R\x07publish\x12\x12\n\x04body\x18\
-    \x04\x20\x01(\tR\x04body\x128\n\x08language\x18\x05\x20\x01(\x0e2\x1c.co\
-    ntentkm.Document.LanguageR\x08language\x12>\n\nimportance\x18\x06\x20\
-    \x01(\x0e2\x1e.contentkm.Document.ImportanceR\nimportance\x12B\n\x0cmedi\
-    a_filter\x18\x07\x20\x01(\x0e2\x1f.contentkm.Document.MediaFilterR\x0bme\
-    diaFilter\x12/\n\x08metadata\x18\x08\x20\x01(\x0b2\x13.contentkm.MetaDat\
-    aR\x08metadata\"M\n\x08Language\x12\x0b\n\x07ENGLISH\x10\0\x12\n\n\x06FR\
-    ENCH\x10\x01\x12\x0e\n\nPORTUGUESE\x10\x02\x12\x0b\n\x07SPANISH\x10\x03\
-    \x12\x0b\n\x07SWAHILI\x10\x04\"9\n\nImportance\x12\x07\n\x03LOW\x10\0\
-    \x12\n\n\x06MEDIUM\x10\x01\x12\x08\n\x04HIGH\x10\x02\x12\x0c\n\x08CRITIC\
-    AL\x10\x03\"\x9d\x02\n\x0bMediaFilter\x12\r\n\tIG_WILLOW\x10\0\x12\r\n\t\
-    IG_WALDEN\x10\x01\x12\x0f\n\x0bIG_VALENCIA\x10\x02\x12\x0e\n\nIG_TOASTER\
-    \x10\x03\x12\x0c\n\x08IG_SUTRO\x10\x04\x12\r\n\tIG_SIERRA\x10\x05\x12\
-    \x0b\n\x07IG_RISE\x10\x06\x12\x10\n\x0cIG_NASHVILLE\x10\x07\x12\x0e\n\nI\
-    G_MAYFAIR\x10\x08\x12\x0b\n\x07IG_LOFI\x10\t\x12\r\n\tIG_KELVIN\x10\n\
-    \x12\x0e\n\nIG_INKWELL\x10\x0b\x12\r\n\tIG_HUDSON\x10\x0c\x12\x0b\n\x07I\
-    G_HEFE\x10\r\x12\x10\n\x0cIG_EARLYBIRD\x10\x0e\x12\x0e\n\nIG_BRANNAN\x10\
-    \x0f\x12\x0c\n\x08IG_AMARO\x10\x10\x12\x0b\n\x07IG_1977\x10\x11\"\xc9\
-    \x01\n\x05Media\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x12)\n\x04\
-    type\x18\x02\x20\x01(\x0e2\x15.contentkm.Media.TypeR\x04type\x12\x19\n\
-    \x08file_url\x18\x03\x20\x01(\tR\x07fileUrl\x12/\n\x08metadata\x18\x04\
-    \x20\x01(\x0b2\x13.contentkm.MetaDataR\x08metadata\"5\n\x04Type\x12\t\n\
-    \x05AUDIO\x10\0\x12\x0c\n\x08DOCUMENT\x10\x01\x12\t\n\x05IMAGE\x10\x02\
-    \x12\t\n\x05VIDEO\x10\x03\"\xfa\x01\n\x08MetaData\x12A\n\x0eidentificati\
-    on\x18\x01\x20\x01(\x0b2\x19.contentkm.IdentificationR\x0eidentification\
-    \x125\n\ntimestamps\x18\x02\x20\x01(\x0b2\x15.contentkm.TimeStampsR\ntim\
-    estamps\x12(\n\x01m\x18\x03\x20\x03(\x0b2\x1a.contentkm.MetaData.MEntryR\
-    \x01m\x1aJ\n\x06MEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12*\
-    \n\x05value\x18\x02\x20\x01(\x0b2\x14.google.protobuf.AnyR\x05value:\x02\
-    8\x01\"]\n\x0eIdentification\x12\x17\n\x07user_id\x18\x01\x20\x01(\tR\
-    \x06userId\x12\x1e\n\nidentifier\x18\x02\x20\x01(\tR\nidentifier\x12\x12\
-    \n\x04tags\x18\x03\x20\x03(\tR\x04tags\"x\n\nTimeStamps\x124\n\x07create\
-    d\x18\x01\x20\x01(\x0b2\x1a.google.protobuf.TimestampR\x07created\x124\n\
-    \x07updated\x18\x02\x20\x01(\x0b2\x1a.google.protobuf.TimestampR\x07upda\
-    ted2\x7f\n\x07AuthKam\x129\n\x06Create\x12\x12.contentkm.Content\x1a\x19\
-    .contentkm.ContentHandles\"\0\x129\n\x06Update\x12\x12.contentkm.Content\
-    \x1a\x19.contentkm.ContentHandles\"\0b\x06proto3\
+    \n\x13svc/contentkm.proto\x12\x04grpc\x1a\x19google/protobuf/any.proto\
+    \x1a\x1fgoogle/protobuf/timestamp.proto\"e\n\x07Content\x12,\n\tdocument\
+    s\x18\x01\x20\x03(\x0b2\x0e.grpc.DocumentR\tdocuments\x12,\n\x0bmedia_it\
+    ems\x18\x02\x20\x03(\x0b2\x0b.grpc.MediaR\nmediaItems\"[\n\x0eContentHan\
+    dles\x12/\n\x08item_ids\x18\x01\x20\x03(\x0b2\x14.grpc.IdentificationR\
+    \x07itemIds\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\xd3\
+    \x05\n\x08Document\x12\x14\n\x05title\x18\x01\x20\x01(\tR\x05title\x12\
+    \x12\n\x04slug\x18\x02\x20\x01(\tR\x04slug\x12\x18\n\x07publish\x18\x03\
+    \x20\x01(\x08R\x07publish\x12\x12\n\x04body\x18\x04\x20\x01(\tR\x04body\
+    \x12-\n\x06langue\x18\x05\x20\x01(\x0e2\x15.grpc.Document.LangueR\x06lan\
+    gue\x12-\n\x06niveau\x18\x06\x20\x01(\x0e2\x15.grpc.Document.NiveauR\x06\
+    niveau\x12@\n\rfiltre_visuel\x18\x07\x20\x01(\x0e2\x1b.grpc.Document.Fil\
+    treVisuelR\x0cfiltreVisuel\x12*\n\x08metadata\x18\x08\x20\x01(\x0b2\x0e.\
+    grpc.MetaDataR\x08metadata\"K\n\x06Langue\x12\x0b\n\x07ENGLISH\x10\0\x12\
+    \n\n\x06FRENCH\x10\x01\x12\x0e\n\nPORTUGUESE\x10\x02\x12\x0b\n\x07SPANIS\
+    H\x10\x03\x12\x0b\n\x07SWAHILI\x10\x04\"5\n\x06Niveau\x12\x07\n\x03LOW\
+    \x10\0\x12\n\n\x06MEDIUM\x10\x01\x12\x08\n\x04HIGH\x10\x02\x12\x0c\n\x08\
+    CRITICAL\x10\x03\"\x9e\x02\n\x0cFiltreVisuel\x12\r\n\tIG_WILLOW\x10\0\
+    \x12\r\n\tIG_WALDEN\x10\x01\x12\x0f\n\x0bIG_VALENCIA\x10\x02\x12\x0e\n\n\
+    IG_TOASTER\x10\x03\x12\x0c\n\x08IG_SUTRO\x10\x04\x12\r\n\tIG_SIERRA\x10\
+    \x05\x12\x0b\n\x07IG_RISE\x10\x06\x12\x10\n\x0cIG_NASHVILLE\x10\x07\x12\
+    \x0e\n\nIG_MAYFAIR\x10\x08\x12\x0b\n\x07IG_LOFI\x10\t\x12\r\n\tIG_KELVIN\
+    \x10\n\x12\x0e\n\nIG_INKWELL\x10\x0b\x12\r\n\tIG_HUDSON\x10\x0c\x12\x0b\
+    \n\x07IG_HEFE\x10\r\x12\x10\n\x0cIG_EARLYBIRD\x10\x0e\x12\x0e\n\nIG_BRAN\
+    NAN\x10\x0f\x12\x0c\n\x08IG_AMARO\x10\x10\x12\x0b\n\x07IG_1977\x10\x11\"\
+    \xd3\x01\n\x05Media\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x123\n\
+    \tcategorie\x18\x02\x20\x01(\x0e2\x15.grpc.Media.CategorieR\tcategorie\
+    \x12\x19\n\x08file_url\x18\x03\x20\x01(\tR\x07fileUrl\x12*\n\x08metadata\
+    \x18\x04\x20\x01(\x0b2\x0e.grpc.MetaDataR\x08metadata\":\n\tCategorie\
+    \x12\t\n\x05AUDIO\x10\0\x12\x0c\n\x08DOCUMENT\x10\x01\x12\t\n\x05IMAGE\
+    \x10\x02\x12\t\n\x05VIDEO\x10\x03\"\xeb\x01\n\x08MetaData\x12<\n\x0eiden\
+    tification\x18\x01\x20\x01(\x0b2\x14.grpc.IdentificationR\x0eidentificat\
+    ion\x120\n\ntimestamps\x18\x02\x20\x01(\x0b2\x10.grpc.TimeStampsR\ntimes\
+    tamps\x12#\n\x01m\x18\x03\x20\x03(\x0b2\x15.grpc.MetaData.MEntryR\x01m\
+    \x1aJ\n\x06MEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12*\n\x05\
+    value\x18\x02\x20\x01(\x0b2\x14.google.protobuf.AnyR\x05value:\x028\x01\
+    \"]\n\x0eIdentification\x12\x17\n\x07user_id\x18\x01\x20\x01(\tR\x06user\
+    Id\x12\x1e\n\nidentifier\x18\x02\x20\x01(\tR\nidentifier\x12\x12\n\x04ta\
+    gs\x18\x03\x20\x03(\tR\x04tags\"x\n\nTimeStamps\x124\n\x07created\x18\
+    \x01\x20\x01(\x0b2\x1a.google.protobuf.TimestampR\x07created\x124\n\x07u\
+    pdated\x18\x02\x20\x01(\x0b2\x1a.google.protobuf.TimestampR\x07updated2\
+    \xd4\x01\n\nContentKam\x12/\n\x06Create\x12\r.grpc.Content\x1a\x14.grpc.\
+    ContentHandles\"\0\x12/\n\x06Update\x12\r.grpc.Content\x1a\x14.grpc.Cont\
+    entHandles\"\0\x12,\n\x03Get\x12\x14.grpc.ContentHandles\x1a\r.grpc.Cont\
+    ent\"\0\x126\n\x06Delete\x12\x14.grpc.ContentHandles\x1a\x14.grpc.Conten\
+    tHandles\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

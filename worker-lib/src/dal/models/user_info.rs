@@ -10,6 +10,7 @@ use validation::{AuthTrait, AuthDataTrait};
 #[graphql(description = "Claims")]
 #[derive(Clone, Debug, Default, Serialize, Deserialize, GraphQLObject)]
 pub struct UserAuthData {
+    pub token: Option<String>,
     pub user_id: Option<String>,
     pub email: Option<String>,
     pub role: Option<i32>
@@ -28,8 +29,9 @@ impl AuthDataTrait for UserAuthData {
 pub fn create_complete_user(user_id: String, email: String, username: String, password: String) -> String {
     match User::get_user(user_id.clone(), email.clone()) {
         Some(_user) => {
-            debug!("User already Exists!");
-            String::from("")
+            let err_msg = String::from("");
+            debug!("{}", err_msg.clone());
+            err_msg
         },
         None => {
             let password_hash = sec::hash_password(user_id.clone(), password);
@@ -209,6 +211,7 @@ impl ModelDynaConv for User {
 impl AuthTrait<UserAuthData> for User {
     fn to_auth_data(&self) -> UserAuthData {
         UserAuthData{
+            token: None,
             user_id: self.user_id.to_owned(),
             email: self.email.to_owned(),
             role: self.role.to_owned()

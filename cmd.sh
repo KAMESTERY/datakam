@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x #echo on
 
 BASEDIR=`pwd`
 unamestr=`uname`
@@ -22,10 +23,21 @@ case $1 in
         genRsa
         ;;
     sub.update)
-        git submodule update --recursive --remote
+        rm -rf $BASEDIR/webkam $BASEDIR/worker-rpc/svc
+        git config -f .gitmodules --get-regexp '^submodule\..*\.path$' |
+        while read path_key path
+        do
+            url_key=$(echo $path_key | sed 's/\.path/.url/')
+            url=$(git config -f .gitmodules --get "$url_key")
+            git submodule add --force $url $path
+            cd $path && git pull
+        done
         ;;
-    build.workers)
-        docker run --rm -v $BASEDIR/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v $BASEDIR:/code -w /code og-rust-lambda:latest cargo build --release
+    build.workers.lambda)
+        docker run --rm -v $BASEDIR/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v $BASEDIR:/code -w /code og-rust-lambda:0.1 cargo build --release
+        ;;
+    build.workers.ubuntu)
+        docker build -t worker_rpc-rust-ubuntu:0.1 -f $BASEDIR/infrastructure/Dockerfile.ubuntu $BASEDIR
         ;;
     build.webkam)
         cd $BASEDIR/webkam; make build-ui; GOOS=linux GOARCH=amd64 go build -o server *.go

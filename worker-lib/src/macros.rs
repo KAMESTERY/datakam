@@ -11,6 +11,7 @@ use validation::{
     ADMINISTER
 };
 
+#[macro_export]
 macro_rules! secured {
     ( $token:expr, $id:expr, $dowork:expr ) => {
         {

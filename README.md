@@ -27,6 +27,13 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [This is a gRPC client-side load balancing example on top of grpc-go.](https://github.com/hakobe/grpc-go-client-side-load-balancing-example)
+* [List of AWS Service Principals](https://gist.github.com/outcastgeek/893e45fe64b13d7a642ecfb77e03c69f)
+* [AWS Policy Generator](https://awspolicygen.s3.amazonaws.com/policygen.html)
+* [IAM Policy for programatic access to lightsail](https://forums.aws.amazon.com/thread.jspa?threadID=251990)
+* [dive -- A tool for exploring a docker image, layer contents, and discovering ways to shrink your Docker image size.](https://github.com/wagoodman/dive)
+* [How to generate an SSH key and add your public key to the server for authentication](https://adamdehaven.com/blog/how-to-generate-an-ssh-key-and-add-your-public-key-to-the-server-for-authentication/)
+* [SSH-KEYGEN - GENERATE A NEW SSH KEY](https://www.ssh.com/ssh/keygen/)
 * [ZODB + Traversal Wiki Tutorial](https://docs.pylonsproject.org/projects/pyramid/en/latest/tutorials/wiki/index.html)
 * [Critical vulnerabilities in JSON Web Token libraries](https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/)
 * [GO JWT Middleware](https://github.com/auth0/go-jwt-middleware/blob/master/jwtmiddleware.go)

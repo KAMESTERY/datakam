@@ -954,19 +954,19 @@ impl ::protobuf::reflect::ProtobufValue for EnrollStatusResp {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x10svc/authkm.proto\x12\x06authkm\"F\n\x12UserCredentialsReq\x12\x14\
-    \n\x05email\x18\x01\x20\x01(\tR\x05email\x12\x1a\n\x08password\x18\x02\
-    \x20\x01(\tR\x08password\"i\n\x0eAuthClaimsResp\x12\x14\n\x05token\x18\
-    \x01\x20\x01(\tR\x05token\x12\x17\n\x07user_id\x18\x02\x20\x01(\tR\x06us\
-    erId\x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05email\x12\x12\n\x04role\
-    \x18\x04\x20\x01(\x05R\x04role\"]\n\rUserEnrollReq\x12\x1a\n\x08username\
-    \x18\x01\x20\x01(\tR\x08username\x12\x14\n\x05email\x18\x02\x20\x01(\tR\
-    \x05email\x12\x1a\n\x08password\x18\x03\x20\x01(\tR\x08password\"F\n\x10\
-    EnrollStatusResp\x12\x18\n\x07success\x18\x01\x20\x01(\x08R\x07success\
-    \x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message2\x8c\x01\n\x07AuthK\
-    am\x12D\n\x0cAuthenticate\x12\x1a.authkm.UserCredentialsReq\x1a\x16.auth\
-    km.AuthClaimsResp\"\0\x12;\n\x06Enroll\x12\x15.authkm.UserEnrollReq\x1a\
-    \x18.authkm.EnrollStatusResp\"\0b\x06proto3\
+    \n\x10svc/authkm.proto\x12\x04grpc\"F\n\x12UserCredentialsReq\x12\x14\n\
+    \x05email\x18\x01\x20\x01(\tR\x05email\x12\x1a\n\x08password\x18\x02\x20\
+    \x01(\tR\x08password\"i\n\x0eAuthClaimsResp\x12\x14\n\x05token\x18\x01\
+    \x20\x01(\tR\x05token\x12\x17\n\x07user_id\x18\x02\x20\x01(\tR\x06userId\
+    \x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05email\x12\x12\n\x04role\x18\
+    \x04\x20\x01(\x05R\x04role\"]\n\rUserEnrollReq\x12\x1a\n\x08username\x18\
+    \x01\x20\x01(\tR\x08username\x12\x14\n\x05email\x18\x02\x20\x01(\tR\x05e\
+    mail\x12\x1a\n\x08password\x18\x03\x20\x01(\tR\x08password\"F\n\x10Enrol\
+    lStatusResp\x12\x18\n\x07success\x18\x01\x20\x01(\x08R\x07success\x12\
+    \x18\n\x07message\x18\x02\x20\x01(\tR\x07message2\x84\x01\n\x07AuthKam\
+    \x12@\n\x0cAuthenticate\x12\x18.grpc.UserCredentialsReq\x1a\x14.grpc.Aut\
+    hClaimsResp\"\0\x127\n\x06Enroll\x12\x13.grpc.UserEnrollReq\x1a\x16.grpc\
+    .EnrollStatusResp\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

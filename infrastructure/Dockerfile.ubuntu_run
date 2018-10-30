@@ -1,0 +1,10 @@
+
+FROM ubuntu:18.04
+RUN apt update -y
+RUN apt install -y libssl1.0.0 libssl-dev
+RUN ln -s /usr/lib/x86_linux-gnu/libssl.so.1.0.0 /lib/x86_64-linux-gnu/libssl.so.10
+RUN ln -s /usr/lib/x86_linux-gnu/libcrypto.so.1.0.0 /lib/x86_64-linux-gnu/libcrypto.so.10
+COPY worker-rpc /
+# CMD ["/worker-rpc"]
+CMD ["bash"]
+

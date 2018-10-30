@@ -1,6 +1,5 @@
 # Project related
 manage
-webkam
 .idea
 .terraform
 *.iml

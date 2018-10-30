@@ -6,6 +6,7 @@ RUSTY_WORKER=worker-fn
 RUSTY_WORKER_RPC=worker-rpc
 RUSTY_LIBWORKEREXT=workerext
 RUSTY_WORKER_LIB=worker-lib
+INFRASTRUCTURE=$(BASEDIR)/infrastructure
 
 # These are the values we want to pass for VERSION and BUILD
 VERSION=0.0.1
@@ -19,11 +20,17 @@ devops-init:
 	rm -rf .terraform
 	terraform init infrastructure
 
+lightsail_keys:
+	rm -rf $(INFRASTRUCTURE)/lightsail_keys/*
+	ssh-keygen -f $(INFRASTRUCTURE)/lightsail_keys/grpc_vps_servers_key -t rsa -b 4096 -C ubuntu
+#	ssh-keygen -f $(INFRASTRUCTURE)/lightsail_keys/grpc_vps_servers_key -t rsa -b 4096 -C vpskam@kamestery.com # for the first time
+	chmod 400 $(INFRASTRUCTURE)/lightsail_keys/*
+
 deploy:
-	terraform fmt infrastructure
-	terraform get infrastructure
-	terraform plan infrastructure
-	terraform apply -auto-approve infrastructure
+	terraform fmt $(INFRASTRUCTURE)
+	terraform get $(INFRASTRUCTURE)
+	terraform plan $(INFRASTRUCTURE)
+	terraform apply -auto-approve $(INFRASTRUCTURE)
 
 deploy-functions: deploy
 	cd $(BASEDIR)/$(RUSTY_WORKER)/ && up data_dev -v
@@ -50,8 +57,9 @@ prod-build-workers: rsa lambda-binary-builder
 	cp $(BASEDIR)/target/release/$(RUSTY_WORKER_RPC) $(BASEDIR)/$(RUSTY_WORKER_RPC)/server
 #	cp $(BASEDIR)/target/release/lib$(RUSTY_LIBWORKEREXT).so $(BASEDIR)/lambda/worker/lib$(RUSTY_LIBWORKEREXT).so
 
-lambda-binary-builder:
-	docker build -t og-rust-lambda:latest $(BASEDIR)/infrastructure
+rusty-binary-builder:
+	docker build -t og-rust-lambda:0.1 -f $(INFRASTRUCTURE)/Dockerfile.lambda $(INFRASTRUCTURE)
+	docker build -t og-rust-ubuntu:0.1 -f $(INFRASTRUCTURE)/Dockerfile.ubuntu $(INFRASTRUCTURE)
 
 # CLEAN
 

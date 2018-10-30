@@ -1,3 +1,6 @@
 [submodule "webkam"]
 	path = webkam
 	url = https://github.com/KAMESTERY/webkam.git
+[submodule "worker-rpc/svc"]
+	path = worker-rpc/svc
+	url = https://github.com/KAMESTERY/contractskam.git

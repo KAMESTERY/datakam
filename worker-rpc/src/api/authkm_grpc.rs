@@ -40,13 +40,13 @@ impl ::grpc::ClientStub for AuthKamClient {
         AuthKamClient {
             grpc_client: grpc_client,
             method_Authenticate: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                name: "/authkm.AuthKam/Authenticate".to_string(),
+                name: "/grpc.AuthKam/Authenticate".to_string(),
                 streaming: ::grpc::rt::GrpcStreaming::Unary,
                 req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                 resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
             }),
             method_Enroll: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                name: "/authkm.AuthKam/Enroll".to_string(),
+                name: "/grpc.AuthKam/Enroll".to_string(),
                 streaming: ::grpc::rt::GrpcStreaming::Unary,
                 req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                 resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -73,11 +73,11 @@ pub struct AuthKamServer;
 impl AuthKamServer {
     pub fn new_service_def<H : AuthKam + 'static + Sync + Send + 'static>(handler: H) -> ::grpc::rt::ServerServiceDefinition {
         let handler_arc = ::std::sync::Arc::new(handler);
-        ::grpc::rt::ServerServiceDefinition::new("/authkm.AuthKam",
+        ::grpc::rt::ServerServiceDefinition::new("/grpc.AuthKam",
             vec![
                 ::grpc::rt::ServerMethod::new(
                     ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                        name: "/authkm.AuthKam/Authenticate".to_string(),
+                        name: "/grpc.AuthKam/Authenticate".to_string(),
                         streaming: ::grpc::rt::GrpcStreaming::Unary,
                         req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                         resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -89,7 +89,7 @@ impl AuthKamServer {
                 ),
                 ::grpc::rt::ServerMethod::new(
                     ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
-                        name: "/authkm.AuthKam/Enroll".to_string(),
+                        name: "/grpc.AuthKam/Enroll".to_string(),
                         streaming: ::grpc::rt::GrpcStreaming::Unary,
                         req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                         resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
