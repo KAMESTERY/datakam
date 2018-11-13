@@ -27,6 +27,9 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [Announcing Terraform Support for Kubernetes Service on AWS](https://www.hashicorp.com/blog/hashicorp-announces-terraform-support-aws-kubernetes)
+* [What data type should be use for timestamp in DynamoDB?](https://stackoverflow.com/questions/40561484/what-data-type-should-be-use-for-timestamp-in-dynamodb)
+* [Chrono: Date and Time for Rust](https://github.com/chronotope/chrono)
 * [This is a gRPC client-side load balancing example on top of grpc-go.](https://github.com/hakobe/grpc-go-client-side-load-balancing-example)
 * [List of AWS Service Principals](https://gist.github.com/outcastgeek/893e45fe64b13d7a642ecfb77e03c69f)
 * [AWS Policy Generator](https://awspolicygen.s3.amazonaws.com/policygen.html)

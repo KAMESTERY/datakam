@@ -2,10 +2,10 @@
 use std::collections::HashMap;
 use juniper::{FieldResult, RootNode};
 use dal::{
-    DynaDB, create_complete_user,
+    DynaDB, create_complete_user, create_documents,
     create_complete_thing, delete_complete_thing,
     User, UserProfile, UserGroup, UserAuthData,
-    Thing, Data, ThingInput,ThingOutput
+    Thing, Data, ThingDataTrait, DocumentInput, ThingInput,ThingOutput
 };
 use validation::{
     AuthDataTrait,
@@ -90,6 +90,18 @@ graphql_object!(QueryRoot: () |&self| {
         )
     }
 
+    field query_les_choses(
+                token: String, user_id: String,
+                filter_expr: Option<String>,
+                key_condition_expr: Option<String>,
+                data: Option<Vec<Vec<String>>>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(ThingOutput::query_les_choses(user_id, filter_expr, key_condition_expr, data))
+        )
+    }
+
     field get_les_choses(token: String, user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<ThingOutput>>> {
         secured!(
             token,
@@ -134,6 +146,15 @@ graphql_object!(MutationRoot: () |&self| {
             //TODO: How to return AttributeValue struct?
             // field create_user(user_id: String, email: String, username: String, password: String) -> FieldResult<Option<HashMap<String, AttributeValue>>> {
             Ok(Some(create_complete_user(user_id, email, username, password)))
+        )
+    }
+    field create_documents(user_id: String, token: String, documents: Vec<DocumentInput>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id,
+            Ok(Some(
+                create_documents(documents)
+            ))
         )
     }
     field create_complete_thing(token: String, thing: ThingInput) -> FieldResult<Option<String>> {

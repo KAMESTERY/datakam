@@ -2,8 +2,56 @@
 use rusoto_dynamodb::{AttributeValue};
 use std::collections::HashMap;
 use uuid::Uuid;
+use rayon::prelude::*;
+use chrono::prelude::*;
 use dal::dynatraits::{ModelDynaConv};
 use dal::dynamodb::{attr_n, attr_s, attr_ss, DynaDB};
+
+pub trait ThingDataTrait {
+    fn get_data(&self) -> Vec<Vec<String>>;
+    fn data_as_hashmap(&self) -> Result<HashMap<String, String>, &'static str> {
+        Ok(data_as_hashmap(self.get_data().clone()))
+    }
+}
+
+pub fn data_as_hashmap(data: Vec<Vec<String>>) -> HashMap<String, String> {
+    let mut hm = HashMap::new();
+    data.clone().into_iter().for_each(|v| {
+        let k: String = v.get(0)
+            .expect("No Key Provided")
+            .to_string();
+        let v: String = v.get(1)
+            .expect("No Value Provided")
+            .to_string();
+        hm.insert(k, v);
+    });
+    debug!("Transformed VecOfVec {:?} into Map {:?}", data, hm);
+    hm
+}
+
+#[derive(GraphQLInputObject)]
+#[graphql(description = "A DocumentInput :-)")]
+pub struct DocumentInput {
+    pub name: String,
+    pub user_id: String,
+    pub document_id: String,
+    pub data: Vec<Vec<String>>
+}
+
+impl ThingDataTrait for DocumentInput {
+    fn get_data(&self) -> Vec<Vec<String>> {
+        self.data.clone()
+    }
+}
+
+pub fn create_documents(documents: Vec<DocumentInput>) -> Vec<String> {
+    documents.par_iter().map(|doc| {
+        match doc.data_as_hashmap().ok() {
+            Some(data_map) => create_thing(doc.name.clone(), doc.user_id.clone(), data_map, doc.document_id.clone()),
+            None => String::from("")
+        }
+    }).collect()
+}
 
 #[derive(GraphQLInputObject)]
 #[graphql(description = "A ThingInput :-)")]
@@ -14,21 +62,15 @@ pub struct ThingInput {
 //    pub data: Vec<(String, String)>
 }
 
-impl ThingInput {
-    pub fn data_as_hashmap(&self) -> Result<HashMap<String, String>, &'static str> {
-        let mut h = HashMap::new();
-        self.data.clone().into_iter().for_each(|v| {
-            let k: String = v.get(0)
-                .expect("No Key Provided")
-                .to_string();
-            let v: String = v.get(1)
-                .expect("No Value Provided")
-                .to_string();
-            h.insert(k, v);
-        });
-        debug!("Transformed VecOfVec {:?} into Map {:?}", self.data, h);
-        Ok(h)
+impl ThingDataTrait for ThingInput {
+    fn get_data(&self) -> Vec<Vec<String>> {
+        self.data.clone()
     }
+}
+
+pub fn create_complete_thing(name: String, user_id: String, data: HashMap<String, String>) -> String {
+    let thing_id = format!("{}", Uuid::new_v4());
+    create_thing(name, user_id, data, thing_id)
 }
 
 #[derive(Clone, Debug, GraphQLObject)]
@@ -38,6 +80,18 @@ pub struct ThingOutput {
 }
 
 impl ThingOutput {
+    pub fn query_les_choses(user_id: String, filter_expr: Option<String>, key_condition_expr: Option<String>, raw_data: Option<Vec<Vec<String>>>) -> Option<Vec<ThingOutput>> {
+        let mut data= HashMap::new();
+        if raw_data.is_some() {
+            let d = data_as_hashmap(raw_data.unwrap());
+            for (k, v) in d {
+                data.insert(k, attr_s(Some(v)));
+            }
+        }
+        let things: Vec<Thing> = DynaDB::query(String::from("Things"), Some(data), filter_expr, key_condition_expr)?;
+        ThingOutput::to_thingouput_vec(things)
+    }
+
     pub fn get_les_choses(user_id: String, names: Vec<String>) -> Option<Vec<ThingOutput>> {
         let thing_keys = names.into_iter().map(|name| {
             [
@@ -46,21 +100,7 @@ impl ThingOutput {
             ].iter().cloned().collect()
         }).collect();
         let things: Vec<Thing> = DynaDB::batchget_table(String::from("Things"), thing_keys)?;
-        let list_of_choses = things.clone().iter().map(|thing: &Thing| {
-            let data_ids = thing.to_owned().data_ids?;
-            let data_keys = data_ids.into_iter().map(|id| {
-                [
-                    (String::from("ThingID"), attr_s(thing.to_owned().thing_id)),
-                    (String::from("DataID"), attr_s(Some(id)))
-                ].iter().cloned().collect()
-            }).collect();
-            let data: Vec<Data> = DynaDB::batchget_table(String::from("Data"), data_keys)?;
-           Some( ThingOutput { thing: thing.to_owned(), data })
-        }).filter(|c| {
-            c.is_some()
-        }).map(|x| x.unwrap()).collect();
-
-        Some(list_of_choses)
+        ThingOutput::to_thingouput_vec(things)
     }
 
     pub fn get_thing_output(name: String, user_id: String) -> Option<ThingOutput> {
@@ -77,42 +117,54 @@ impl ThingOutput {
             ThingOutput { thing, data }
         )
     }
+
+    fn to_thingouput_vec(things: Vec<Thing>) -> Option<Vec<ThingOutput>> {
+        let list_of_choses = things.clone().iter().map(|thing: &Thing| {
+            let data_ids = thing.to_owned().data_ids?;
+            let data_keys = data_ids.into_iter().map(|id| {
+                [
+                    (String::from("ThingID"), attr_s(thing.to_owned().thing_id)),
+                    (String::from("DataID"), attr_s(Some(id)))
+                ].iter().cloned().collect()
+            }).collect();
+            let data: Vec<Data> = DynaDB::batchget_table(String::from("Data"), data_keys)?;
+            Some(ThingOutput { thing: thing.to_owned(), data })
+        }).filter(|c| {
+            c.is_some()
+        }).map(|x| x.unwrap()).collect();
+        Some(list_of_choses)
+    }
 }
 
-pub fn create_complete_thing(name: String, user_id: String, data: HashMap<String, String>) -> String {
-    let thing_id = Uuid::new_v4();
-    let thing_id_string = format!("{}", thing_id);
+fn create_thing(name: String, user_id: String, data: HashMap<String, String>, thing_id: String) -> String {
     let mut data_ids = Vec::new();
-
     for (k, v) in data {
         let data_id = Uuid::new_v4();
         let data_id_string = format!("{}", data_id);
         Data::create_datum(
             data_id_string.clone(),
-            thing_id_string.clone(),
+            thing_id.clone(),
             k,
             v
         );
         data_ids.push(data_id_string)
     }
-
-    let created_at = String::from("today");
-    let updated_at = String::from("today");
+    let now_string = Utc::now().to_string(); // ISO 8601
+    let created_at = String::from(now_string.clone());
+    let updated_at = String::from(now_string);
     let version = 0;
     let score = 0;
-
     Thing::create_thing(
-        name,
+        name.clone(),
         user_id,
-        format!("{}", thing_id),
+        thing_id,
         version,
         score,
         created_at,
         updated_at,
         data_ids
     );
-
-    String::from("SUCCESS")
+    name
 }
 
 pub fn delete_complete_thing(name: String, user_id: String) -> Option<String> {

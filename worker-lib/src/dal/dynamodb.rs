@@ -62,8 +62,8 @@ impl DynaDB {
         }
     }
 
-    pub fn query<T: ModelDynaConv>(table: String, key_condition_expr: String, data: HashMap<String, AttributeValue>) -> Option<Vec<T>> {
-        let response = _query(table, key_condition_expr, data);
+    pub fn query<T: ModelDynaConv>(table: String, data: Option<HashMap<String, AttributeValue>>, filter_expr: Option<String>, key_condition_expr: Option<String>) -> Option<Vec<T>> {
+        let response = _query(table, data, filter_expr, key_condition_expr);
 
         match response {
             Some(res) => Some(res.iter().map(|data|
@@ -136,10 +136,11 @@ fn _batchget(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Optio
     results
 }
 
-fn _query(table: String, key_condition_expr: String, data: HashMap<String, AttributeValue>) -> Option<Vec<HashMap<String, AttributeValue>>> {
+fn _query(table: String, data: Option<HashMap<String, AttributeValue>>, filter_expr: Option<String>, key_condition_expr: Option<String>) -> Option<Vec<HashMap<String, AttributeValue>>> {
 
     let query_input = QueryInput::new(table)
         .with_data(data)
+        .with_filter_expr(filter_expr)
         .with_key_condition_expr(key_condition_expr);
 
     let client = DynamoDbClient::new(Region::UsEast1);

@@ -23,24 +23,27 @@ case $1 in
         genRsa
         ;;
     sub.update)
-        rm -rf $BASEDIR/webkam $BASEDIR/worker-rpc/svc
+        rm -rf $BASEDIR/webkam $BASEDIR/controlkam $BASEDIR/worker-rpc/svc $BASEDIR/worker-fn/svc
         git config -f .gitmodules --get-regexp '^submodule\..*\.path$' |
         while read path_key path
         do
             url_key=$(echo $path_key | sed 's/\.path/.url/')
             url=$(git config -f .gitmodules --get "$url_key")
             git submodule add --force $url $path
-            cd $path && git pull
+            cd $path && git reset master@{upstream} && git pull && cd ..
         done
         ;;
     build.workers.lambda)
-        docker run --rm -v $BASEDIR/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v $BASEDIR:/code -w /code og-rust-lambda:0.1 cargo build --release
+        docker run --rm -v $BASEDIR/cargo:/home/cargo -e CARGO_HOME='/home/cargo' -v $BASEDIR:/code -w /code outcastgeek/rust-lambda:0.1 cargo build --release
         ;;
     build.workers.ubuntu)
         docker build -t worker_rpc-rust-ubuntu:0.1 -f $BASEDIR/infrastructure/Dockerfile.ubuntu $BASEDIR
         ;;
-    build.webkam)
-        cd $BASEDIR/webkam; make build-ui; GOOS=linux GOARCH=amd64 go build -o server *.go
+    build.webapp)
+        cd $2; make build-ui; GOOS=linux GOARCH=amd64 go build -o server main.go
+        # cd $2; GOOS=linux GOARCH=amd64 go build -o server main.go
+        # cd $2; GOOS=linux GOARCH=amd64 go build -o server *.go
+        # cd $2; make build-ui; GOOS=linux GOARCH=amd64 go build -o server *.go
         ;;
     deploy.function)
         cd $2; up $3

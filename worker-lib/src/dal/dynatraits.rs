@@ -90,8 +90,9 @@ impl PutItemInputBuilder for PutItemInput {
 
 pub trait QueryInputBuilder {
     fn new(table: String) -> Self;
-    fn with_data(&mut self, data: HashMap<String, AttributeValue>) -> Self;
-    fn with_key_condition_expr(&mut self, expr: String) -> Self;
+    fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self;
+    fn with_key_condition_expr(&mut self, expr: Option<String>) -> Self;
+    fn with_filter_expr(&mut self, expr: Option<String>) -> Self;
 }
 
 impl QueryInputBuilder for QueryInput {
@@ -117,13 +118,18 @@ impl QueryInputBuilder for QueryInput {
         }
     }
 
-    fn with_data(&mut self, data: HashMap<String, AttributeValue>) -> Self {
-        self.expression_attribute_values = Some(data);
+    fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self {
+        self.expression_attribute_values = data;
         self.clone()
     }
 
-    fn with_key_condition_expr(&mut self, expr: String) -> Self {
-        self.key_condition_expression = Some(expr);
+    fn with_key_condition_expr(&mut self, expr: Option<String>) -> Self {
+        self.key_condition_expression = expr;
+        self.clone()
+    }
+
+    fn with_filter_expr(&mut self, expr: Option<String>) -> Self {
+        self.filter_expression = expr;
         self.clone()
     }
 }

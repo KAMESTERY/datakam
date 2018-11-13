@@ -57,7 +57,7 @@ fn crud_user() {
         ]
             .iter().cloned().collect();
 
-    let users: Option<Vec<User>> = DynaDB::query(table_name.clone(), key_condition_expr, data);
+    let users: Option<Vec<User>> = DynaDB::query(table_name.clone(), Some(data), None, Some(key_condition_expr));
 
     println!("Users: {:?}", users);
 

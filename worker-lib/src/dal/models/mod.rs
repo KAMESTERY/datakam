@@ -9,7 +9,8 @@ pub use self::user_info::{
     User, UserProfile, UserGroup, UserAuthData
 };
 pub use self::things::{
+    create_documents,
     create_complete_thing,
     delete_complete_thing,
-    Thing, Data, ThingInput, ThingOutput
+    Thing, Data, ThingDataTrait, DocumentInput, ThingInput, ThingOutput
 };

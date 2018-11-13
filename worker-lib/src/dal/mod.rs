@@ -13,9 +13,9 @@ pub use self::dynamodb::{
     DynaDB
 };
 pub use self::models::{
-    create_complete_user, create_complete_thing, delete_complete_thing,
+    create_documents, create_complete_user, create_complete_thing, delete_complete_thing,
     User, UserProfile, UserGroup, UserAuthData,
-    Thing, Data, ThingInput, ThingOutput
+    Thing, Data, ThingDataTrait, DocumentInput, ThingInput, ThingOutput
 };
 
 #[cfg(test)] mod tests;

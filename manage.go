@@ -74,7 +74,9 @@ func main() {
 		wg.Add(1)
 		go buildWorkersForDeploy(&wg, deploymentAssets)
 		wg.Add(1)
-		go buildWebKam(&wg, deploymentAssets)
+		go buildWebApp(&wg, deploymentAssets, "webkam", "dev")
+		wg.Add(1)
+		go buildWebApp(&wg, deploymentAssets, "controlkam", "ck_dev")
 		wg.Wait()
 		log.Print("Completed Functions Deployment")
 	}
@@ -99,7 +101,7 @@ func buildWorkerDockerImage() {
 	var wgDockerBuilder sync.WaitGroup
 	wgDockerBuilder.Add(1)
 	go func(wg *sync.WaitGroup) {
-		lambdaWorkerBuilderCmd := exec.Command("docker", "build", "-t", "og-rust-lambda:0.1", "-f", baseDir+"/infrastructure/Dockerfile.lambda", baseDir+"/infrastructure")
+		lambdaWorkerBuilderCmd := exec.Command("docker", "build", "-t", "outcastgeek/rust-lambda:0.1", "-f", baseDir+"/infrastructure/Dockerfile.lambda", baseDir+"/infrastructure")
 		execute(lambdaWorkerBuilderCmd)
 		wg.Done()
 	}(&wgDockerBuilder)
@@ -144,17 +146,17 @@ func buildWorkersForDeploy(wg *sync.WaitGroup, distBase string) {
 	wg.Done()
 }
 
-func buildWebKam(wg *sync.WaitGroup, distBase string) {
-	log.Print("Building WebKam...")
-	buildWorkerCmd := exec.Command("sh", baseDir+"/cmd.sh", "build.webkam")
+func buildWebApp(wg *sync.WaitGroup, distBase, webapp, env string) {
+	log.Printf("Building %s...", webapp)
+	buildWorkerCmd := exec.Command("sh", baseDir+"/cmd.sh", "build.webapp", baseDir+"/"+webapp)
 	execute(buildWorkerCmd)
-	publishBinaryCmd := exec.Command("cp", baseDir+"/webkam/server", distBase+"/webkam/server")
+	publishBinaryCmd := exec.Command("cp", baseDir+"/"+webapp+"/server", distBase+"/"+webapp+"/server")
 	execute(publishBinaryCmd)
-	publishBinaryCmd = exec.Command("cp", "-R", baseDir+"/webkam/templates", distBase+"/webkam/templates")
+	publishBinaryCmd = exec.Command("cp", "-R", baseDir+"/"+webapp+"/templates", distBase+"/"+webapp+"/templates")
 	execute(publishBinaryCmd)
-	publishBinaryCmd = exec.Command("cp", "-R", baseDir+"/webkam/static", distBase+"/webkam/static")
+	publishBinaryCmd = exec.Command("cp", "-R", baseDir+"/"+webapp+"/static", distBase+"/"+webapp+"/static")
 	execute(publishBinaryCmd)
-	deployCmd := exec.Command("sh", baseDir+"/cmd.sh", "deploy.function", distBase+"/webkam/", "dev")
+	deployCmd := exec.Command("sh", baseDir+"/cmd.sh", "deploy.function", distBase+"/"+webapp+"/", env)
 	execute(deployCmd)
 	wg.Done()
 }
@@ -165,6 +167,8 @@ func prepDeploymentAssets(deploymentAssets string) {
 	assetsFoldersCmd := exec.Command("mkdir", "-p", deploymentAssets+"/workerfn")
 	execute(assetsFoldersCmd)
 	assetsFoldersCmd = exec.Command("mkdir", "-p", deploymentAssets+"/webkam")
+	execute(assetsFoldersCmd)
+	assetsFoldersCmd = exec.Command("mkdir", "-p", deploymentAssets+"/controlkam")
 	execute(assetsFoldersCmd)
 	cargoFolderCmd := exec.Command("mkdir", "-p", baseDir+"/cargo")
 	execute(cargoFolderCmd)
@@ -186,6 +190,16 @@ func prepDeploymentAssets(deploymentAssets string) {
 		},
 	)
 	writeFile(deploymentAssets+"/webkam/up.json", upWebkam)
+	// Prep ControlKam
+	upControlkam := renderTmpl(
+		"controlkam_up_json.tmpl",
+		map[string]string{
+			"log_level":       "DEBUG",
+			"backend_key":     "data-dev",
+			"rpc_backend_key": "35.175.245.161:80",
+		},
+	)
+	writeFile(deploymentAssets+"/controlkam/up.json", upControlkam)
 }
 
 func cleanupDeploymentAssets(deploymentAssets string) {

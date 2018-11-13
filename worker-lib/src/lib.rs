@@ -27,6 +27,8 @@ extern crate rusoto_core;
 extern crate rusoto_dynamodb;
 extern crate jsonwebtoken as jwt;
 extern crate core;
+extern crate rayon;
+extern crate chrono;
 
 #[macro_use]
 mod macros;

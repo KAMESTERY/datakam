@@ -10,15 +10,27 @@ log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug
 #log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 env_logger = "0.5"
 openssl-probe = "0.1"
+
 # Concurrency
 futures = "0.1"
 num_cpus = "1.0"
+
 # Web
 actix = "0.7"
 actix-web = "0.7"
-juniper = "0.9.2"
-juniper_codegen = "0.9.2"
+
+# GraphQL
+juniper = "0.10"
+juniper_codegen = "0.10"
+
 # Json
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
+
+# Protocol Buffers
+bytes = "0.4"
+protobuf = { version = "~2.1", features = ["with-bytes"] }
+
+[build-dependencies]
+protoc-rust = "2.1"

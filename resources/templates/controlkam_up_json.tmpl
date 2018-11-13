@@ -1,7 +1,7 @@
 
-{{ define "webkam_up_json.tmpl" }}
+{{ define "controlkam_up_json.tmpl" }}
 {
-  "name": "webkam",
+  "name": "controlkam",
   "profile": "default",
   "regions": [
     "us-east-1"
@@ -22,14 +22,14 @@
     ]
   },
   "stages": {
-    "prod": {
-      "domain": "kamestery.com"
+    "ck_prod": {
+      "domain": "ctrlkm.kamestery.com"
     },
-    "stage": {
-      "domain": "stage.kamestery.com"
+    "ck_stage": {
+      "domain": "ctrlkm-stage.kamestery.com"
     },
-    "dev": {
-      "domain": "dev.kamestery.com"
+    "ck_dev": {
+      "domain": "ctrlkm-dev.kamestery.com"
     }
   },
   "environment": {

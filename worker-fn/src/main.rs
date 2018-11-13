@@ -11,6 +11,8 @@ extern crate actix;
 extern crate actix_web;
 extern crate env_logger;
 extern crate core;
+extern crate bytes;
+extern crate protobuf;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -24,6 +26,7 @@ extern crate openssl_probe;
 extern crate worker_lib;
 
 mod app_state;
+mod api;
 
 use actix::prelude::*;
 use actix_web::{

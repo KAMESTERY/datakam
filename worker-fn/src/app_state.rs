@@ -28,7 +28,7 @@ impl Message for GraphQLData {
 }
 
 pub struct GraphQLExecutor {
-    schema: Arc<Schema>,
+        schema: Arc<Schema>,
 }
 
 impl GraphQLExecutor {
