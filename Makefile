@@ -19,6 +19,10 @@ REVISION=$(shell echo `git rev-parse HEAD`)
 devops-init:
 	rm -rf .terraform
 	terraform init infrastructure
+	brew update && brew install terraform kops kubernetes-cli kubernetes-helm
+	go get -u github.com/kubernetes/kompose
+	go get -u -v github.com/heptio/authenticator/...
+#	cp $(GOPATH)/bin/aws-iam-authenticator $(GOPATH)/bin/heptio-authenticator-aws
 
 lightsail_keys:
 	rm -rf $(INFRASTRUCTURE)/lightsail_keys/*

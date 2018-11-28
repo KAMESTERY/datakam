@@ -27,6 +27,14 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [Kubernetes Web UI (Dashboard)](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+* [EC2 ELB PROXY protocol support](https://github.com/heptio/contour/blob/master/docs/proxy-proto.md)
+* [HELM Role-based Access Control](https://github.com/helm/helm/blob/master/docs/rbac.md)
+* [Configure RBAC In Your Kubernetes Cluster](https://docs.bitnami.com/kubernetes/how-to/configure-rbac-in-your-kubernetes-cluster/)
+* [Kubernetes Configure Service Accounts for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+* [Translate a Docker Compose File to Kubernetes Resources](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/)
+* [Getting Started with AWS EKS](https://www.terraform.io/docs/providers/aws/guides/eks-getting-started.html#kubernetes-worker-nodes)
+* [AWS vpc](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws)
 * [Announcing Terraform Support for Kubernetes Service on AWS](https://www.hashicorp.com/blog/hashicorp-announces-terraform-support-aws-kubernetes)
 * [What data type should be use for timestamp in DynamoDB?](https://stackoverflow.com/questions/40561484/what-data-type-should-be-use-for-timestamp-in-dynamodb)
 * [Chrono: Date and Time for Rust](https://github.com/chronotope/chrono)

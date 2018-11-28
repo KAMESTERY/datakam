@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x #echo on
+#set -x #echo on
 
 BASEDIR=`pwd`
 unamestr=`uname`
@@ -7,6 +7,8 @@ RUSTY_WORKER=worker-fn
 RUSTY_WORKER_RPC=worker-rpc
 RUSTY_LIBWORKEREXT=workerext
 RUSTY_WORKER_LIB=worker-lib
+KUBECONFIG=$BASEDIR/infrastructure/kube/ekskam-kubeconfig.yml
+HELM_HOME=$BASEDIR/infrastructure/kube/tools/.helm
 
 genRsa() {
     openssl genrsa -out $BASEDIR/$RUSTY_WORKER_LIB/src/private_rsa_key.pem 4096
@@ -62,6 +64,19 @@ case $1 in
         cargo +nightly build --target wasm32-unknown-unknown --release
         mkdir -p worker-fn/wasm
         wasm-bindgen target/wasm32-unknown-unknown/debug/hello_world_wasm.wasm --nodejs --out-dir worker-fn/wasm
+        ;;
+    terraform)
+        terraform $2 $3 $4 $5 $6 $7 $8 $9 $BASEDIR/infrastructure
+        ;;
+    kubectl)
+        KUBECONFIG=$KUBECONFIG kubectl $2 $3 $4 $5 $6 $7 $8 $9
+        KUBECONFIG=$KUBECONFIG kubectl --namespace $2 logs -lapp=$3 --all-containers=true
+        ;;
+    kalogs)
+        KUBECONFIG=$KUBECONFIG kubectl --namespace $2 logs -lapp=$3 --all-containers=true
+        ;;
+    helm)
+        KUBECONFIG=$KUBECONFIG HELM_HOME=$HELM_HOME helm $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     esac
 exit 0
