@@ -2,6 +2,7 @@
 name = "worker-fn"
 version = "0.1.0"
 authors = ["outcastgeek <outcastgeek+git@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 worker-lib = { path = "../worker-lib" }

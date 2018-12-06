@@ -3,41 +3,32 @@
 //! A simple example integrating juniper in actix-web
 //!
 
-//#![warn(rust_2018_idioms)]
-
 #[macro_use]
 extern crate log;
-extern crate actix;
-extern crate actix_web;
-extern crate env_logger;
-extern crate core;
-extern crate bytes;
-extern crate protobuf;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
-extern crate juniper;
-extern crate juniper_codegen;
-extern crate num_cpus;
-extern crate futures;
-extern crate openssl_probe;
-extern crate worker_lib;
 
-mod app_state;
-mod api;
+use std::env;
 
+use actix;
 use actix::prelude::*;
 use actix_web::{
     App, AsyncResponder, Error, FutureResponse, http, HttpRequest, HttpResponse, Json,
     middleware, server, State,
 };
+use env_logger;
 use futures::future::Future;
 use juniper::http::graphiql::graphiql_source;
+use num_cpus;
+use openssl_probe;
+use serde_json;
+
+use worker_lib::create_schema;
 
 use crate::app_state::{AppState, GraphQLData, GraphQLExecutor};
-use worker_lib::create_schema;
-use std::env;
+
+mod app_state;
+mod api;
 
 fn index(_req: &HttpRequest<AppState>) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::Ok()

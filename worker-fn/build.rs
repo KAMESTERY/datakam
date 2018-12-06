@@ -1,5 +1,5 @@
 
-extern crate protoc_rust;
+use protoc_rust;
 
 use protoc_rust::Customize;
 

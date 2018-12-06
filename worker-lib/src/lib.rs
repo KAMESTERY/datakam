@@ -3,31 +3,24 @@
 //! A simple example integrating juniper in actix-web
 //!
 
-//#![warn(rust_2018_idioms)]
-
-//extern crate wasm_bindgen;
-#[macro_use]
-extern crate log;
-extern crate env_logger;
-extern crate uuid;
-extern crate validator_derive;
-extern crate validator;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
 #[macro_use]
 extern crate juniper;
 #[macro_use]
 extern crate juniper_codegen;
-extern crate data_encoding;
-extern crate ring;
-extern crate rusoto_core;
-extern crate rusoto_dynamodb;
-extern crate jsonwebtoken as jwt;
-extern crate core;
-extern crate rayon;
-extern crate chrono;
+//extern crate wasm_bindgen;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde_derive;
+
+
+use jsonwebtoken as jwt;
+//use wasm_bindgen::prelude::*;
+use juniper::http::GraphQLRequest;
+use serde_json;
+
+pub use crate::dal::DynaDB;
+pub use crate::schema::{create_schema, Schema};
 
 #[macro_use]
 mod macros;
@@ -36,12 +29,6 @@ pub mod dal;
 mod security;
 pub mod authentication;
 mod validation;
-
-//use wasm_bindgen::prelude::*;
-use juniper::http::GraphQLRequest;
-
-pub use crate::schema::{create_schema, Schema};
-pub use crate::dal::{DynaDB};
 
 //#[wasm_bindgen]
 pub fn execute_query(query: String) -> String {

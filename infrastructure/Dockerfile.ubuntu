@@ -1,5 +1,5 @@
 
-FROM rust:latest as build
+FROM rust:1.31 as build
 
 RUN apt-get update -y
 RUN apt-get install zip -y
