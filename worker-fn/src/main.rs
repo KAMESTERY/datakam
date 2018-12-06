@@ -18,7 +18,6 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate juniper;
-#[macro_use]
 extern crate juniper_codegen;
 extern crate num_cpus;
 extern crate futures;
@@ -36,7 +35,7 @@ use actix_web::{
 use futures::future::Future;
 use juniper::http::graphiql::graphiql_source;
 
-use app_state::{AppState, GraphQLData, GraphQLExecutor};
+use crate::app_state::{AppState, GraphQLData, GraphQLExecutor};
 use worker_lib::create_schema;
 use std::env;
 

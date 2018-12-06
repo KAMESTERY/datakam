@@ -1,10 +1,5 @@
-use dal::{attr_s, DynaDB, ModelDynaConv, User};
-use jwt::{self, TokenData};
+use crate::dal::{attr_s, DynaDB, ModelDynaConv, User};
 use rusoto_dynamodb::AttributeValue;
-use security::{
-    check_password, hash_password,
-    jwt_decode, jwt_encode
-};
 use std::collections::HashMap;
 
 static EMAIL: &'static str = "yuyu@yuyu.yuy";

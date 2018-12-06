@@ -1,14 +1,14 @@
-use jwt::{self, TokenData};
-use security as sec;
+
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
-use std::marker::Sized;
-// A trait that the Validate derive will impl
-use validator::{Validate, ValidationError};
+// // A trait that the Validate derive will impl
+// use validator::{Validate, ValidationError};
 
-pub const GUEST: u32 = 0x01;
-pub const USER: u32 = 0x02;
-pub const CONTRIBUTE: u32 = 0x04;
+use crate::security as sec;
+
+//pub const GUEST: u32 = 0x01;
+//pub const USER: u32 = 0x02;
+//pub const CONTRIBUTE: u32 = 0x04;
 pub const MANAGE: u32 = 0x08;
 pub const ADMINISTER: u32 = 0x80;
 
@@ -35,8 +35,8 @@ pub fn from_token<T: AuthDataTrait>(token: String) -> Option<T> {
     Some(claims)
 }
 
-pub fn validate_token<T: AuthDataTrait>(token: String) -> Option<String> {
-    let claims: T = sec::jwt_decode(token)?;
-    let new_token = sec::jwt_encode(claims);
-    new_token
-}
+//pub fn validate_token<T: AuthDataTrait>(token: String) -> Option<String> {
+//    let claims: T = sec::jwt_decode(token)?;
+//    let new_token = sec::jwt_encode(claims);
+//    new_token
+//}

@@ -6,7 +6,7 @@ use rusoto_dynamodb::{
     DeleteItemInput, GetItemInput, PutItemInput, QueryInput
 };
 use std::collections::HashMap;
-use dal::{
+use crate::dal::{
     AttributeValueBuilder, BatchGetItemInputBuilder, DeleteItemInputBuilder,
     GetItemInputBuilder, QueryInputBuilder, PutItemInputBuilder, ModelDynaConv
 };

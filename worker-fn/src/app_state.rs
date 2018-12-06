@@ -33,7 +33,7 @@ pub struct GraphQLExecutor {
 
 impl GraphQLExecutor {
     pub fn new(schema: Arc<Schema>) -> GraphQLExecutor {
-        GraphQLExecutor { schema: schema }
+        GraphQLExecutor { schema }
     }
 }
 

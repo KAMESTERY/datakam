@@ -1,7 +1,7 @@
 
-use dal::{create_complete_user, User, UserAuthData};
-use security::{jwt_encode, jwt_decode, check_password};
-use validation::AuthTrait;
+use crate::dal::{create_complete_user, User, UserAuthData};
+use crate::security::{jwt_encode, jwt_decode, check_password};
+use crate::validation::AuthTrait;
 
 // Enroll
 pub fn enroll(user_id: String, email: String, username: String, password: String) -> String {

@@ -1,8 +1,9 @@
 use data_encoding::HEXUPPER;
-use jwt::{self, Algorithm, Header, TokenData, Validation};
 use ring::{digest, pbkdf2};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
+
+use crate::jwt::{self, Algorithm, Header, Validation};
 
 const MULTI_GENIUS_KID: &'static str = "MULTI_GENIUS_KID";
 
@@ -11,9 +12,9 @@ const N_ITER: u32 = 100_000;
 
 static DIGEST_ALG: &'static digest::Algorithm = &digest::SHA512;
 
-static PRIVATE_KEY_PEM: &'static str = include_str!("private_rsa_key.pem");
+// static PRIVATE_KEY_PEM: &'static str = include_str!("private_rsa_key.pem");
 static PRIVATE_KEY_DER: &'static [u8] = include_bytes!("private_rsa_key.der");
-static PUBLIC_KEY_DER: &'static [u8] = include_bytes!("public_key.der");
+// static PUBLIC_KEY_DER: &'static [u8] = include_bytes!("public_key.der");
 
 //    debug!("Private RSA Key Pem {:?}", PRIVATE_KEY_PEM);
 //    debug!("Private RSA Key Der {:?}", PRIVATE_KEY_DER);

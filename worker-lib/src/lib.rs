@@ -10,7 +10,6 @@
 extern crate log;
 extern crate env_logger;
 extern crate uuid;
-#[macro_use]
 extern crate validator_derive;
 extern crate validator;
 extern crate serde;
@@ -41,8 +40,8 @@ mod validation;
 //use wasm_bindgen::prelude::*;
 use juniper::http::GraphQLRequest;
 
-pub use schema::{create_schema, Schema};
-pub use dal::{DynaDB};
+pub use crate::schema::{create_schema, Schema};
+pub use crate::dal::{DynaDB};
 
 //#[wasm_bindgen]
 pub fn execute_query(query: String) -> String {
@@ -78,7 +77,7 @@ pub fn execute_query(query: String) -> String {
 mod tests {
     use super::*;
 
-    static get_things_hhhh_query: &'static str = include_str!("get_things_hhhh_query.graphql");
+    static GET_THINGS_HHHH_QUERY: &'static str = include_str!("get_things_hhhh_query.graphql");
 
     #[test]
     fn it_works() {
@@ -89,7 +88,7 @@ mod tests {
     fn test_query_execution() {
 
         let gql_response = execute_query(
-            format!("{{\"query\": \"{}\"}}", get_things_hhhh_query.to_string())
+            format!("{{\"query\": \"{}\"}}", GET_THINGS_HHHH_QUERY.to_string())
         );
 //        let gql_response = unsafe {
 //            execute_query(

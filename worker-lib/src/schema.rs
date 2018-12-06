@@ -1,23 +1,19 @@
-
 use std::collections::HashMap;
+
 use juniper::{FieldResult, RootNode};
-use dal::{
-    DynaDB, create_complete_user, create_documents,
-    create_complete_thing, delete_complete_thing,
-    User, UserProfile, UserGroup, UserAuthData,
-    Thing, Data, ThingDataTrait, DocumentInput, ThingInput,ThingOutput
+
+use crate::authentication as auth;
+use crate::dal::{
+    create_complete_thing, create_complete_user, create_documents, delete_complete_thing,
+    DocumentInput, DynaDB, ThingDataTrait, ThingInput, ThingOutput,
+    User, UserAuthData, UserGroup, UserProfile
 };
-use validation::{
+use crate::validation::{
+    ADMINISTER,
     AuthDataTrait,
     from_token,
-    validate_token,
-    GUEST,
-    USER,
-    CONTRIBUTE,
-    MANAGE,
-    ADMINISTER
+    MANAGE
 };
-use authentication as auth;
 
 #[derive(GraphQLEnum)]
 enum Episode {
@@ -151,7 +147,7 @@ graphql_object!(MutationRoot: () |&self| {
     field create_documents(user_id: String, token: String, documents: Vec<DocumentInput>) -> FieldResult<Option<Vec<String>>> {
         secured!(
             token,
-            user_id,
+            user_id.clone(),
             Ok(Some(
                 create_documents(documents)
             ))

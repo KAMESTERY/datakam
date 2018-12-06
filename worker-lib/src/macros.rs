@@ -1,15 +1,14 @@
-
-use dal::{UserAuthData};
-use validation::{
-    AuthDataTrait,
-    from_token,
-    validate_token,
-    GUEST,
-    USER,
-    CONTRIBUTE,
-    MANAGE,
-    ADMINISTER
-};
+//use crate::dal::UserAuthData;
+//use crate::validation::{
+//    ADMINISTER,
+//    AuthDataTrait,
+//    CONTRIBUTE,
+//    from_token,
+//    GUEST,
+//    MANAGE,
+//    USER,
+//    validate_token
+//};
 
 #[macro_export]
 macro_rules! secured {
@@ -18,7 +17,7 @@ macro_rules! secured {
             let user_auth: Option<UserAuthData> = from_token($token);
             match user_auth {
                 Some(auth) => {
-                    if auth.can($id, MANAGE as i32) {
+                    if auth.can($id, MANAGE as i32) || auth.can($id, ADMINISTER as i32) {
                         $dowork
                     } else {
                         Ok(None)

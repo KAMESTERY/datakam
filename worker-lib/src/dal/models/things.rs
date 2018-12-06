@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use rayon::prelude::*;
 use chrono::prelude::*;
-use dal::dynatraits::{ModelDynaConv};
-use dal::dynamodb::{attr_n, attr_s, attr_ss, DynaDB};
+use crate::dal::dynatraits::{ModelDynaConv};
+use crate::dal::dynamodb::{attr_n, attr_s, attr_ss, DynaDB};
 
 pub trait ThingDataTrait {
     fn get_data(&self) -> Vec<Vec<String>>;
@@ -80,7 +80,7 @@ pub struct ThingOutput {
 }
 
 impl ThingOutput {
-    pub fn query_les_choses(user_id: String, filter_expr: Option<String>, key_condition_expr: Option<String>, raw_data: Option<Vec<Vec<String>>>) -> Option<Vec<ThingOutput>> {
+    pub fn query_les_choses(_user_id: String, filter_expr: Option<String>, key_condition_expr: Option<String>, raw_data: Option<Vec<Vec<String>>>) -> Option<Vec<ThingOutput>> {
         let mut data= HashMap::new();
         if raw_data.is_some() {
             let d = data_as_hashmap(raw_data.unwrap());
