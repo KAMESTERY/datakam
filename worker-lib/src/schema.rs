@@ -4,9 +4,11 @@ use juniper::{FieldResult, RootNode};
 
 use crate::authentication as auth;
 use crate::dal::{
-    create_complete_thing, create_complete_user, create_documents, delete_complete_thing,
+    create_complete_user, create_complete_thing, delete_complete_thing,
+    create_documents, update_documents, delete_documents,
     DocumentInput, DynaDB, ThingDataTrait, ThingInput, ThingOutput,
     User, UserAuthData, UserGroup, UserProfile
+//    , ContentList
 };
 use crate::validation::{
     ADMINISTER,
@@ -86,24 +88,98 @@ graphql_object!(QueryRoot: () |&self| {
         )
     }
 
-    field query_les_choses(
+    field scan_les_choses(
                 token: String, user_id: String,
+                index_name: Option<String>,
+                attr_names: Option<Vec<Vec<String>>>,
                 filter_expr: Option<String>,
-                key_condition_expr: Option<String>,
-                data: Option<Vec<Vec<String>>>) -> FieldResult<Option<Vec<ThingOutput>>> {
+                projection_expr: Option<String>,
+                limit: i32,
+                data: Option<Vec<Vec<String>>>
+            ) -> FieldResult<Option<Vec<ThingOutput>>> {
         secured!(
             token,
             user_id.clone(),
-            Ok(ThingOutput::query_les_choses(user_id, filter_expr, key_condition_expr, data))
+            Ok(ThingOutput::scan_les_choses(
+                user_id,
+                index_name,
+                attr_names,
+                filter_expr,
+                projection_expr,
+                Some(i64::from(limit)),
+                data
+            ))
         )
     }
 
-    field get_les_choses(token: String, user_id: String, names: Vec<String>) -> FieldResult<Option<Vec<ThingOutput>>> {
+    field query_les_choses(
+                token: String,
+                user_id: String,
+                index_name: Option<String>,
+                attr_names: Option<Vec<Vec<String>>>,
+                filter_expr: Option<String>,
+                key_condition_expr: Option<String>,
+                projection_expr: Option<String>,
+                select: Option<String>,
+                limit: Option<i32>,
+                data: Option<Vec<Vec<String>>>
+            ) -> FieldResult<Option<Vec<ThingOutput>>> {
+        let limit64 = match limit {
+            Some(l) => Some(i64::from(l)),
+            None => None
+        };
         secured!(
             token,
             user_id.clone(),
-            Ok(ThingOutput::get_les_choses(user_id, names))
+            Ok(ThingOutput::query_les_choses(
+                index_name,
+                attr_names,
+                filter_expr,
+                key_condition_expr,
+                projection_expr,
+                select,
+                limit64,
+                data
+            ))
         )
+    }
+
+    field query_public_choses(
+                index_name: Option<String>,
+                attr_names: Option<Vec<Vec<String>>>,
+                filter_expr: Option<String>,
+                key_condition_expr: Option<String>,
+                projection_expr: Option<String>,
+                select: Option<String>,
+                limit: Option<i32>,
+                data: Option<Vec<Vec<String>>>
+            ) -> FieldResult<Option<Vec<ThingOutput>>> {
+        let limit64 = match limit {
+            Some(l) => Some(i64::from(l)),
+            None => None
+        };
+        Ok(ThingOutput::query_les_choses(
+                index_name,
+                attr_names,
+                filter_expr,
+                key_condition_expr,
+                projection_expr,
+                select,
+                limit64,
+                data
+            ))
+    }
+
+    field get_les_choses(token: String, user_id: String, data: Vec<Vec<String>>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(ThingOutput::get_les_choses(data))
+        )
+    }
+
+    field get_public_choses(data: Vec<Vec<String>>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        Ok(ThingOutput::get_les_choses(data))
     }
 
     field list_dynamodb_tables(&executor) -> FieldResult<Option<Vec<String>>> {
@@ -153,6 +229,24 @@ graphql_object!(MutationRoot: () |&self| {
             ))
         )
     }
+    field update_documents(user_id: String, token: String, documents: Vec<DocumentInput>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(Some(
+                update_documents(documents)
+            ))
+        )
+    }
+    field delete_documents(user_id: String, token: String, data: Vec<Vec<String>>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(Some(
+                delete_documents(data)
+            ))
+        )
+    }
     field create_complete_thing(token: String, thing: ThingInput) -> FieldResult<Option<String>> {
         let data: HashMap<String, String> = thing.data_as_hashmap()?;
         secured!(
@@ -162,7 +256,8 @@ graphql_object!(MutationRoot: () |&self| {
                 create_complete_thing(
                     thing.name,
                     thing.user_id,
-                    data
+                    data,
+                    thing.tags
                 )
             ))
         )

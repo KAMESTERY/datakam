@@ -1,6 +1,11 @@
 
 use rusoto_dynamodb::{
-    AttributeValue, BatchGetItemInput, DeleteItemInput, GetItemInput, KeysAndAttributes, PutItemInput, QueryInput
+    AttributeValue, BatchGetItemInput,
+    DeleteItemInput, GetItemInput,
+    KeysAndAttributes, PutItemInput,
+    QueryInput, ScanInput,
+    BatchWriteItemInput, WriteRequest,
+    DeleteRequest, PutRequest
 };
 use std::collections::HashMap;
 
@@ -20,17 +25,14 @@ impl BatchGetItemInputBuilder for BatchGetItemInput {
     fn new() -> Self {
         BatchGetItemInput {
             request_items: HashMap::new(),
-            return_consumed_capacity: None,
+            ..BatchGetItemInput::default()
         }
     }
 
     fn with_keys(&mut self, table_name: String, keys: Vec<HashMap<String, AttributeValue>>) -> Self {
         let kt = KeysAndAttributes{
-            attributes_to_get: None,
-            consistent_read: None,
-            expression_attribute_names: None,
             keys,
-            projection_expression: None,
+            ..KeysAndAttributes::default()
         };
         self.request_items.insert(table_name, kt);
         self.clone()
@@ -45,13 +47,9 @@ pub trait GetItemInputBuilder {
 impl GetItemInputBuilder for GetItemInput {
     fn new(table: String) -> Self {
         GetItemInput {
-            attributes_to_get: None,
-            consistent_read: None,
-            expression_attribute_names: None,
-            key: HashMap::new(),
-            projection_expression: None,
-            return_consumed_capacity: None,
             table_name: table,
+            key: HashMap::new(),
+            ..GetItemInput::default()
         }
     }
 
@@ -69,16 +67,9 @@ pub trait PutItemInputBuilder {
 impl PutItemInputBuilder for PutItemInput {
     fn new(table: String) -> Self {
         PutItemInput {
-            condition_expression: None,
-            conditional_operator: None,
-            expected: None,
-            expression_attribute_names: None,
-            expression_attribute_values: None,
-            item: HashMap::new(),
-            return_consumed_capacity: None,
-            return_item_collection_metrics: None,
-            return_values: None,
             table_name: table,
+            item: HashMap::new(),
+            ..PutItemInput::default()
         }
     }
 
@@ -88,36 +79,76 @@ impl PutItemInputBuilder for PutItemInput {
     }
 }
 
+pub trait BatchWriteItemInputBuilder {
+    fn new() -> Self;
+    fn with_put_items(&mut self, table: String, data: Vec<HashMap<String, AttributeValue>>) -> Self;
+    fn with_delete_items(&mut self, table: String, data: Vec<HashMap<String, AttributeValue>>) -> Self;
+}
+
+impl BatchWriteItemInputBuilder for BatchWriteItemInput {
+    fn new() -> Self {
+        BatchWriteItemInput::default()
+    }
+
+    fn with_put_items(&mut self, table: String, data: Vec<HashMap<String, AttributeValue>>) -> Self {
+
+        let items_data = data.iter().map(|datum| {
+            WriteRequest {
+                put_request: Some(PutRequest { item: datum.clone() }),
+                delete_request: None
+            }
+        }).collect();
+
+        self.request_items.insert(table, items_data);
+
+        self.clone()
+    }
+
+    fn with_delete_items(&mut self, table: String, data: Vec<HashMap<String, AttributeValue>>) -> Self {
+
+        let items_data = data.iter().map(|datum| {
+            WriteRequest {
+                put_request: None,
+                delete_request: Some(DeleteRequest { key: datum.clone() })
+            }
+        }).collect();
+
+        self.request_items.insert(table, items_data);
+
+        self.clone()
+    }
+}
+
 pub trait QueryInputBuilder {
     fn new(table: String) -> Self;
+    fn with_index_name(&mut self, idx_name: Option<String>) -> Self;
+    fn with_expr_attr_names(&mut self, expr_attr_names: Option<HashMap<String, String>>) -> Self;
     fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self;
     fn with_key_condition_expr(&mut self, expr: Option<String>) -> Self;
     fn with_filter_expr(&mut self, expr: Option<String>) -> Self;
+    fn with_projection_expression(&mut self, expr: Option<String>) -> Self;
+    fn with_select(&mut self, select: Option<String>) -> Self;
+    fn with_limit(&mut self, limit: Option<i64>) -> Self;
 }
 
 impl QueryInputBuilder for QueryInput {
     fn new(table: String) -> Self {
         QueryInput {
-            attributes_to_get: None,
-            conditional_operator: None,
-            consistent_read: None,
-            exclusive_start_key: None,
-            expression_attribute_names: None,
-            expression_attribute_values: None,
-            filter_expression: None,
-            index_name: None,
-            key_condition_expression: None,
-            key_conditions: None,
-            limit: None,
-            projection_expression: None,
-            query_filter: None,
-            return_consumed_capacity: None,
-            scan_index_forward: None,
-            select: None,
             table_name: table,
+            ..QueryInput::default()
         }
     }
-
+    
+    fn with_index_name(&mut self, idx_name: Option<String>) -> Self {
+        self.index_name = idx_name;
+        self.clone()
+    }
+    
+    fn with_expr_attr_names(&mut self, expr_attr_names: Option<HashMap<String, String>>) -> Self {
+        self.expression_attribute_names = expr_attr_names;
+        self.clone()
+    }
+    
     fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self {
         self.expression_attribute_values = data;
         self.clone()
@@ -132,6 +163,70 @@ impl QueryInputBuilder for QueryInput {
         self.filter_expression = expr;
         self.clone()
     }
+    
+    fn with_projection_expression(&mut self, expr: Option<String>) -> Self {
+        self.projection_expression = expr;
+        self.clone()
+    }
+
+    fn with_select(&mut self, select: Option<String>) -> Self {
+        self.select = select;
+        self.clone()
+    }
+
+    fn with_limit(&mut self, limit: Option<i64>) -> Self {
+        self.limit = limit;
+        self.clone()
+    }
+}
+
+pub trait ScanInputBuilder {
+    fn new(table: String) -> Self;
+    fn with_index_name(&mut self, idx_name: Option<String>) -> Self;
+    fn with_expr_attr_names(&mut self, expr_attr_names: Option<HashMap<String, String>>) -> Self;
+    fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self;
+    fn with_filter_expr(&mut self, expr: Option<String>) -> Self;
+    fn with_projection_expression(&mut self, expr: Option<String>) -> Self;
+    fn with_limit(&mut self, limit: Option<i64>) -> Self;
+}
+
+impl ScanInputBuilder for ScanInput {
+    fn new(table: String) -> Self {
+        ScanInput {
+            table_name: table,
+            ..ScanInput::default()
+        }
+    }
+    
+    fn with_index_name(&mut self, idx_name: Option<String>) -> Self {
+        self.index_name = idx_name;
+        self.clone()
+    }
+    
+    fn with_expr_attr_names(&mut self, expr_attr_names: Option<HashMap<String, String>>) -> Self {
+        self.expression_attribute_names = expr_attr_names;
+        self.clone()
+    }
+    
+    fn with_data(&mut self, data: Option<HashMap<String, AttributeValue>>) -> Self {
+        self.expression_attribute_values = data;
+        self.clone()
+    }
+    
+    fn with_filter_expr(&mut self, expr: Option<String>) -> Self {
+        self.filter_expression = expr;
+        self.clone()
+    }
+    
+    fn with_projection_expression(&mut self, expr: Option<String>) -> Self {
+        self.projection_expression = expr;
+        self.clone()
+    }
+
+    fn with_limit(&mut self, limit: Option<i64>) -> Self {
+        self.limit = limit;
+        self.clone()
+    }
 }
 
 pub trait DeleteItemInputBuilder {
@@ -142,16 +237,9 @@ pub trait DeleteItemInputBuilder {
 impl DeleteItemInputBuilder for DeleteItemInput {
     fn new(table: String) -> Self {
         DeleteItemInput {
-            condition_expression: None,
-            conditional_operator: None,
-            expected: None,
-            expression_attribute_names: None,
-            expression_attribute_values: None,
-            key: HashMap::new(),
-            return_consumed_capacity: None,
-            return_item_collection_metrics: None,
-            return_values: None,
             table_name: table,
+            key: HashMap::new(),
+            ..DeleteItemInput::default()
         }
     }
 
@@ -178,16 +266,7 @@ pub trait AttributeValueBuilder {
 impl AttributeValueBuilder for AttributeValue {
     fn new() -> Self {
         AttributeValue {
-            b: None,
-            bool: None,
-            bs: None,
-            l: None,
-            m: None,
-            n: None,
-            ns: None,
-            null: None,
-            s: None,
-            ss: None,
+            ..AttributeValue::default()
         }
     }
 

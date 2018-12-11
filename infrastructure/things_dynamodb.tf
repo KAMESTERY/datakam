@@ -1,9 +1,12 @@
 resource "aws_dynamodb_table" "things-dynamodb-table" {
-  name           = "Things"
-  read_capacity  = 1
-  write_capacity = 1
-  hash_key       = "Name"
-  range_key      = "UserID"
+  name         = "Things"
+  billing_mode = "PAY_PER_REQUEST"
+
+  //  read_capacity  = 1
+  //  write_capacity = 1
+  hash_key = "Name"
+
+  range_key = "ThingID"
 
   attribute {
     name = "Name"
@@ -42,7 +45,7 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
 
   //  attribute {
   //    name = "DataIDs"
-  //    type = "S"
+  //    type = "S"0000000000
   //  }
 
   ttl {
@@ -50,11 +53,12 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     enabled        = false
   }
   global_secondary_index {
-    name            = "UserIDIndex"
-    hash_key        = "UserID"
-    range_key       = "Score"
-    write_capacity  = 1
-    read_capacity   = 1
+    name      = "UserIDIndex"
+    hash_key  = "UserID"
+    range_key = "Score"
+
+    //    write_capacity  = 1
+    //    read_capacity   = 1
     projection_type = "INCLUDE"
 
     non_key_attributes = [
@@ -62,11 +66,12 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     ]
   }
   global_secondary_index {
-    name            = "ThingIDIndex"
-    hash_key        = "ThingID"
-    range_key       = "Version"
-    write_capacity  = 1
-    read_capacity   = 1
+    name      = "ThingIDIndex"
+    hash_key  = "ThingID"
+    range_key = "Version"
+
+    //    write_capacity  = 1
+    //    read_capacity   = 1
     projection_type = "INCLUDE"
 
     non_key_attributes = [
@@ -74,11 +79,12 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     ]
   }
   global_secondary_index {
-    name            = "CreatedAtIndex"
-    hash_key        = "CreatedAt"
-    range_key       = "Name"
-    write_capacity  = 1
-    read_capacity   = 1
+    name      = "CreatedAtIndex"
+    hash_key  = "CreatedAt"
+    range_key = "Name"
+
+    //    write_capacity  = 1
+    //    read_capacity   = 1
     projection_type = "INCLUDE"
 
     non_key_attributes = [
@@ -86,11 +92,12 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
     ]
   }
   global_secondary_index {
-    name            = "UpdatedAtIndex"
-    hash_key        = "UpdatedAt"
-    range_key       = "Name"
-    write_capacity  = 1
-    read_capacity   = 1
+    name      = "UpdatedAtIndex"
+    hash_key  = "UpdatedAt"
+    range_key = "Name"
+
+    //    write_capacity  = 1
+    //    read_capacity   = 1
     projection_type = "INCLUDE"
 
     non_key_attributes = [
@@ -128,62 +135,63 @@ resource "aws_dynamodb_table" "things-dynamodb-table" {
 //updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 resource "aws_dynamodb_table" "data-dynamodb-table" {
-  name           = "Data"
-  read_capacity  = 1
-  write_capacity = 1
-  hash_key       = "DataID"
-  range_key      = "ThingID"
+  name         = "Data"
+  billing_mode = "PAY_PER_REQUEST"
 
+  //  read_capacity  = 1
+  //  write_capacity = 1
+
+  hash_key  = "ThingID"
+  range_key = "DataID"
   attribute {
     name = "DataID"
     type = "S"
   }
-
   attribute {
     name = "ThingID"
     type = "S"
   }
 
-  attribute {
-    name = "Key"
-    type = "S"
-  }
-
-  attribute {
-    name = "Value"
-    type = "S"
-  }
+  //  attribute {
+  //    name = "Key"
+  //    type = "S"
+  //  }
+  //
+  //  attribute {
+  //    name = "Value"
+  //    type = "S"
+  //  }
 
   ttl {
     attribute_name = "TimeToExist"
     enabled        = false
   }
 
-  global_secondary_index {
-    name            = "ThingIDIndex"
-    hash_key        = "ThingID"
-    range_key       = "Key"
-    write_capacity  = 1
-    read_capacity   = 1
-    projection_type = "INCLUDE"
-
-    non_key_attributes = [
-      "DataID",
-    ]
-  }
-
-  global_secondary_index {
-    name            = "KeyIndex"
-    hash_key        = "Key"
-    range_key       = "Value"
-    write_capacity  = 1
-    read_capacity   = 1
-    projection_type = "INCLUDE"
-
-    non_key_attributes = [
-      "DataID",
-    ]
-  }
+  //  global_secondary_index {
+  //    name            = "ThingIDIndex"
+  //    hash_key        = "ThingID"
+  //    range_key       = "Key"
+  //    write_capacity  = 1
+  //    read_capacity   = 1
+  //    projection_type = "INCLUDE"
+  //
+  //    non_key_attributes = [
+  //      "DataID",
+  //    ]
+  //  }
+  //
+  //  global_secondary_index {
+  //    name            = "KeyIndex"
+  //    hash_key        = "Key"
+  //    range_key       = "Value"
+  //    write_capacity  = 1
+  //    read_capacity   = 1
+  //    projection_type = "INCLUDE"
+  //
+  //      non_key_attributes = [
+  //        "DataID",
+  //      ]
+  //    }
 
   tags {
     Name        = "data-table-1"

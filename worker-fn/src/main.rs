@@ -21,7 +21,6 @@ use futures::future::Future;
 use juniper::http::graphiql::graphiql_source;
 use num_cpus;
 use openssl_probe;
-use serde_json;
 
 use worker_lib::create_schema;
 

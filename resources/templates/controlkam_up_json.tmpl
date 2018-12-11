@@ -37,8 +37,9 @@
     "LOG_LEVEL": "{{ .log_level }}"{{with .backend_key }},
     "BACKEND": "https://{{ . }}.kamestery.com"
     {{ end }}{{with .rpc_backend_key}},
-    "RPC_BACKEND": "{{ . }}"
+    "RPC_BACKEND": "{{ . }}",
     {{ end }}
+    "NAMESPACE": "{{ .namespace }}"
   },
   "error_pages": {
     "disable": true

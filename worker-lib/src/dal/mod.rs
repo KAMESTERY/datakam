@@ -4,8 +4,9 @@ mod dynamodb;
 mod models;
 
 pub use self::dynatraits::{
-    BatchGetItemInputBuilder, DeleteItemInputBuilder, ModelDynaConv, AttributeValueBuilder,
-    GetItemInputBuilder, QueryInputBuilder, PutItemInputBuilder
+    DeleteItemInputBuilder, ModelDynaConv, AttributeValueBuilder,
+    GetItemInputBuilder, QueryInputBuilder, ScanInputBuilder, PutItemInputBuilder,
+    BatchGetItemInputBuilder,  BatchWriteItemInputBuilder
 };
 pub use self::dynamodb::{
     attr_b, attr_bool, attr_bs, attr_l, attr_m,
@@ -13,9 +14,11 @@ pub use self::dynamodb::{
     DynaDB
 };
 pub use self::models::{
-    create_documents, create_complete_user, create_complete_thing, delete_complete_thing,
+    create_documents, update_documents, delete_documents,
+    create_complete_user, create_complete_thing, delete_complete_thing,
     User, UserProfile, UserGroup, UserAuthData,
     Thing, Data, ThingDataTrait, DocumentInput, ThingInput, ThingOutput
+//    , ContentList
 };
 
 #[cfg(test)] mod tests;

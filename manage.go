@@ -180,6 +180,7 @@ func prepDeploymentAssets(deploymentAssets string) {
 		},
 	)
 	writeFile(deploymentAssets+"/workerfn/up.json", upWorkerFn)
+	namespace := "com.kamestery.devdata"
 	// Prep WebKam
 	upWebkam := renderTmpl(
 		"webkam_up_json.tmpl",
@@ -187,6 +188,7 @@ func prepDeploymentAssets(deploymentAssets string) {
 			"log_level":       "DEBUG",
 			"backend_key":     "data-dev",
 			"rpc_backend_key": "35.175.245.161:80",
+			"namespace":       namespace,
 		},
 	)
 	writeFile(deploymentAssets+"/webkam/up.json", upWebkam)
@@ -197,6 +199,7 @@ func prepDeploymentAssets(deploymentAssets string) {
 			"log_level":       "DEBUG",
 			"backend_key":     "data-dev",
 			"rpc_backend_key": "35.175.245.161:80",
+			"namespace":       namespace,
 		},
 	)
 	writeFile(deploymentAssets+"/controlkam/up.json", upControlkam)

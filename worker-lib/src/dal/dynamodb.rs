@@ -2,13 +2,18 @@
 use rusoto_core::Region;
 use rusoto_dynamodb::{
     DynamoDb, // This is Required!!!!
-    AttributeValue, BatchGetItemInput, DynamoDbClient, ListTablesInput,
-    DeleteItemInput, GetItemInput, PutItemInput, QueryInput
+    AttributeValue, DynamoDbClient,
+    ListTablesInput, DeleteItemInput,
+    GetItemInput, PutItemInput,
+    QueryInput, ScanInput,
+    BatchGetItemInput, BatchWriteItemInput, BatchWriteItemOutput
 };
 use std::collections::HashMap;
 use crate::dal::{
-    AttributeValueBuilder, BatchGetItemInputBuilder, DeleteItemInputBuilder,
-    GetItemInputBuilder, QueryInputBuilder, PutItemInputBuilder, ModelDynaConv
+    ModelDynaConv,
+    AttributeValueBuilder, DeleteItemInputBuilder, GetItemInputBuilder,
+    QueryInputBuilder, ScanInputBuilder, PutItemInputBuilder,
+    BatchGetItemInputBuilder, BatchWriteItemInputBuilder
 };
 
 // Group all DynamoDB API calls to this Struct
@@ -62,9 +67,113 @@ impl DynaDB {
         }
     }
 
-    pub fn query<T: ModelDynaConv>(table: String, data: Option<HashMap<String, AttributeValue>>, filter_expr: Option<String>, key_condition_expr: Option<String>) -> Option<Vec<T>> {
-        let response = _query(table, data, filter_expr, key_condition_expr);
+    // BatchPuts Items To Multiple Tables
+    pub fn batchput_data(tables_data: Vec<HashMap<String, Vec<HashMap<String, AttributeValue>>>>) -> Option<BatchWriteItemOutput> {
 
+        let mut batchwrite_input = BatchWriteItemInput::new();
+
+        tables_data.into_iter().for_each(|tbl_data| {
+            for (table, data) in tbl_data {
+                batchwrite_input.with_put_items(table, data);
+            }
+        });
+
+        let batchwrite_output = _batchwrite(batchwrite_input);
+
+        batchwrite_output
+    }
+
+    // BatchPuts Items To A Single Table
+    pub fn batchput_table(table: String, data: Vec<HashMap<String, AttributeValue>>) -> Option<BatchWriteItemOutput> {
+
+        let batchwrite_input = BatchWriteItemInput::new()
+            .with_put_items(table, data);
+
+        let batchwrite_output = _batchwrite(batchwrite_input);
+
+        batchwrite_output
+    }
+
+    // BatchDeletes Items From A Single Table
+    pub fn batchdelete_table(table: String, data: Vec<HashMap<String, AttributeValue>>) -> Option<BatchWriteItemOutput> {
+
+        let batchwrite_input = BatchWriteItemInput::new()
+            .with_delete_items(table, data);
+
+        let batchwrite_output = _batchwrite(batchwrite_input);
+
+        batchwrite_output
+    }
+
+    // BatchDeletes Items From Multiple Tables
+    pub fn batchdelete_data(tables_data: Vec<HashMap<String, Vec<HashMap<String, AttributeValue>>>>) -> Option<BatchWriteItemOutput> {
+
+        let mut batchwrite_input = BatchWriteItemInput::new();
+
+        tables_data.into_iter().for_each(|tbl_data| {
+            for (table, data) in tbl_data {
+                batchwrite_input.with_delete_items(table, data);
+            }
+        });
+
+        let batchwrite_output = _batchwrite(batchwrite_input);
+
+        batchwrite_output
+    }
+
+    pub fn query<T: ModelDynaConv>(
+        table: String,
+        index_name: Option<String>,
+        expr_attr_names: Option<HashMap<String, String>>,
+        data: Option<HashMap<String, AttributeValue>>,
+        filter_expr: Option<String>,
+        key_condition_expr: Option<String>,
+        projection_expr: Option<String>,
+        select: Option<String>,
+        limit: Option<i64>
+    ) -> Option<Vec<T>> {
+        
+        let response = _query(
+            table,
+            index_name,
+            expr_attr_names,
+            data,
+            filter_expr,
+            key_condition_expr,
+            projection_expr,
+            select,
+            limit
+        );
+
+        match response {
+            Some(res) => Some(res.iter().map(|data|
+                T::new()
+                    .hydrate(data.clone()))
+                .collect()),
+            None => None
+        }
+    }
+    
+    pub fn scan<T: ModelDynaConv>(
+        table: String,
+        index_name: Option<String>,
+        expr_attr_names: Option<HashMap<String, String>>,
+        data: Option<HashMap<String, AttributeValue>>,
+        filter_expr: Option<String>,
+        projection_expr: Option<String>,
+        limit: Option<i64>
+    ) -> Option<Vec<T>> {
+        
+        let response = _scan(
+            table,
+            index_name,
+            expr_attr_names,
+            data,
+            filter_expr,
+            projection_expr,
+            limit
+        );
+        
         match response {
             Some(res) => Some(res.iter().map(|data|
                 T::new()
@@ -136,12 +245,40 @@ fn _batchget(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Optio
     results
 }
 
-fn _query(table: String, data: Option<HashMap<String, AttributeValue>>, filter_expr: Option<String>, key_condition_expr: Option<String>) -> Option<Vec<HashMap<String, AttributeValue>>> {
+fn _batchwrite(batchwrite_input: BatchWriteItemInput) -> Option<BatchWriteItemOutput> {
+
+    let client = DynamoDbClient::new(Region::UsEast1);
+
+    match client.batch_write_item(batchwrite_input).sync() {
+        Ok(batchwrite_output) => Some(batchwrite_output),
+        Err(error) => {
+            error!("TABLE_BATCHWRITE_ERROR:::: {}", error);
+            None
+        }
+    }
+}
+
+fn _query(
+    table: String,
+    index_name: Option<String>,
+    expr_attr_names: Option<HashMap<String, String>>,
+    data: Option<HashMap<String, AttributeValue>>,
+    filter_expr: Option<String>,
+    key_condition_expr: Option<String>,
+    projection_expr: Option<String>,
+    select: Option<String>,
+    limit: Option<i64>
+) -> Option<Vec<HashMap<String, AttributeValue>>> {
 
     let query_input = QueryInput::new(table)
+        .with_index_name(index_name)
+        .with_expr_attr_names(expr_attr_names)
         .with_data(data)
         .with_filter_expr(filter_expr)
-        .with_key_condition_expr(key_condition_expr);
+        .with_key_condition_expr(key_condition_expr)
+        .with_projection_expression(projection_expr)
+        .with_select(select)
+        .with_limit(limit);
 
     let client = DynamoDbClient::new(Region::UsEast1);
 
@@ -153,6 +290,37 @@ fn _query(table: String, data: Option<HashMap<String, AttributeValue>>, filter_e
         }
     };
 
+    results
+}
+
+fn _scan(
+    table: String,
+    index_name: Option<String>,
+    expr_attr_names: Option<HashMap<String, String>>,
+    data: Option<HashMap<String, AttributeValue>>,
+    filter_expr: Option<String>,
+    projection_expr: Option<String>,
+    limit: Option<i64>
+) -> Option<Vec<HashMap<String, AttributeValue>>> {
+    
+    let scan_input = ScanInput::new(table)
+        .with_index_name(index_name)
+        .with_expr_attr_names(expr_attr_names)
+        .with_data(data)
+        .with_filter_expr(filter_expr)
+        .with_projection_expression(projection_expr)
+        .with_limit(limit);
+
+    let client = DynamoDbClient::new(Region::UsEast1);
+    
+    let results = match client.scan(scan_input).sync() {
+        Ok(output) => output.items,
+        Err(error) => {
+            error!("TABLE_SCAN_ERROR:::: {}", error);
+            None
+        }
+    };
+    
     results
 }
 

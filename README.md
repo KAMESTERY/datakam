@@ -27,6 +27,7 @@ Native development with Nim and Rust
 
 ## Miscellaneous
 
+* [DynamoDB Querying](https://www.dynamodbguide.com/querying)
 * [Kubernetes Web UI (Dashboard)](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
 * [EC2 ELB PROXY protocol support](https://github.com/heptio/contour/blob/master/docs/proxy-proto.md)
 * [HELM Role-based Access Control](https://github.com/helm/helm/blob/master/docs/rbac.md)

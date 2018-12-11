@@ -30,7 +30,7 @@ pub fn create_complete_user(user_id: String, email: String, username: String, pa
     match User::get_user(user_id.clone(), email.clone()) {
         Some(_user) => {
             let err_msg = String::from("");
-            debug!("{}", err_msg.clone());
+            debug!("User Already Exists! {}", user_id.clone());
             err_msg
         },
         None => {

@@ -21,8 +21,8 @@ actix = "0.7"
 actix-web = "0.7"
 
 # GraphQL
-juniper = "0.10"
-juniper_codegen = "0.10"
+juniper = "0.11"
+juniper_codegen = "0.11"
 
 # Json
 serde = "1.0"
