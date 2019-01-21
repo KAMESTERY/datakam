@@ -1,9 +1,3 @@
-[submodule "webkam"]
-	path = webkam
-	url = https://github.com/KAMESTERY/webkam.git
 [submodule "svc"]
 	path = svc
 	url = https://github.com/KAMESTERY/contractskam.git
-[submodule "controlkam"]
-	path = controlkam
-	url = https://bitbucket.org/outcastgeek/controlkam.git

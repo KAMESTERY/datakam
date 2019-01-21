@@ -25,8 +25,21 @@ pub fn data_as_hashmap(data: Vec<Vec<String>>) -> HashMap<String, String> {
             .to_string();
         hm.insert(k, v);
     });
-    debug!("Transformed VecOfVec {:?} into Map {:?}", data, hm);
+//    debug!("Transformed VecOfVec {:?} into Map {:?}", data, hm);
     hm
+}
+
+#[derive(GraphQLInputObject)]
+#[graphql(description = "A QueryInput :-)")]
+pub struct QueryInput {
+    pub index_name: Option<String>,
+    pub attr_names: Option<Vec<Vec<String>>>,
+    pub filter_expr: Option<String>,
+    pub key_condition_expr: Option<String>,
+    pub projection_expr: Option<String>,
+    pub select: Option<String>,
+    pub limit: Option<i32>,
+    pub raw_data: Option<Vec<Vec<String>>>
 }
 
 #[derive(GraphQLInputObject)]
@@ -43,6 +56,59 @@ impl ThingDataTrait for DocumentInput {
     fn get_data(&self) -> Vec<Vec<String>> {
         self.data.clone()
     }
+}
+
+#[derive(GraphQLInputObject)]
+#[graphql(description = "A MediaInput :-)")]
+pub struct MediaInput {
+    pub name: String,
+    pub user_id: String,
+    pub media_id: String,
+    pub data: Vec<Vec<String>>,
+    pub tags: Option<Vec<String>>
+}
+
+impl ThingDataTrait for MediaInput {
+    fn get_data(&self) -> Vec<Vec<String>> {
+        self.data.clone()
+    }
+}
+
+pub fn create_media_items(media: Vec<MediaInput>) -> Vec<String> {
+    media.par_iter().map(|m| {
+        match Thing::get_thing(m.name.clone(), m.media_id.clone()) {
+            Some(_thing) =>{
+                let err_msg = String::from("");
+                warn!("Media Already Exists! {} ==> {}", m.name.clone(), m.media_id.clone());
+                err_msg
+            },
+            None => {
+                match m.data_as_hashmap().ok() {
+                    Some(data_map) => create_thing(
+                        m.name.clone(),
+                        m.user_id.clone(),
+                        data_map,
+                        m.media_id.clone(),
+                        m.tags.clone()),
+                    None => String::from("")
+                }
+            }
+        }
+    }).collect()
+}
+
+pub fn update_media_items(media: Vec<MediaInput>) -> Vec<String> {
+    media.par_iter().for_each(|doc| {
+        delete_complete_thing(doc.name.clone(), doc.media_id.clone());
+    });
+    create_media_items(media)
+}
+
+pub fn delete_media_items(data: Vec<Vec<String>>) -> Vec<String> {
+    data.par_iter().map(|vec_kv| {
+        let (name, thing_id) = (vec_kv[0].clone(), vec_kv[1].clone());
+        delete_complete_thing(name, thing_id).unwrap_or_default()
+    }).collect()
 }
 
 pub fn create_documents(documents: Vec<DocumentInput>) -> Vec<String> {
@@ -276,7 +342,7 @@ fn create_thing(name: String, user_id: String, data: HashMap<String, String>, th
     data_tbl_data.insert(data_tbl, data_tbl_data_vec);
     tables_data.push(data_tbl_data);
 
-    debug!("BatchPut Tables Data: {:?}", tables_data.clone());
+//    debug!("BatchPut Tables Data: {:?}", tables_data.clone());
 
     match DynaDB::batchput_data(tables_data.clone()) {
         Some(output) => match output.unprocessed_items {
@@ -368,7 +434,7 @@ impl Thing {
             .with_tags(tags)
             .drain();
 
-        debug!("Put Thing Values: {:?}", thing_values);
+//        debug!("Put Thing Values: {:?}", thing_values);
 
         let put_response = DynaDB::put(String::from("Things"), thing_values);
 
@@ -383,11 +449,11 @@ impl Thing {
             .with_thing_id(thing_id)
             .key();
 
-        debug!("Get User Key: {:?}", key);
+//        debug!("Get User Key: {:?}", key);
 
         let thing: Option<Thing> = DynaDB::get(String::from("Things"), key.clone());
 
-        debug!("Thing: {:?}", thing);
+//        debug!("Thing: {:?}", thing);
 
         thing
     }
@@ -398,7 +464,7 @@ impl Thing {
             .with_thing_id(thing_id)
             .key();
 
-        debug!("Delete Thing Key: {:?}", key);
+//        debug!("Delete Thing Key: {:?}", key);
 
         let result = DynaDB::delete(String::from("Things"), key);
         debug!("Result: {:?}", result.clone());
@@ -515,7 +581,7 @@ impl Data {
             .with_value(value)
             .drain();
 
-        debug!("Put Data Values: {:?}", datum_values);
+//        debug!("Put Data Values: {:?}", datum_values);
 
         let put_response = DynaDB::put(String::from("Data"), datum_values);
 
@@ -529,7 +595,7 @@ impl Data {
             .with_data_id(data_id)
             .key();
 
-        debug!("Get Data Key: {:?}", key.clone());
+//        debug!("Get Data Key: {:?}", key.clone());
 
         let datum: Option<Data> = DynaDB::get(String::from("Data"), key);
 
@@ -556,7 +622,7 @@ impl Data {
             .with_data_id(data_id)
             .key();
 
-        debug!("Delete Data Key: {:?}", key);
+//        debug!("Delete Data Key: {:?}", key);
 
         let result = DynaDB::delete(String::from("Data"), key);
         debug!("Result: {:?}", result.clone());

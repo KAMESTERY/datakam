@@ -196,6 +196,8 @@ fn _put(table: String, item: HashMap<String, AttributeValue>) -> Option<HashMap<
     let put_input = PutItemInput::new(table)
         .with_item(item);
 
+    dbg!(put_input.clone());
+
     let client = DynamoDbClient::new(Region::UsEast1);
 
     let results = match client.put_item(put_input).sync() {
@@ -213,6 +215,8 @@ fn _get(table: String, key: HashMap<String, AttributeValue>) -> Option<HashMap<S
 
     let get_input = GetItemInput::new(table)
         .with_key(key);
+
+    dbg!(get_input.clone());
 
     let client = DynamoDbClient::new(Region::UsEast1);
 
@@ -232,6 +236,8 @@ fn _batchget(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Optio
     let batchget_input = BatchGetItemInput::new()
         .with_keys(table, keys);
 
+    dbg!(batchget_input.clone());
+
     let client = DynamoDbClient::new(Region::UsEast1);
 
     let results = match client.batch_get_item(batchget_input).sync() {
@@ -246,6 +252,8 @@ fn _batchget(table: String, keys: Vec<HashMap<String, AttributeValue>>) -> Optio
 }
 
 fn _batchwrite(batchwrite_input: BatchWriteItemInput) -> Option<BatchWriteItemOutput> {
+
+    dbg!(batchwrite_input.clone());
 
     let client = DynamoDbClient::new(Region::UsEast1);
 
@@ -280,6 +288,8 @@ fn _query(
         .with_select(select)
         .with_limit(limit);
 
+    dbg!(query_input.clone());
+
     let client = DynamoDbClient::new(Region::UsEast1);
 
     let results = match client.query(query_input).sync() {
@@ -311,6 +321,8 @@ fn _scan(
         .with_projection_expression(projection_expr)
         .with_limit(limit);
 
+    dbg!(scan_input.clone());
+
     let client = DynamoDbClient::new(Region::UsEast1);
     
     let results = match client.scan(scan_input).sync() {
@@ -328,6 +340,8 @@ fn _delete(table: String, key: HashMap<String, AttributeValue>) -> Option<HashMa
 
     let delete_input = DeleteItemInput::new(table)
         .with_key(key);
+
+    dbg!(delete_input.clone());
 
     let client = DynamoDbClient::new(Region::UsEast1);
 

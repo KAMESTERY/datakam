@@ -2,6 +2,7 @@
 mod dynatraits;
 mod dynamodb;
 mod models;
+mod data_access_layer;
 
 pub use self::dynatraits::{
     DeleteItemInputBuilder, ModelDynaConv, AttributeValueBuilder,
@@ -14,11 +15,13 @@ pub use self::dynamodb::{
     DynaDB
 };
 pub use self::models::{
-    create_documents, update_documents, delete_documents,
     create_complete_user, create_complete_thing, delete_complete_thing,
     User, UserProfile, UserGroup, UserAuthData,
-    Thing, Data, ThingDataTrait, DocumentInput, ThingInput, ThingOutput
-//    , ContentList
+    Thing, Data, ThingDataTrait, ThingInput, ThingOutput,
+    DocumentInput, MediaInput, QueryInput
+};
+pub use self::data_access_layer::{
+    InputData, query, get, create, update, delete, DeleteData
 };
 
 #[cfg(test)] mod tests;

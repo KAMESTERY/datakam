@@ -4,11 +4,11 @@ use juniper::{FieldResult, RootNode};
 
 use crate::authentication as auth;
 use crate::dal::{
+    InputData, query, get, create, update, delete, DeleteData,
     create_complete_user, create_complete_thing, delete_complete_thing,
-    create_documents, update_documents, delete_documents,
-    DocumentInput, DynaDB, ThingDataTrait, ThingInput, ThingOutput,
+    DynaDB, ThingDataTrait, ThingInput, ThingOutput,
+    DocumentInput, MediaInput, QueryInput,
     User, UserAuthData, UserGroup, UserProfile
-//    , ContentList
 };
 use crate::validation::{
     ADMINISTER,
@@ -85,6 +85,26 @@ graphql_object!(QueryRoot: () |&self| {
             token,
             user_id.clone(),
             Ok(ThingOutput::get_thing_output(name, user_id))
+        )
+    }
+
+    field query(token: String, user_id: String, queries: Vec<QueryInput>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(query(queries))
+        )
+    }
+
+    field query_public(queries: Vec<QueryInput>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        Ok(query(queries)) //TODO: Return only public and published documents
+    }
+
+    field get(token: String, user_id: String, data: Vec<Vec<String>>) -> FieldResult<Option<Vec<ThingOutput>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(get(data))
         )
     }
 
@@ -225,7 +245,7 @@ graphql_object!(MutationRoot: () |&self| {
             token,
             user_id.clone(),
             Ok(Some(
-                create_documents(documents)
+                create(InputData::Documents {documents})
             ))
         )
     }
@@ -234,7 +254,7 @@ graphql_object!(MutationRoot: () |&self| {
             token,
             user_id.clone(),
             Ok(Some(
-                update_documents(documents)
+                update(InputData::Documents {documents})
             ))
         )
     }
@@ -243,7 +263,34 @@ graphql_object!(MutationRoot: () |&self| {
             token,
             user_id.clone(),
             Ok(Some(
-                delete_documents(data)
+                delete(DeleteData::Documents {data})
+            ))
+        )
+    }
+    field create_media_items(user_id: String, token: String, media: Vec<MediaInput>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(Some(
+                create(InputData::Media {media})
+            ))
+        )
+    }
+    field update_media_items(user_id: String, token: String, media: Vec<MediaInput>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(Some(
+                update(InputData::Media {media})
+            ))
+        )
+    }
+    field delete_media_items(user_id: String, token: String, data: Vec<Vec<String>>) -> FieldResult<Option<Vec<String>>> {
+        secured!(
+            token,
+            user_id.clone(),
+            Ok(Some(
+                delete(DeleteData::Media {data})
             ))
         )
     }
