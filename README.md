@@ -1,4 +1,38 @@
-# slapman
+# datakam
+
+Kamestery Data Application
+
+You can open the project in Gitpod, a free online dev evironment for GitHub:
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/KAMESTERY/datakam)
+
+## Git Setup
+
+```{bash}
+# Clone the main repository
+git clone https://github.com/KAMESTERY/datakam.git my_datakam
+
+# Now navigate to https://github.com/KAMESTERY/datakam and fork the remository
+# Then add you fork as a remote
+cd my_datakam
+git remote add my_datakam https://github.com/yourusername/datakam
+
+# List your remotes
+git remote
+#-output-> my_datakam
+#-output-> origin
+
+# Make changes and push them to your fork
+git push -u my_datakam master
+
+# And navigate to https://github.com/yourusername/datakam and create a pull request
+
+# Finally pull new changes from origin
+git pull origin master
+
+# That completes your git workflow for contributing to this project. Thank you!
+
+```
 
 ## GraphQL
 
