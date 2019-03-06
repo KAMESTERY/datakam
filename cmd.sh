@@ -19,7 +19,7 @@ case $1 in
         genRsa
         ;;
     sub.update)
-        rm -rf $BASEDIR/worker-rpc/svc $BASEDIR/worker-fn/svc
+        rm -rf $BASEDIR/svc
         git config -f .gitmodules --get-regexp '^submodule\..*\.path$' |
         while read path_key path
         do
