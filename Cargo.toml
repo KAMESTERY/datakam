@@ -4,6 +4,6 @@
 members = [
 #    "worker-rpc",
     "worker-fn",
-#    "worker-ext",
+    "worker-ext",
     "worker-lib",
 ]

@@ -2,9 +2,7 @@
 //#![feature(use_extern_macros, specialization)]
 //#![feature(specialization)] // for 0.4
 
-//#[macro_use]
 //extern crate pyo3;
-#[macro_use]
 extern crate log;
 extern crate worker_lib;
 

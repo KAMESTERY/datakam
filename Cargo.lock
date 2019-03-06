@@ -2202,6 +2202,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "worker-ext"
+version = "0.1.0"
+dependencies = [
+ "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "worker-lib 0.1.0",
+]
+
+[[package]]
 name = "worker-fn"
 version = "0.1.0"
 dependencies = [
