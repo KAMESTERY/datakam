@@ -1,8 +1,0 @@
-mutation CreateNewUser {
-  userCreate(
-    username:"Lambert",
-    email:"lambert@awesome.com",
-    password: "sdfsdaf",
-    confirmPassword:"sdfsdaf"
-  )
-}

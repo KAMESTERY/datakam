@@ -1,9 +1,0 @@
-
-[workspace]
-
-members = [
-#    "worker-rpc",
-    "worker-fn",
-    "worker-ext",
-    "worker-lib",
-]
