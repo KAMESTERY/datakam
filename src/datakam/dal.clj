@@ -9,6 +9,7 @@
             [cognitect.aws.client.api.async :as aws.async]
             [com.rpl.specter :as S]
             [clojure.spec.alpha :as s]
+            [datakam.specs.macros :refer [okspk?]]
             [datakam.specs.common-spec :as cspk]
             [datakam.specs.thing-spec :as tspk]
             [datakam.specs.data-spec :as dspk]

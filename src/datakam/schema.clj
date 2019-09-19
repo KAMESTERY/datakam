@@ -42,12 +42,12 @@
                                   :UpdatedAt {:type 'String}}}}
                       :input-objects {:ThingKey
                                       {:fields
-                                        {:Name {:type 'String}
-                                         :ThingID {:type 'String}}}
+                                       {:Name {:type 'String}
+                                        :ThingID {:type 'String}}}
                                       :DocKey
-                                       {:fields
-                                        {:Topic {:type 'String}
-                                         :DocumentID {:type 'String}}}
+                                      {:fields
+                                       {:Topic {:type 'String}
+                                        :DocumentID {:type 'String}}}
                                       :DocQuery
                                       {:fields
                                        {:Name {:type 'String}}}}
@@ -67,11 +67,13 @@
                                  :args {:dockey {:type :DocKey}}
                                  :resolve :get_document}
                                 :querydocument
-                                 {:type '(list :Document)
-                                  :args {:docquery {:type :DocQuery}}
-                                  :resolve :query_document}}}
-                     (util/attach-resolvers {:hello #(constantly "world")
-                                             :list_tables dal/list-tables
+                                {:type '(list :Document)
+                                 :args {:docquery {:type :DocQuery}}
+                                 :resolve :query_document}}}
+                     (util/attach-resolvers {:hello (fn [_ _ _]
+                                                      "world")
+                                             :list_tables (fn [_ _ _]
+                                                            (dal/list-tables))
                                              :get_thing (fn [ctx {:keys [tkey]} v]
                                                           (println "Context: " ctx)
                                                           (println "Thing Key: " tkey)

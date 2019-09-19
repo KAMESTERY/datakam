@@ -32,7 +32,9 @@
   [request]
   ;;(prn request)
   (let [query (-> request :json-params :query)
-        result (execute main-schema query nil nil)]
+        result (try (execute main-schema query nil nil)
+                    (catch AssertionError e
+                      (-> e Throwable->map :via first)))]
     (ring-resp/response result)))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.

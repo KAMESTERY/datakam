@@ -50,3 +50,5 @@
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.7"]]}
              :uberjar {:aot [datakam.server]}}
   :main ^{:skip-aot true} datakam.server)
+
+
