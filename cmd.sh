@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x #echo on
 
+APPDIR=`dirname $0`
+
 set -ex
 export AWS_REGION=us-east-1
 export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
@@ -10,7 +12,7 @@ export PORT=$PORT
 
 if [ "$1" = "start" ]
 then
-    exec java -jar app.jar
+    exec java -jar $APPDIR/app.jar
 fi
 
 exec "$@"

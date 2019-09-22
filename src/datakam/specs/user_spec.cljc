@@ -10,14 +10,14 @@
 (s/def ::Email ::cspk/email-type)
 (s/def ::Username ::cspk/non-null-string-type)
 (s/def ::Role int?)
-(s/def ::Confirmed boolean?)
+(s/def ::Confirmed int?)
 (s/def ::PasswordHash ::cspk/non-null-string-type)
 (s/def ::LastSeen ::cspk/non-null-string-type)
 
 (s/def ::user-cat (s/keys :req [::UserID]))
 (s/def ::user-key (s/keys :req [::UserID ::Email]))
 (s/def ::user (s/keys :req [::UserID ::Email]
-                      :opt [::Role ::Confirmed
+                      :opt [::Role ::Confirmed ::Username
                             ::PasswordHash ::LastSeen]))
 
 (s/def ::user-like (s/or

@@ -6,6 +6,7 @@
             [datakam.specs.common-spec :as cspk]
             [datakam.specs.thing-spec :as tspk]
             [datakam.specs.data-spec :as dspk]
+            [datakam.specs.media-spec :as mspk]
             [com.rpl.specter :as S])
   (:import java.util.Base64))
 
@@ -24,6 +25,7 @@
 (s/def ::Title ::cspk/non-null-string-type)
 (s/def ::Identifier ::cspk/non-null-string-type)
 (s/def ::Body ::cspk/non-null-string-type)
+(s/def ::Media ::mspk/many-media-type)
 ;; (s/def ::Bag (s/map-of keyword? ::cspk/has-some-value-type))
 (s/def ::Extra (s/map-of keyword? ::cspk/has-some-value-type))
 (s/def ::Tags ::cspk/tags-type)
@@ -36,8 +38,8 @@
                                 ::Slug ::FiltreVisuel
                                 ::Langue ::Niveau
                                 ::Identifier ::Title ::Body]
-                          :opt [::Tags ::Version ::Score
-                                ::CreatedAt ::UpdatedAt]))
+                          :opt [::Media ::Tags ::Version
+                                ::Score ::CreatedAt ::UpdatedAt]))
 
 (s/def ::document-like (s/or
                     :k ::document-key

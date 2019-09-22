@@ -39,3 +39,6 @@ build/
 # Project
 .idea
 datakam.iml
+*.der
+*.pem
+

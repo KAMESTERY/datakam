@@ -6,7 +6,9 @@
             [selmer.parser :as selmer]
             [com.walmartlabs.lacinia :refer [execute]]
             [datakam.schema :refer [main-schema]]
-            [datakam.dal :as dal]))
+            [datakam.dal :as dal]
+            [datakam.domain :as dmn]
+            [datakam.utils :as utils]))
 
 (defn about-page
   [request]
@@ -21,6 +23,21 @@
 (defn list-tables
   [request]
   (ring-resp/response (dal/list-tables)))
+
+(defn get-topic
+  [request]
+  (let [namespace (-> request :path-params :namespace)
+        topic (-> request :path-params :topic)]
+    (ring-resp/response (dmn/query-document {:Name (str namespace ":##:" topic)}))))
+
+(defn get-title
+  [request]
+  (let [namespace (-> request :path-params :namespace)
+        topic (-> request :path-params :topic)
+        title (-> request :path-params :title)]
+    (ring-resp/response (dmn/get-document
+                         {:Topic (str namespace ":##:" topic)
+                          :DocumentID (str namespace ":##:" topic ":##:" title)}))))
 
 (defn graphiql
   [request]
@@ -48,19 +65,21 @@
 (def routes #{["/" :get (conj common-interceptors `home-page)]
               ["/about" :get (conj common-interceptors `about-page)]
               ["/list-tables" :get (conj json-interceptors `list-tables)]
+              ["/topic/:namespace/:topic" :get (conj json-interceptors `get-topic)]
+              ["/title/:namespace/:topic/:title" :get (conj json-interceptors `get-title)]
               ["/gql" :post (conj json-interceptors `gql)]
               ["/graphiql" :get (conj common-interceptors `graphiql)]})
 
 ;; Map-based routes
-;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
-;                   :get home-page
-;                   "/about" {:get about-page}}})
+                                        ;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
+                                        ;                   :get home-page
+                                        ;                   "/about" {:get about-page}}})
 
 ;; Terse/Vector-based routes
-;(def routes
-;  `[[["/" {:get home-page}
-;      ^:interceptors [(body-params/body-params) http/html-body]
-;      ["/about" {:get about-page}]]]])
+                                        ;(def routes
+                                        ;  `[[["/" {:get home-page}
+                                        ;      ^:interceptors [(body-params/body-params) http/html-body]
+                                        ;      ["/about" {:get about-page}]]]])
 
 ;; Consumed by datakam.server/create-server
 ;; See http/default-interceptors for additional options you can configure
@@ -96,8 +115,8 @@
               ;;::http/type :jetty
               ::http/type :immutant
               ;;::http/host "localhost"
-              ::http/port (or (some-> (System/getenv "PORT") Integer/parseInt)
-                              1234)
+              ::http/host "0.0.0.0"
+              ::http/port (utils/get-port 8080)
               ;; Options to pass to the container (Jetty)
               ::http/container-options {:h2c? true
                                         :h2? false
