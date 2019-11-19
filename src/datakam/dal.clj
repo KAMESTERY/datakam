@@ -51,7 +51,13 @@
 (defn- derive-key-cond-expr-and-namevals [logic op sffx m]
   {:kce (cljstr/join (str " " (name logic) " ")
                      (map
-                      #(str "#" (name %) " " (name op) " :" (name %) (name sffx))
+                      (fn [k]
+                        (let [flat (str "#" (name k) " " (name op) " :" (name k) (name sffx))
+                              wrap (str (name op) "(#" (name k) ", :" (name k) (name sffx) ")")]
+                          (condp = op
+                            :BEGINS_WITH wrap
+                            :CONTAINS wrap
+                            flat)))
                       (keys m)))
    :ean (into {}
               (map #(hash-map (str "#" (name %)) %) (keys m)))})
@@ -140,12 +146,12 @@
 
 ;; QueryItems
 
-(defn- query [table m & {:keys [op logic prfx sffx fltr]
-                         :or {op := logic :AND prfx ":" sffx :Q fltr {}}}]
+(defn- query [table m & {:keys [op logic prfx sffx fop fltr]
+                         :or {op := logic :AND prfx ":" sffx :Q fop := fltr {}}}]
   (let [{kce :kce ean :ean} (derive-key-cond-expr-and-namevals
                              logic op sffx m)
         {fkce :kce fean :ean} (derive-key-cond-expr-and-namevals
-                               logic op sffx fltr)
+                               logic fop sffx fltr)
         qean (merge ean fean)
         qdata (merge m fltr)
         eav (-> (condp = table
@@ -161,6 +167,11 @@
              :KeyConditionExpression    kce
              :ExpressionAttributeNames qean
              :ExpressionAttributeValues eav}]
+    (println "Query ExpressionAttributeNames: " qean)
+    (println "Query Data: " qdata)
+    (println "ExpressionAttributeValues: " eav)
+    (println "KCE: " kce)
+    (println "FKCE: " fkce)
     (map into-map-value
          (-> (aws/invoke ddb
                          {:op      :Query
@@ -408,8 +419,21 @@
     :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
 
   (query-thing
+   {:Name    "com.kamestery.devdata:##:africa"})
+
+  (query-thing
    {:Name    "com.kamestery.devdata:##:africa"
     :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
+
+  (query-thing
+   {:Name    "com.kamestery.devdata:##:africa"}
+   :fop :BEGINS_WITH
+   :fltr {:ThingID "com.kamestery.devdata:##:africa:##:project-"})
+
+  (query-thing
+   {:Name    "com.kamestery.devdata:##:africa"}
+   :fop :CONTAINS
+   :fltr {:Tags ["inspiration"]})
 
   (query-thing
    {:Name    "com.kamestery.devdata:##:some-bogus-topic"})

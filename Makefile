@@ -1,6 +1,7 @@
 BASEDIR=$(PWD)
 APPNAME=datakam
 PROJECTID=kamestery
+REGION=us-east1
 
 gen-rsa:
 	# Generating params file
@@ -14,5 +15,5 @@ container: gen-rsa
 	gcloud builds submit --tag gcr.io/$(PROJECTID)/$(APPNAME)
 
 deploy: container
-	gcloud beta run deploy --image gcr.io/$(PROJECTID)/$(APPNAME) --platform managed
+	gcloud beta run deploy $(APPNAME) --image gcr.io/$(PROJECTID)/$(APPNAME) --platform managed --region $(REGION)
 
