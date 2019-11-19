@@ -24,7 +24,9 @@
                      :c ::user-cat
                      :k ::user-key
                      :u ::user))
-(s/def ::many-users-type (s/* ::user-like))
+(s/def ::many-users-type (s/or
+                          :nada empty?
+                          :lst (s/* ::user-like)))
 
 ;; Helpers
 

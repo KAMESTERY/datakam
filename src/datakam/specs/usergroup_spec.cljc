@@ -19,7 +19,9 @@
                           :c ::usergroup-cat
                           :k ::usergroup-key
                           :ug ::usergroup))
-(s/def ::many-usergroups-type (s/* ::usergroup-like))
+(s/def ::many-usergroups-type (s/or
+                               :nada empty?
+                               :lst (s/* ::usergroup-like)))
 
 ;; Helpers
 

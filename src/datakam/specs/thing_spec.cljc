@@ -41,7 +41,9 @@
 (s/def ::thing-name ::thing-name-type)
 (s/def ::thing-id ::thing-id-type)
 
-(s/def ::Name ::thing-name-type)
+(s/def ::Name (s/or
+               :n ::thing-name-type
+               :t ::thing-id-type))
 (s/def ::ThingID ::thing-id-type)
 (s/def ::UserID ::cspk/email-type)
 (s/def ::Tags ::cspk/tags-type)
@@ -60,7 +62,9 @@
                       :c ::thing-cat
                       :k ::thing-key
                       :t ::thing))
-(s/def ::many-things-type (s/* ::thing-like))
+(s/def ::many-things-type (s/or
+                           :nada empty?
+                           :lst (s/* ::thing-like)))
 
 ;; Helpers
 

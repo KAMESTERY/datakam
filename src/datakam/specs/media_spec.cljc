@@ -33,7 +33,9 @@
                     :k ::media-key
                     :kb ::media-browse-key
                     :d ::media))
-(s/def ::many-media-type (s/* ::media-like))
+(s/def ::many-media-type (s/or
+                          :nada empty?
+                          :lst (s/* ::media-like)))
 
 ;; Helpers
 

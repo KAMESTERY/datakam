@@ -411,6 +411,9 @@
    {:Name    "com.kamestery.devdata:##:africa"
     :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
 
+  (query-thing
+   {:Name    "com.kamestery.devdata:##:some-bogus-topic"})
+
   (get-item :Things {:Name    {:S "com.kamestery.devdata:##:africa"}
                      :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}})
   (get-data

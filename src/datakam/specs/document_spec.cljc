@@ -44,7 +44,9 @@
 (s/def ::document-like (s/or
                     :k ::document-key
                     :d ::document))
-(s/def ::many-document-type (s/* ::document-like))
+(s/def ::many-document-type (s/or
+                             :nada empty?
+                             :lst (s/* ::document-like)))
 
 
 

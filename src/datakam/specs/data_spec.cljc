@@ -20,7 +20,9 @@
                      :c ::data-cat
                      :k ::data-key
                      :d ::data))
-(s/def ::many-data-type (s/* ::data-like))
+(s/def ::many-data-type (s/or
+                         :nada empty?
+                         :lst (s/* ::data-like)))
 
 ;; Helpers
 

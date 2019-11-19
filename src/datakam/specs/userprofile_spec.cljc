@@ -22,7 +22,9 @@
 (s/def ::userprofile-like (s/or
                             :k ::userprofile-key
                             :up ::userprofile))
-(s/def ::many-userprofiles-type (s/* ::userprofile-like))
+(s/def ::many-userprofiles-type (s/or
+                                 :nada empty?
+                                 :lst (s/* ::userprofile-like)))
 
 ;; Helpers
 

@@ -28,8 +28,8 @@
     (pmap (fn [thing]
             (let [data (dal/query-data (select-keys thing [:ThingID]))
                   media (-> thing
-                            (rename-keys {:ThingID :ParentDocumentID})
-                            (select-keys [:ParentDocumentID])
+                            (select-keys [:ThingID])
+                            (rename-keys {:ThingID :Name})
                             query-media)]
               (-> (docspk/thing-data-to-document thing data)
                   (assoc :Media media)))) things)
@@ -44,8 +44,8 @@
                               :ThingID (:DocumentID dockey)})
         data (dal/query-data (select-keys thing [:ThingID]))
         media (-> thing
-                  (rename-keys {:ThingID :ParentDocumentID})
-                  (select-keys [:ParentDocumentID])
+                  (select-keys [:ThingID])
+                  (rename-keys {:ThingID :Name})
                   query-media)]
     (-> (docspk/thing-data-to-document thing data)
         (assoc :Media media))))
