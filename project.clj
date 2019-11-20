@@ -32,9 +32,9 @@
                  [clj-time "0.15.2"]
                  [org.clojure/test.check "0.10.0" :scope "test"]]
   :min-lein-version "2.0.0"
-  ;;:jvm-opts ["-server"
-  ;;           "-Dclojure.compiler.elide-meta=\"[:doc :file :line :added]\""
-  ;;           "-Dclojure.compiler.direct-linking=true"]
+  :jvm-opts ["-server"
+             ;;"-Dclojure.compiler.elide-meta=\"[:doc :file :line :added]\""
+             "-Dclojure.compiler.direct-linking=true"]
   :resource-paths ["config", "resources"]
   ;;:jvm-opts ["-server" "-Xmx12G" "-Xmx8g" "-XX:+UseG1GC"]
   :plugins [[cider/nrepl "0.3.0"]
@@ -55,7 +55,9 @@
                                         ;:java-agents [[org.mortbay.jetty.alpn/jetty-alpn-agent "2.0.5"]]
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "datakam.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.7"]]}
-             :uberjar {:aot [datakam.server]}}
-  :main ^{:skip-aot true} datakam.server)
+             :uberjar {;;:aot [datakam.server]
+                       :aot :all}}
+  ;;:main ^{:skip-aot true} datakam.server
+  :main datakam.server)
 
 

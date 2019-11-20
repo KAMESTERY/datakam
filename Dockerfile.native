@@ -1,0 +1,50 @@
+FROM clojure:openjdk-8-lein-2.9.1 AS builder
+
+RUN mkdir $HOME/.aws
+RUN echo "[default]" > $HOME/.aws/config
+RUN echo "region=us-east-1" >> $HOME/.aws/config
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY project.clj /usr/src/app/
+RUN lein deps
+ADD . /usr/src/app
+RUN openssl ecparam -name brainpoolP512t1 -out ./resources/ecparams.pem
+RUN openssl ecparam -in ./resources/ecparams.pem -genkey -noout -out ./resources/ecprivkey.pem
+RUN openssl ec -in ./resources/ecprivkey.pem -pubout -out ./resources/ecpubkey.pem
+RUN lein uberjar
+
+FROM oracle/graalvm-ce:19.2.1 AS nativebuilder
+
+RUN gu install native-image
+
+COPY --from=builder /usr/src/app/cmd.sh /tmp/cmd.sh
+COPY --from=builder /usr/src/app/resources /tmp/resources
+COPY --from=builder /usr/src/app/target/datakam-0.0.1-SNAPSHOT-standalone.jar /tmp/app.jar
+
+WORKDIR /tmp
+RUN native-image \
+  -H:EnableURLProtocols=http,https \
+  --report-unsupported-elements-at-runtime \
+  --initialize-at-build-time --no-server \
+  -cp /tmp/app.jar datakam.server
+
+FROM openjdk:8-slim
+MAINTAINER outcastgeek <outcastgeek+git@gmail.com>
+
+RUN mkdir /datakam
+
+COPY --from=nativebuilder /tmp/cmd.sh /datakam/cmd.sh
+COPY --from=nativebuilder /tmp/resources /datakam/resources
+COPY --from=nativebuilder /tmp/datakam.server /datakam/datakam.server
+
+ENV AWS_REGION=us-east-1 \
+    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+    PORT=${PORT}
+
+EXPOSE ${PORT}
+
+WORKDIR /datakam
+CMD ["/datakam/datakam.server", "-Dserver.port=${PORT}"]
+

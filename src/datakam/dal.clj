@@ -167,11 +167,11 @@
              :KeyConditionExpression    kce
              :ExpressionAttributeNames qean
              :ExpressionAttributeValues eav}]
-    (println "Query ExpressionAttributeNames: " qean)
-    (println "Query Data: " qdata)
-    (println "ExpressionAttributeValues: " eav)
-    (println "KCE: " kce)
-    (println "FKCE: " fkce)
+    ;; (println "Query ExpressionAttributeNames: " qean)
+    ;; (println "Query Data: " qdata)
+    ;; (println "ExpressionAttributeValues: " eav)
+    ;; (println "KCE: " kce)
+    ;; (println "FKCE: " fkce)
     (map into-map-value
          (-> (aws/invoke ddb
                          {:op      :Query
