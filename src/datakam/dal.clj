@@ -1,8 +1,10 @@
 (ns datakam.dal
-  (:require [clojure.core.async :as a]
+  (:require [clojure.set :refer [rename-keys]]
+            [clojure.core.async :as a]
             [clojure.java.io :as io]
             [clojure.data.json :as json]
             [clojure.edn :as edn]
+            [clojure.pprint :refer [pprint]]
             [clojure.string :as cljstr]
             [clojure.walk :refer [stringify-keys]]
             [cognitect.aws.client.api :as aws]
@@ -15,20 +17,8 @@
             [datakam.specs.data-spec :as dspk]
             [datakam.specs.user-spec :as uspk]
             [datakam.specs.userprofile-spec :as upspk]
-            [datakam.specs.usergroup-spec :as ugspk]))
-
-;; BatchWriteItems
-
-(s/def ::domain-like (s/or
-                      :t ::tspk/thing :tk ::tspk/thing-key
-                      :d ::dspk/data :dk ::dspk/data-key
-                      :u ::uspk/user :uk ::uspk/user-key
-                      :up ::upspk/userprofile :upk ::upspk/userprofile-key
-                      :ug ::ugspk/usergroup :ugk ::ugspk/usergroup-key))
-(s/def ::Puts (s/* ::domain-like))
-(s/def ::Deletes (s/* ::domain-like))
-(s/def ::domain-batch (s/keys :req [::Puts ::Deletes]))
-(s/def ::batch-write-items (s/map-of keyword? ::domain-batch))
+            [datakam.specs.usergroup-spec :as ugspk]
+            [datakam.specs.batchwrite-spec :as bwspk]))
 
 ;;;; Helpers
 
@@ -132,7 +122,9 @@
                         (s/valid?
                          ::ugspk/usergroup-like
                          (ugspk/usergroup-keys-localize lm)) (ugspk/usergroup-to-attrvals lm)
-                        :else lm))
+                        :else (do
+                                (println "No Match for: " lm)
+                                lm)))
                                         ;kvec (-> m keys (into []))
         resm (S/multi-transform [(S/multi-path
                                   :Things :Data :User :UserProfile :UserGroup)
@@ -198,7 +190,7 @@
 ;;        (into #{})))
 
 (defn batch-write [items]
-  {:pre  [(s/valid? ::batch-write-items items)]
+  {:pre  [(s/valid? ::bwspk/batch-write-items (bwspk/batch-keys-localize items))]
    :post [(s/valid? any? %)]}
   (let [req-data (batch-write-items-to-attrvals items)
         rits (map
@@ -447,4 +439,3 @@
   (get-item :Data
             {:DataID  {:S "27ed56f9-05ec-4105-abfb-103b9d4a8854"}
              :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}}))
-

@@ -13,10 +13,6 @@
 (defn- check-password [hashed-password password]
   (hashers/check password hashed-password))
 
-(defn- print-val [v]
-  (println v)
-  v)
-
 (defn enroll! [user]
   (let [passwd (:Password user)
         user-no-pass (dissoc user :Password)]

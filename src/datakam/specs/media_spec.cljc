@@ -3,6 +3,7 @@
             [clojure.string :refer [capitalize join lower-case split]]
             [clojure.set :refer [rename-keys]]
             [clojure.spec.alpha :as s]
+            [camel-snake-kebab.core :as csk]
             [datakam.specs.common-spec :as cspk]
             [datakam.specs.thing-spec :as tspk]
             [datakam.specs.data-spec :as dspk]
@@ -44,14 +45,6 @@
 
 (defn uuid []
   (java.util.UUID/randomUUID))
-
-(defn camelize [input-string]
-  (let [words (split input-string #"[\s_-]+")]
-    (join "" (cons (lower-case (first words)) (map capitalize (rest words))))))
-
-(defn chameau [input-string]
-  (let [words (split input-string #"[\s_-]+")]
-    (join "" (cons (capitalize (first words)) (map capitalize (rest words))))))
 
 (defn update-vals [m val-keys f]
   (reduce #(update-in % [%2] f) m val-keys))
@@ -95,12 +88,15 @@
                :UpdatedAt (str (now))))))
 
 (defn media-to-data [m]
+  {:pre [(s/valid? ::media (media-keys-localize m))]
+   :post [(s/valid? ::dspk/many-data-type (map dspk/data-keys-localize %))]}
   (let [thing-id (:MediaID m)]
     (map (fn [[k v]]
-           (hash-map :DataID (str (uuid)) :ThingID thing-id :Key k :Value v))
+           (hash-map :DataID (str (uuid)) :ThingID thing-id :Key k :Value (if-not (string? v)
+                                                                            (pr-str v)
+                                                                            v)))
          (-> m
-             (rename-keys {:MediaID :ThingID})
-             (dissoc :ParentDocumentID :Type :MediaID :UserID :Tags)
+             (dissoc :ParentDocumentID :MediaID :UserID :Tags)
              seq))))
 
 (defn thing-data-to-media [thing data]
@@ -108,13 +104,13 @@
           (s/valid? ::dspk/many-data-type (map #(dspk/data-keys-localize %) data))]
    :post [(s/valid? ::media (media-keys-localize %))]}
   (-> thing
-      (rename-keys {:Name :Type
+      (rename-keys {:Name :ParentDocumentID
                     :ThingID :MediaID})
       (merge
-       (into {} (map #(hash-map
-                       (-> % :Key capitalize chameau keyword)
-                       (-> % :Value)) data)))
-      (update-vals [:FileUrl] edn/read-string)))
+        (into {} (map #(hash-map
+                         (-> % :Key csk/->PascalCase keyword)
+                         (-> % :Value)) data)))
+      ))
 
 ;; (defn dissociate-media [parent-doc-id & media-ids]
 ;;   ...) ;; TODO: Implement this!

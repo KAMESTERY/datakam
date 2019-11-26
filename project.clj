@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [io.pedestal/pedestal.service "0.5.7"]
-
+                 ;[io.pedestal/pedestal.log "0.5.7"]
                  ;; Remove this line and uncomment one of the next lines to
                  ;; use Immutant or Tomcat instead of Jetty:
                  ;;[io.pedestal/pedestal.jetty "0.5.7"]
@@ -22,6 +22,7 @@
                  [environ "1.1.0"]
                  [com.walmartlabs/lacinia "0.36.0-alpha-2"]
                  [selmer "1.12.17"]
+                 [camel-snake-kebab "0.4.1"]
                  [com.rpl/specter "1.1.3"]
                  ;;[buddy "2.0.0"]
                  [buddy/buddy-core "1.6.0"]
@@ -30,6 +31,8 @@
                  [buddy/buddy-sign "3.1.0"]
                  [camel-snake-kebab "0.4.0"]
                  [clj-time "0.15.2"]
+                 [expound "0.8.0"]
+                 [com.bhauman/spell-spec "0.1.1"]
                  [org.clojure/test.check "0.10.0" :scope "test"]]
   :min-lein-version "2.0.0"
   :jvm-opts ["-server"

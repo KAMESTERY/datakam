@@ -1,10 +1,13 @@
 (ns datakam.service
-  (:require [io.pedestal.http :as http]
+  (:require [clojure.pprint :refer [pprint]]
+            [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
+            [io.pedestal.interceptor.error :as error-int]
             [ring.util.response :as ring-resp]
             [selmer.parser :as selmer]
             [com.walmartlabs.lacinia :refer [execute]]
+            [com.walmartlabs.lacinia.util :as lutil]
             [datakam.schema :refer [main-schema]]
             [datakam.dal :as dal]
             [datakam.domain :as dmn]
@@ -45,13 +48,37 @@
    (selmer/render-file "public/graphiql.html"
                        {:url (route/url-for ::gql)})))
 
+;(defn gql
+;  [request]
+;  ;;(prn request)
+;  (let [query (-> request :json-params :query)
+;        result (try (execute main-schema query nil nil)
+;                    (catch java.lang.AssertionError e
+;                      (println "Catching Exception")
+;                      (pprint e)
+;                      (-> e Throwable->map :via first))
+;                    (catch java.lang.Exception e
+;                      (println "Catching Exception")
+;                      (pprint e)
+;                      (-> e Throwable->map :via first))
+;                    ;(catch java.lang.AssertionError e
+;                    ;  {:status 400
+;                    ;   :headers {}
+;                    ;   :body (lutil/as-error-map e)})
+;                    ;(catch java.lang.Exception e
+;                    ;  {:status 500
+;                    ;   :headers {}
+;                    ;   :body (lutil/as-error-map e)})
+;                    )]
+;    (pprint result)
+;    (ring-resp/response result)))
+
 (defn gql
   [request]
-  ;;(prn request)
+  (println "GQL Request:" request)
   (let [query (-> request :json-params :query)
-        result (try (execute main-schema query nil nil)
-                    (catch AssertionError e
-                      (-> e Throwable->map :via first)))]
+        result (execute main-schema query nil nil)]
+    (println "GQL Response:" result)
     (ring-resp/response result)))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
@@ -61,6 +88,22 @@
 
 (def json-interceptors [(body-params/body-params) http/json-body])
 
+;(def service-error-handler
+;  (error-int/error-dispatch [ctx ex]
+;
+;                            [{:exception-type java.lang.AssertionError}]
+;                            (assoc ctx :response {:status 400
+;                                                  :headers {}
+;                                                  :body (lutil/as-error-map ex)})
+;
+;                            [{:exception-type java.lang.Exception}]
+;                            (assoc ctx :response {:status 500
+;                                                  :headers {}
+;                                                  :body (lutil/as-error-map ex)})
+;
+;                            :else
+;                            (assoc ctx :io.pedestal.interceptor.chain/error ex)))
+
 ;; Tabular routes
 (def routes #{["/" :get (conj common-interceptors `home-page)]
               ["/about" :get (conj common-interceptors `about-page)]
@@ -68,6 +111,7 @@
               ["/topic/:namespace/:topic" :get (conj json-interceptors `get-topic)]
               ["/title/:namespace/:topic/:title" :get (conj json-interceptors `get-title)]
               ["/gql" :post (conj json-interceptors `gql)]
+              ;["/gql" :post (conj json-interceptors service-error-handler `gql)]
               ["/graphiql" :get (conj common-interceptors `graphiql)]})
 
 ;; Map-based routes

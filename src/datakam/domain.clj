@@ -1,6 +1,7 @@
 (ns datakam.domain
   (:require [clojure.spec.alpha :as s]
             [clojure.set :refer [rename-keys]]
+            [clojure.pprint :refer [pprint]]
             [datakam.specs.macros :refer [okspk?]]
             [datakam.specs.common-spec :as cspk]
             [datakam.specs.thing-spec :as tspk]
@@ -52,7 +53,7 @@
 
 (defn get-media [mkey]
   {:pre  [(okspk? ::mspk/media-key (mspk/media-keys-localize mkey))]
-   :post [(okspk? ::mspk/document (mspk/media-keys-localize %))]}
+   :post [(okspk? ::mspk/media-like (mspk/media-keys-localize %))]}
   (let [thing (dal/get-thing {:Name (:Topic mkey)
                               :ThingID (:MediaID mkey)})
         data (dal/query-data (select-keys thing [:ThingID]))]
@@ -60,7 +61,7 @@
 
 (defn get-browse-media [mkey]
   {:pre  [(okspk? ::mspk/media-key (mspk/media-keys-localize mkey))]
-   :post [(okspk? ::mspk/document (mspk/media-keys-localize %))]}
+   :post [(okspk? ::mspk/media-like (mspk/media-keys-localize %))]}
   (let [thing (dal/get-thing {:Name (:Type mkey)
                               :ThingID (:MediaID mkey)})
         data (dal/query-data (select-keys thing [:ThingID]))]
@@ -70,20 +71,21 @@
 
 (defn- put-document [doc]
   {:pre  [(okspk? ::docspk/document (docspk/document-keys-localize doc))]
-   :post [(okspk? empty? %)]}
-  (let [thing (docspk/doc-to-thing doc)
-        data (docspk/doc-to-data doc)
+   :post [(okspk? empty? (:UnprocessedItems %))]}
+  (let [doc-no-media (dissoc doc :Media)
+        thing (docspk/doc-to-thing doc-no-media)
+        data (docspk/doc-to-data doc-no-media)
         payload (atom (hash-map :Things {:Puts [thing]}
                                 :Data {:Puts data}))]
-    (pmap #(let [t (mspk/media-to-thing %)
-                 a (mspk/media-to-association %)
-                 d (mspk/media-to-data %)]
+    (doseq [m (:Media doc)]
+        (let [t (mspk/media-to-thing m)
+              a (mspk/media-to-association m)
+              d (mspk/media-to-data m)]
              (swap! payload update-in [:Things :Puts] conj t)
              (swap! payload update-in [:Things :Puts] conj a)
-             (swap! payload update-in [:Data :Puts] conj d)) (:Media doc))
-                                        ;(dal/batch-write (hash-map :Things {:Puts [thing]}
-                                        ;                           :Data {:Puts data}))
-    (dal/batch-write payload)))
+             (swap! payload update-in [:Data :Puts] concat d)))
+    (swap! payload update-in [:Data :Puts] #(into [] %))
+    (dal/batch-write @payload)))
 
 (defn- put-media [media]
   {:pre  [(okspk? ::mspk/media (mspk/media-keys-localize media))]

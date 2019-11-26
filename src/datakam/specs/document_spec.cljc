@@ -3,6 +3,7 @@
             [clojure.string :refer [capitalize join lower-case split]]
             [clojure.set :refer [rename-keys]]
             [clojure.spec.alpha :as s]
+            [camel-snake-kebab.core :as csk]
             [datakam.specs.common-spec :as cspk]
             [datakam.specs.thing-spec :as tspk]
             [datakam.specs.data-spec :as dspk]
@@ -58,14 +59,6 @@
 (defn uuid []
   (java.util.UUID/randomUUID))
 
-(defn camelize [input-string]
-  (let [words (split input-string #"[\s_-]+")]
-    (join "" (cons (lower-case (first words)) (map capitalize (rest words))))))
-
-(defn chameau [input-string]
-  (let [words (split input-string #"[\s_-]+")]
-    (join "" (cons (capitalize (first words)) (map capitalize (rest words))))))
-
 (defn update-vals [m val-keys f]
   (reduce #(update-in % [%2] f) m val-keys))
 
@@ -81,7 +74,7 @@
                   :Slug   ::Slug :Langue ::Langue :Body ::Body
                   :Title ::Title :Score ::Score :Version ::Version
                   :Niveau ::Niveau :FiltreVisuel ::FiltreVisuel
-                  :Identifier ::Identifier :Tags ::Tags
+                  :Identifier ::Identifier :Tags ::Tags     ;:Media ::Media
                   :CreatedAt ::CreatedAt :UpdatedAt ::UpdatedAt}))
 
 (defn doc-to-thing [m & {:keys [score version]
@@ -97,12 +90,16 @@
              :UpdatedAt (str (now)))))
 
 (defn doc-to-data [m]
+  {:pre [(s/valid? ::document (document-keys-localize m))]
+   :post [(s/valid? ::dspk/many-data-type (map dspk/data-keys-localize %))]}
   (let [thing-id (:DocumentID m)]
     (map (fn [[k v]]
-           (hash-map :DataID (str (uuid)) :ThingID thing-id :Key k :Value v))
+           (hash-map :DataID (str (uuid)) :ThingID thing-id :Key k :Value (if-not (string? v)
+                                                                            (pr-str v)
+                                                                            v)))
          (-> m
              (rename-keys {:DocumentID :ThingID})
-             (dissoc :Topic :DocumentID :UserID :Tags)
+             (dissoc :Topic :ThingID :DocumentID :UserID :Tags)
              seq))))
 
 (defn thing-data-to-document [thing data]
@@ -110,11 +107,10 @@
           (s/valid? ::dspk/many-data-type (map #(dspk/data-keys-localize %) data))]
    :post [(s/valid? ::document (document-keys-localize %))]}
   (-> thing
-      (rename-keys {:Name :Topic
+      (rename-keys {:Name    :Topic
                     :ThingID :DocumentID})
       (merge
-       (into {} (map #(hash-map
-                       (-> % :Key capitalize chameau keyword)
-                       (-> % :Value)) data)))
+        (into {} (map #(hash-map
+                         (-> % :Key csk/->PascalCase keyword)
+                         (-> % :Value)) data)))
       (update-vals [:FiltreVisuel :Langue :Niveau :Publish] edn/read-string)))
-

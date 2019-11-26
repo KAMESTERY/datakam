@@ -70,6 +70,7 @@
                                   :Tags {:type '(list String)}
                                   :FiltreVisuel {:type 'Int}
                                   :Niveau {:type 'Int}
+                                  :Langue {:type 'Int}
                                   :Score {:type 'Int}
                                   :Version {:type 'Int}
                                   :Title {:type 'String}
@@ -141,6 +142,7 @@
                                         :Media {:type '(list :InputMediaType)}
                                         :Tags {:type '(list String)}
                                         :FiltreVisuel {:type 'Int}
+                                        :Langue {:type 'Int}
                                         :Niveau {:type 'Int}
                                         :Title {:type 'String}
                                         :Body {:type 'String}}}
@@ -241,9 +243,9 @@
                                              :get_userprofile (fn [ctx {:keys [upkey]} v]
                                                                 (dal/get-userprofile upkey))
                                              :get_thing (fn [ctx {:keys [tkey]} v]
-                                                          (println "Context: " ctx)
-                                                          (println "Thing Key: " tkey)
-                                                          (println "Value? " v)
+                                                          ;(println "Context: " ctx)
+                                                          ;(println "Thing Key: " tkey)
+                                                          ;(println "Value? " v)
                                                           (dal/get-thing tkey))
                                              :get_document (fn [ctx {:keys [dockey]} v]
                                                              (dmn/get-document dockey))

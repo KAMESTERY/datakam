@@ -9,8 +9,11 @@
 
 (s/def ::DataID ::cspk/non-null-string-type)
 (s/def ::ThingID ::tspk/thing-id-type)
-(s/def ::Key string?)
-(s/def ::Value ::cspk/has-some-value-type)
+(s/def ::Key (s/or
+               :k keyword?
+               :s string?))
+;(s/def ::Value ::cspk/has-some-value-type)
+(s/def ::Value ::cspk/non-null-string-type)
 
 (s/def ::data-cat (s/keys :req [::ThingID]))
 (s/def ::data-key (s/keys :req [::ThingID ::DataID]))
