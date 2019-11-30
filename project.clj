@@ -30,6 +30,7 @@
                  [buddy/buddy-hashers "1.4.0"]
                  [buddy/buddy-sign "3.1.0"]
                  [camel-snake-kebab "0.4.0"]
+                 [clj-commons/unfurl "0.11.0"]
                  [clj-time "0.15.2"]
                  [expound "0.8.0"]
                  [com.bhauman/spell-spec "0.1.1"]

@@ -8,7 +8,7 @@
             [selmer.parser :as selmer]
             [com.walmartlabs.lacinia :refer [execute]]
             [com.walmartlabs.lacinia.util :as lutil]
-            [datakam.schema :refer [main-schema]]
+            [datakam.gql.schema :refer [main-schema]]
             [datakam.dal :as dal]
             [datakam.domain :as dmn]
             [datakam.utils :as utils]))
