@@ -48,38 +48,39 @@
    (selmer/render-file "public/graphiql.html"
                        {:url (route/url-for ::gql)})))
 
-;(defn gql
-;  [request]
-;  ;;(prn request)
-;  (let [query (-> request :json-params :query)
-;        result (try (execute main-schema query nil nil)
-;                    (catch java.lang.AssertionError e
-;                      (println "Catching Exception")
-;                      (pprint e)
-;                      (-> e Throwable->map :via first))
-;                    (catch java.lang.Exception e
-;                      (println "Catching Exception")
-;                      (pprint e)
-;                      (-> e Throwable->map :via first))
-;                    ;(catch java.lang.AssertionError e
-;                    ;  {:status 400
-;                    ;   :headers {}
-;                    ;   :body (lutil/as-error-map e)})
-;                    ;(catch java.lang.Exception e
-;                    ;  {:status 500
-;                    ;   :headers {}
-;                    ;   :body (lutil/as-error-map e)})
-;                    )]
-;    (pprint result)
-;    (ring-resp/response result)))
-
 (defn gql
   [request]
-  (println "GQL Request:" request)
+  (println "GQL Request:" (-> request :json-params :query))
   (let [query (-> request :json-params :query)
-        result (execute main-schema query nil nil)]
+        result (try (execute main-schema query nil nil)
+                    ;(catch java.lang.AssertionError e
+                    ;  (println "Catching Exception")
+                    ;  (pprint e)
+                    ;  (-> e Throwable->map :via first))
+                    ;(catch java.lang.Exception e
+                    ;  (println "Catching Exception")
+                    ;  (pprint e)
+                    ;  (-> e Throwable->map :via first))
+                    (catch java.lang.AssertionError e
+                      {:status  400
+                       :headers {}
+                       :body    (lutil/as-error-map e)})
+                    (catch java.lang.Exception e
+                      {:status  500
+                       :headers {}
+                       :body    (lutil/as-error-map e)})
+                    )]
+    ;(pprint result)
     (println "GQL Response:" result)
     (ring-resp/response result)))
+
+;(defn gql
+;  [request]
+;  (println "GQL Request:" (-> request :json-params :query))
+;  (let [query (-> request :json-params :query)
+;        result (execute main-schema query nil nil)]
+;    (println "GQL Response:" result)
+;    (ring-resp/response result)))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
