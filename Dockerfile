@@ -1,4 +1,4 @@
-FROM clojure:openjdk-8-lein-2.9.1 AS builder
+FROM clojure:openjdk-13-lein-2.9.1 AS builder
 
 RUN mkdir $HOME/.aws
 RUN echo "[default]" > $HOME/.aws/config
@@ -15,7 +15,7 @@ RUN openssl ec -in ./resources/ecprivkey.pem -pubout -out ./resources/ecpubkey.p
 RUN lein uberjar
 
 
-FROM openjdk:8-alpine
+FROM openjdk:13-alpine
 MAINTAINER outcastgeek <outcastgeek+git@gmail.com>
 
 RUN mkdir /datakam
@@ -31,5 +31,5 @@ ENV AWS_REGION=us-east-1 \
 EXPOSE ${PORT}
 
 WORKDIR /datakam
-CMD ["java", "-Dserver.port=${PORT}", "-jar", "/datakam/app.jar"]
+CMD ["java", "-Dserver.port=${PORT} -XX:+UseZGC", "-jar", "/datakam/app.jar"]
 
