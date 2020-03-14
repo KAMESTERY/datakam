@@ -5,7 +5,7 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]
-            [datakam.specs.thing-spec :as tspk]
+            [contractskam.specs.thing-spec :as tspk]
             [datakam.dal :as dal]))
 
 (defspec thing-create-retrieve-delete 1000

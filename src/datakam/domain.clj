@@ -2,12 +2,12 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.set :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
-            [datakam.specs.macros :refer [okspk?]]
-            [datakam.specs.common-spec :as cspk]
-            [datakam.specs.thing-spec :as tspk]
-            [datakam.specs.data-spec :as dspk]
-            [datakam.specs.document-spec :as docspk]
-            [datakam.specs.media-spec :as mspk]
+            [contractskam.specs.macros :refer [okspk?]]
+            [contractskam.specs.common-spec :as cspk]
+            [contractskam.specs.thing-spec :as tspk]
+            [contractskam.specs.data-spec :as dspk]
+            [contractskam.specs.document-spec :as docspk]
+            [contractskam.specs.media-spec :as mspk]
             [datakam.dal :as dal]
             [datakam.auth :as auth]))
 
@@ -29,8 +29,7 @@
   (let [things (apply dal/query-thing m options)]
     (pmap (fn [thing]
             (let [data (dal/query-data (select-keys thing [:ThingID]))]
-              (mspk/thing-data-to-media thing data))) things)
-    ))
+              (mspk/thing-data-to-media thing data))) things)))
 
 (defn query-document [m & options]
   {:pre  [(okspk? ::tspk/thing-like (tspk/thing-keys-localize m))]
@@ -43,10 +42,10 @@
                             (rename-keys {:ThingID :Name})
                             query-media)]
               (-> (docspk/thing-data-to-document thing data)
-                  (assoc :Media media)))) things)
-    ))
+                  (assoc :Media media)))) things)))
 
 ;; GET
+
 
 (defn get-document [dockey]
   {:pre  [(okspk? ::docspk/document-key (docspk/document-keys-localize dockey))]
@@ -188,8 +187,6 @@
     (delete-media mkey)
     {:token new-token}))
 
-
 (comment
-  (query-document {:Name "com.kamestery.devdata:##:africa"})
-  )
+  (query-document {:Name "com.kamestery.devdata:##:africa"}))
 

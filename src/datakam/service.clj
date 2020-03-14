@@ -68,8 +68,7 @@
                     (catch java.lang.Exception e
                       {:status  500
                        :headers {}
-                       :body    (lutil/as-error-map e)})
-                    )]
+                       :body    (lutil/as-error-map e)}))]
     ;(pprint result)
     (println "GQL Response:" result)
     (ring-resp/response result)))

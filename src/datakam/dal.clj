@@ -11,14 +11,14 @@
             [cognitect.aws.client.api.async :as aws.async]
             [com.rpl.specter :as S]
             [clojure.spec.alpha :as s]
-            [datakam.specs.macros :refer [okspk?]]
-            [datakam.specs.common-spec :as cspk]
-            [datakam.specs.thing-spec :as tspk]
-            [datakam.specs.data-spec :as dspk]
-            [datakam.specs.user-spec :as uspk]
-            [datakam.specs.userprofile-spec :as upspk]
-            [datakam.specs.usergroup-spec :as ugspk]
-            [datakam.specs.batchwrite-spec :as bwspk]))
+            [contractskam.specs.macros :refer [okspk?]]
+            [contractskam.specs.common-spec :as cspk]
+            [contractskam.specs.thing-spec :as tspk]
+            [contractskam.specs.data-spec :as dspk]
+            [contractskam.specs.user-spec :as uspk]
+            [contractskam.specs.userprofile-spec :as upspk]
+            [contractskam.specs.usergroup-spec :as ugspk]
+            [contractskam.specs.batchwrite-spec :as bwspk]))
 
 ;;;; Helpers
 
@@ -226,6 +226,7 @@
 
 ;; (item-getter "thing" "Things")
 
+
 (defn get-data [dkey & attrs]
   {:pre  [(s/valid? ::dspk/data-key (dspk/data-keys-localize dkey))
           (s/valid? ::cspk/resource-attrs attrs)]
@@ -397,6 +398,8 @@
 ;;;; Scratch Pad
 
 ;; ask what it can do
+
+
 (comment
   (aws/ops ddb)
 

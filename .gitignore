@@ -17,6 +17,9 @@ repl-port
 .nrepl-port
 .repl
 
+# Deps dot edn
+.cpcache/
+
 # Temp Files
 *.orig
 *~
@@ -38,7 +41,7 @@ build/
 
 # Project
 .idea
-datakam.iml
+*.iml
 *.der
 *.pem
 

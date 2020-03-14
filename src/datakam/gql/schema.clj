@@ -46,7 +46,7 @@
                                              :query_document (fn [ctx {:keys [query]} v]
                                                                (dmn/query-document query))
                                              :query_media (fn [ctx {:keys [query]} v]
-                                                               (dmn/query-media query))
+                                                            (dmn/query-media query))
                                              :put_document (fn [ctx {:keys [token doc]} v]
                                                              (dmn/put-doc token doc))
                                              :put_media (fn [ctx {:keys [token med]} v]

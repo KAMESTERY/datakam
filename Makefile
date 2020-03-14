@@ -11,6 +11,15 @@ gen-rsa:
 	# Generate a public key from private key
 	openssl ec -in $(BASEDIR)/resources/ecprivkey.pem -pubout -out $(BASEDIR)/resources/ecpubkey.pem
 
+run-dev:
+	lein run-dev
+
+fat-dev-jar:
+	clj -A:uberjar
+
+dev-jar-run:
+	java -cp datakam.jar clojure.main -m datakam.server
+
 container: gen-rsa
 	gcloud builds submit --tag gcr.io/$(PROJECTID)/$(APPNAME)
 
