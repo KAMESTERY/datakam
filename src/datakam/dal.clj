@@ -10,6 +10,7 @@
             [cognitect.aws.client.api :as aws]
             [cognitect.aws.client.api.async :as aws.async]
             [com.rpl.specter :as S]
+            [taoensso.timbre :as log]
             [clojure.spec.alpha :as s]
             [contractskam.specs.macros :refer [okspk?]]
             [contractskam.specs.common-spec :as cspk]
@@ -123,7 +124,7 @@
                          ::ugspk/usergroup-like
                          (ugspk/usergroup-keys-localize lm)) (ugspk/usergroup-to-attrvals lm)
                         :else (do
-                                (println "No Match for: " lm)
+                                (log/debug "No Match for: " lm)
                                 lm)))
                                         ;kvec (-> m keys (into []))
         resm (S/multi-transform [(S/multi-path
@@ -159,11 +160,11 @@
              :KeyConditionExpression    kce
              :ExpressionAttributeNames qean
              :ExpressionAttributeValues eav}]
-    ;; (println "Query ExpressionAttributeNames: " qean)
-    ;; (println "Query Data: " qdata)
-    ;; (println "ExpressionAttributeValues: " eav)
-    ;; (println "KCE: " kce)
-    ;; (println "FKCE: " fkce)
+    ;; (log/debug "Query ExpressionAttributeNames: " qean)
+    ;; (log/debug "Query Data: " qdata)
+    ;; (log/debug "ExpressionAttributeValues: " eav)
+    ;; (log/debug "KCE: " kce)
+    ;; (log/debug "FKCE: " fkce)
     (map into-map-value
          (-> (aws/invoke ddb
                          {:op      :Query

@@ -5,6 +5,7 @@
             [buddy.core.nonce :as nonce]
             [buddy.hashers :as hashers]
             [buddy.sign.jwt :as jwt]
+            [taoensso.timbre :as log]
             [datakam.dal :as dal]))
 
 (defn- hash-password [password]
@@ -73,12 +74,12 @@
   (def userid "some-userid")
   (def passwd "some-password")
   (def hpasswd (hash-password passwd))
-  (println hpasswd)
+  (log/debug hpasswd)
   (check-password hpasswd passwd)
   (check-password hpasswd "some-other-password")
   ;;;; JWT
   (def claims {:UserID "sf@sdgf.fg" :Role 9874})
   (def token (jwt-encode claims))
-  (println token)
+  (log/debug token)
   (jwt-decode token))
 

@@ -3,6 +3,7 @@
             [com.walmartlabs.lacinia.schema :as schema]
             [com.walmartlabs.lacinia.util :as util]
             [unfurl.api :refer [unfurl]]
+            [taoensso.timbre :as log]
             [datakam.dal :as dal]
             [datakam.domain :as dmn]
             [datakam.auth :as auth]
@@ -35,9 +36,9 @@
                                              :get_userprofile (fn [ctx {:keys [upkey]} v]
                                                                 (dal/get-userprofile upkey))
                                              :get_thing (fn [ctx {:keys [tkey]} v]
-                                                          ;(println "Context: " ctx)
-                                                          ;(println "Thing Key: " tkey)
-                                                          ;(println "Value? " v)
+                                                          ;(log/debug "Context: " ctx)
+                                                          ;(log/debug "Thing Key: " tkey)
+                                                          ;(log/debug "Value? " v)
                                                           (dal/get-thing tkey))
                                              :get_document (fn [ctx {:keys [dockey]} v]
                                                              (dmn/get-document dockey))

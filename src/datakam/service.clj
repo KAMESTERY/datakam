@@ -8,6 +8,7 @@
             [selmer.parser :as selmer]
             [com.walmartlabs.lacinia :refer [execute]]
             [com.walmartlabs.lacinia.util :as lutil]
+            [taoensso.timbre :as log]
             [datakam.gql.schema :refer [main-schema]]
             [datakam.dal :as dal]
             [datakam.domain :as dmn]
@@ -50,15 +51,15 @@
 
 (defn gql
   [request]
-  (println "GQL Request:" (-> request :json-params :query))
+  (log/debug "GQL Request:" (-> request :json-params :query))
   (let [query (-> request :json-params :query)
         result (try (execute main-schema query nil nil)
                     ;(catch java.lang.AssertionError e
-                    ;  (println "Catching Exception")
+                    ;  (log/debug "Catching Exception")
                     ;  (pprint e)
                     ;  (-> e Throwable->map :via first))
                     ;(catch java.lang.Exception e
-                    ;  (println "Catching Exception")
+                    ;  (log/debug "Catching Exception")
                     ;  (pprint e)
                     ;  (-> e Throwable->map :via first))
                     (catch java.lang.AssertionError e
@@ -70,15 +71,15 @@
                        :headers {}
                        :body    (lutil/as-error-map e)}))]
     ;(pprint result)
-    (println "GQL Response:" result)
+    (log/debug "GQL Response:" result)
     (ring-resp/response result)))
 
 ;(defn gql
 ;  [request]
-;  (println "GQL Request:" (-> request :json-params :query))
+;  (log/debug "GQL Request:" (-> request :json-params :query))
 ;  (let [query (-> request :json-params :query)
 ;        result (execute main-schema query nil nil)]
-;    (println "GQL Response:" result)
+;    (log/debug "GQL Response:" result)
 ;    (ring-resp/response result)))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.

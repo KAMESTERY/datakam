@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.set :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
+            [taoensso.timbre :as log]
             [contractskam.specs.macros :refer [okspk?]]
             [contractskam.specs.common-spec :as cspk]
             [contractskam.specs.thing-spec :as tspk]
@@ -93,7 +94,7 @@
           data (map #(select-keys % [:DataID :ThingID]) (dal/query-data (select-keys thing [:ThingID])))
           payload (hash-map :Things {:Deletes (concat [thing] media_associations)}
                             :Data {:Deletes data})]
-      (println "Delete Payload: ")
+      (log/debug "Delete Payload: ")
       (pprint payload)
       (dal/batch-write payload))
     {:UnprocessedItems []}))
