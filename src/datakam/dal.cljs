@@ -1,18 +1,13 @@
 (ns datakam.dal
+  (:require-macros [contractskam.specs.macros :refer [okspk?]])
   (:require [clojure.set :refer [rename-keys]]
-            [clojure.core.async :as a]
-            [clojure.java.io :as io]
-            [clojure.data.json :as json]
+            [cljs.spec.alpha :as s]
             [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as cljstr]
             [clojure.walk :refer [stringify-keys]]
-            [cognitect.aws.client.api :as aws]
-            [cognitect.aws.client.api.async :as aws.async]
             [com.rpl.specter :as S]
             [taoensso.timbre :as log]
-            [clojure.spec.alpha :as s]
-            [contractskam.specs.macros :refer [okspk?]]
             [contractskam.specs.common-spec :as cspk]
             [contractskam.specs.thing-spec :as tspk]
             [contractskam.specs.data-spec :as dspk]
@@ -71,7 +66,7 @@
     #(tfn (str (name prfx) (name %))) (keys m))
    (vals m)))
 
-(def ddb (aws/client {:api :dynamodb})) ;; Create a client to talk to DynamoDB
+;;(def ddb (aws/client {:api :dynamodb})) ;; Create a client to talk to DynamoDB
 
 (defn- put-item [table item]
   (aws/invoke ddb {:op      :PutItem

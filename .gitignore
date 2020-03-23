@@ -9,7 +9,6 @@ pom.xml.asc
 # Leiningen
 classes/
 lib/
-native/
 checkouts/
 target/
 .lein-*
@@ -45,3 +44,10 @@ build/
 *.der
 *.pem
 
+node_modules
+.shadow-cljs
+native/.idea
+native/cmake-build-debug
+native/target
+native/index.node
+native/artifacts.json

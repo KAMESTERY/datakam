@@ -1,9 +1,9 @@
 (ns datakam.domain
+  (:require-macros [contractskam.specs.macros :refer [okspk?]])
   (:require [clojure.spec.alpha :as s]
             [clojure.set :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
             [taoensso.timbre :as log]
-            [contractskam.specs.macros :refer [okspk?]]
             [contractskam.specs.common-spec :as cspk]
             [contractskam.specs.thing-spec :as tspk]
             [contractskam.specs.data-spec :as dspk]

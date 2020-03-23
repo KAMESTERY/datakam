@@ -1,0 +1,157 @@
+
+query Auth {
+  authenticate(Email: "gggg@gggg.ggg", Password: "gggggggg") {
+    Token
+    UserID
+    Email
+    Role
+  }
+}
+
+query Userinfo {
+  getUserinfo(UserID: "gggg@gggg.ggg", Email: "gggg@gggg.ggg") {
+    UserID
+    Email
+    Username
+    Role
+    Confirmed
+    LastSeen
+    Groups {
+      GroupId
+      GroupName
+    }
+    AvatarHash
+    Name
+    Age
+    AboutMe
+    Location
+    MemberSince
+  }
+}
+
+query GetDocAndRelated {
+  getDocumentAndRelated(
+    Topic: "com.kamestery.devdata:##:africa",
+    Title: "com.kamestery.devdata:##:africa:##:the-ntecher"
+  ) {
+    Topic
+    DocumentID
+    Identifier
+    Slug
+    Publish
+    Media {
+      Type
+      MediaID
+      ParentDocumentID
+      FileUrl
+      UserID
+      Tags
+      Score
+      Version
+      CreatedAt
+    }
+    Tags
+    FiltreVisuel
+    Niveau
+    Langue
+    Score
+    Version
+    Title
+    Body
+    CreatedAt
+    UpdatedAt
+    Related {
+      Topic
+      DocumentID
+      Identifier
+      Slug
+      Publish
+      Media {
+        Type
+        MediaID
+        ParentDocumentID
+        FileUrl
+        UserID
+        Tags
+        Score
+        Version
+        CreatedAt
+      }
+      Tags
+      FiltreVisuel
+      Niveau
+      Langue
+      Score
+      Version
+      Title
+      Body
+      CreatedAt
+      UpdatedAt
+    }
+  }
+}
+
+query GetDocsByTopic {
+  getDocumentByTopics(
+    topics: ["com.kamestery.devdata:##:africa"]
+  ) {
+    Topic
+    Docs {
+      Topic
+      DocumentID
+      Identifier
+      Slug
+      Publish
+      Media {
+        Type
+        MediaID
+        ParentDocumentID
+        FileUrl
+        UserID
+        Tags
+        Score
+        Version
+        CreatedAt
+      }
+      Tags
+      FiltreVisuel
+      Niveau
+      Langue
+      Score
+      Version
+      Title
+      Body
+      CreatedAt
+      UpdatedAt
+    }
+  }
+}
+
+mutation CreateOneDocument {
+  createDocument(
+    doc: {
+      Topic: "com.kamestery.devdata:##:africa",
+      DocumentID: "com.kamestery.devdata:##:africa:##:cool-rust",
+      UserID: "hhhh@hhhh.hhh",
+      Identifier: "com.kamestery.devdata:##:africa:##:cool-rust",
+      Slug: "cool-rust",
+      Publish: true,
+      Tags: [
+        "Africa",
+        "Djehuti"
+      ],
+      FiltreVisuel: 8,
+      Niveau: 4,
+      Langue: 4,
+      Title: "Cool Rust",
+      Body: "This is a very Cool Clojurescript + Rust Association"
+    }
+  )
+}
+
+mutation DeleteOneDocument {
+  deleteDocument(
+    Name: "com.kamestery.devdata:##:africa",
+    ThingID: "com.kamestery.devdata:##:africa:##:cool-rust"
+  )
+}

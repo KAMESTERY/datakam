@@ -3,6 +3,16 @@ APPNAME=datakam
 PROJECTID=kamestery
 REGION=us-east1
 
+system-prep:
+	curl -O https://download.clojure.org/install/linux-install-1.10.1.469.sh
+	chmod +x linux-install-1.10.1.469.sh
+	./linux-install-1.10.1.469.sh
+	rm ./linux-install-1.10.1.469.sh
+	curl -sL https://deb.nodesource.com/setup_13.x | bash -
+	apt-get install build-essential nodejs -y
+	curl https://sh.rustup.rs -sSf | bash -s -- -y
+	npm install --global neon-cli
+
 gen-rsa:
 	# Generating params file
 	openssl ecparam -name brainpoolP512t1 -out $(BASEDIR)/resources/ecparams.pem

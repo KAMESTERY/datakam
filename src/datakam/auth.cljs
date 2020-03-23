@@ -1,12 +1,8 @@
 (ns datakam.auth
-  (:require [clojure.java.io :as io]
-            [clj-time.core :as time]
-            [buddy.core.keys :as ks]
-            [buddy.core.nonce :as nonce]
-            [buddy.hashers :as hashers]
-            [buddy.sign.jwt :as jwt]
+  (:require [tick.alpha.api :as time]
             [taoensso.timbre :as log]
-            [datakam.dal :as dal]))
+            [datakam.dal :as dal]
+            ["dknative" :as native]))
 
 (defn- hash-password [password]
   (hashers/encrypt password {:alg :pbkdf2+sha512 :salt (nonce/random-bytes 64)}))
@@ -28,15 +24,12 @@
           {:msg "Success"}))
       {:errmsg "Password has no Value"})))
 
-;; Create keys instances
-(def ec-privkey (ks/private-key "resources/ecprivkey.pem"))
-(def ec-pubkey (ks/public-key "resources/ecpubkey.pem"))
-(def token-ttl (time/days 4))
-;;(def token-ttl (time/seconds 4))
+(def token-ttl (time/new-duration 4 :days))
+;;(def token-ttl (time/new-duration 4 :seconds))
 
 (defn jwt-encode [claims]
   (-> claims
-      (assoc :exp (time/plus (time/now) token-ttl))
+      (assoc :exp (time/+ (time/now) token-ttl))
       (jwt/sign ec-privkey {:alg :es512})))
 
 (defn jwt-decode [token]
