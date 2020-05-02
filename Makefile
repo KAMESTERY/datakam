@@ -10,8 +10,6 @@ system-prep:
 	rm ./linux-install-1.10.1.469.sh
 	curl -sL https://deb.nodesource.com/setup_13.x | bash -
 	apt-get install build-essential nodejs -y
-	curl https://sh.rustup.rs -sSf | bash -s -- -y
-	npm install --global neon-cli
 
 gen-rsa:
 	# Generating params file

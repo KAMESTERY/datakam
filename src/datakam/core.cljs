@@ -21,9 +21,9 @@
 (defmethod handle :home [req-data]
   (ep/home (:req req-data)))
 
-;; protected
-(defmethod handle :gql [req-data]
-  (ep/gql (:req req-data)))
+;; ;; protected
+;; (defmethod handle :gql [req-data]
+;;   (ep/gql (:req req-data)))
 
 ;; default
 (defmethod handle :default [_]

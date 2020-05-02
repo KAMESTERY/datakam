@@ -1,11 +1,13 @@
 (ns datakam.dal
-  (:require-macros [contractskam.specs.macros :refer [okspk?]])
+  (:require-macros [cljs.core.async.macros :refer [alt! go]]
+                   [contractskam.specs.macros :refer [okspk?]])
   (:require [clojure.set :refer [rename-keys]]
             [cljs.spec.alpha :as s]
             [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as cljstr]
             [clojure.walk :refer [stringify-keys]]
+            [cljs.core.async :refer [<!]]
             [com.rpl.specter :as S]
             [taoensso.timbre :as log]
             [contractskam.specs.common-spec :as cspk]
@@ -14,7 +16,8 @@
             [contractskam.specs.user-spec :as uspk]
             [contractskam.specs.userprofile-spec :as upspk]
             [contractskam.specs.usergroup-spec :as ugspk]
-            [contractskam.specs.batchwrite-spec :as bwspk]))
+            [contractskam.specs.batchwrite-spec :as bwspk]
+            [datakam.aws.core :as aws]))
 
 ;;;; Helpers
 
@@ -66,7 +69,7 @@
     #(tfn (str (name prfx) (name %))) (keys m))
    (vals m)))
 
-;;(def ddb (aws/client {:api :dynamodb})) ;; Create a client to talk to DynamoDB
+(def ddb (aws/client {:api :dynamodb})) ;; Create a client to talk to DynamoDB
 
 (defn- put-item [table item]
   (aws/invoke ddb {:op      :PutItem
@@ -431,6 +434,7 @@
 
   (get-item :Things {:Name    {:S "com.kamestery.devdata:##:africa"}
                      :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}})
+
   (get-data
    {:DataID  "27ed56f9-05ec-4105-abfb-103b9d4a8854"
     :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
@@ -438,3 +442,8 @@
   (get-item :Data
             {:DataID  {:S "27ed56f9-05ec-4105-abfb-103b9d4a8854"}
              :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}}))
+
+(get-item :Things {:Name    "com.kamestery.devdata:##:africa"
+                   :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
+
+

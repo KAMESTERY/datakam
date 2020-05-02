@@ -10,7 +10,7 @@ try {require('source-map-support').install();} catch (e) {console.warn('no "sour
 
 global.CLOSURE_NO_DEPS = true;
 
-global.CLOSURE_DEFINES = {"shadow.cljs.devtools.client.env.repl_pprint":false,"shadow.cljs.devtools.client.env.reload_strategy":"optimized","shadow.cljs.devtools.client.env.devtools_url":"","shadow.cljs.devtools.client.env.autoload":true,"shadow.cljs.devtools.client.env.proc_id":"dbf52f91-abc8-4691-9b20-5501b1ad0314","goog.ENABLE_DEBUG_LOADER":false,"shadow.cljs.devtools.client.env.server_port":9630,"shadow.cljs.devtools.client.env.use_document_host":true,"shadow.cljs.devtools.client.env.module_format":"goog","goog.LOCALE":"en","shadow.cljs.devtools.client.env.build_id":"app","shadow.cljs.devtools.client.env.ignore_warnings":false,"goog.DEBUG":true,"cljs.core._STAR_target_STAR_":"nodejs","shadow.cljs.devtools.client.env.ssl":false,"shadow.cljs.devtools.client.env.enabled":true,"shadow.cljs.devtools.client.env.server_host":"localhost","goog.TRANSPILE":"never"};
+global.CLOSURE_DEFINES = {"shadow.cljs.devtools.client.env.repl_pprint":false,"shadow.cljs.devtools.client.env.reload_strategy":"optimized","shadow.cljs.devtools.client.env.devtools_url":"","shadow.cljs.devtools.client.env.autoload":true,"shadow.cljs.devtools.client.env.proc_id":"ccb985f4-3fab-45a1-b295-ca420b604862","goog.ENABLE_DEBUG_LOADER":false,"shadow.cljs.devtools.client.env.server_port":9630,"shadow.cljs.devtools.client.env.use_document_host":true,"shadow.cljs.devtools.client.env.module_format":"goog","goog.LOCALE":"en","shadow.cljs.devtools.client.env.build_id":"app","shadow.cljs.devtools.client.env.ignore_warnings":false,"goog.DEBUG":true,"cljs.core._STAR_target_STAR_":"nodejs","shadow.cljs.devtools.client.env.ssl":false,"shadow.cljs.devtools.client.env.enabled":true,"shadow.cljs.devtools.client.env.server_host":"localhost","goog.TRANSPILE":"never"};
 
 var goog = global.goog = {};
 
@@ -2390,6 +2390,10 @@ SHADOW_IMPORT("contractskam.specs.user_spec.js");
 SHADOW_IMPORT("contractskam.specs.userprofile_spec.js");
 SHADOW_IMPORT("contractskam.specs.usergroup_spec.js");
 SHADOW_IMPORT("contractskam.specs.batchwrite_spec.js");
+SHADOW_IMPORT("cljs.core.async.interop.js");
+SHADOW_IMPORT("shadow.js.shim.module$aws_sdk.js");
+SHADOW_IMPORT("datakam.aws.dynamodb.js");
+SHADOW_IMPORT("datakam.aws.core.js");
 SHADOW_IMPORT("datakam.dal.js");
 SHADOW_IMPORT("shadow.js.shim.module$js_joda.js");
 SHADOW_IMPORT("java.time.js");
@@ -2421,7 +2425,6 @@ SHADOW_IMPORT("java.time.format.js");
 SHADOW_IMPORT("tick.format.js");
 SHADOW_IMPORT("tick.interval.js");
 SHADOW_IMPORT("tick.alpha.api.js");
-SHADOW_IMPORT("shadow.js.shim.module$dknative.js");
 SHADOW_IMPORT("datakam.auth.js");
 SHADOW_IMPORT("datakam.domain.js");
 SHADOW_IMPORT("shadow.js.shim.module$graphql.js");

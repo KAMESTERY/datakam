@@ -1,8 +1,7 @@
 (ns datakam.auth
   (:require [tick.alpha.api :as time]
             [taoensso.timbre :as log]
-            [datakam.dal :as dal]
-            ["dknative" :as native]))
+            [datakam.dal :as dal]))
 
 (defn- hash-password [password]
   (hashers/encrypt password {:alg :pbkdf2+sha512 :salt (nonce/random-bytes 64)}))

@@ -1,7 +1,6 @@
 (ns datakam.schema
   (:require [taoensso.timbre :as log]
             [datakam.domain]
-            ["dknative" :as native]
             ["graphql" :as gqlmod]))
 
 (def graphql (aget gqlmod "graphql"))
