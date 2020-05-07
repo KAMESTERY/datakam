@@ -1,5 +1,5 @@
 (ns datakam.aws.dynamodb
-  (:require [cljs.core.async :refer [go]]
+  (:require [cljs.core.async :refer [go chan put! <!]]
             [cljs.core.async.interop :refer-macros [<p!]]
             [taoensso.timbre :as log]
             ["aws-sdk" :as aws]))
@@ -27,15 +27,30 @@
       (catch js/Error err
         (log/error "ERROR:::: Unable to batch persist data: " (ex-cause err))))))
 
+;; (defn get [ddbClient data]
+;;   (log/debug data)
+;;   (.log js/console (clj->js data))
+;;   (try
+;;     (-> (.promise
+;;          (.get ddbClient (clj->js data)))
+;;         ;;(js/Promise.resolve)
+;;         (.then (fn [res]
+;;                  (log/debug (js->clj res :keywordize-keys true))
+;;                  (js->clj % :keywordize-keys true))))
+;;     (catch js/Error err
+;;       (log/error "ERROR:::: Unable to retrieve data: " (ex-cause err)))))
+
 (defn get [ddbClient data]
-  (log/debug data)
-  (.log js/console (clj->js data))
+  ;; (log/debug data)
+  ;; (.log js/console (clj->js data))
   (go
     (try
       (let [res (<p! (.promise
-                      (.get ddbClient (clj->js data))))]
-        (log/debug (js->clj res :keywordize-keys true))
-        (js->clj res :keywordize-keys true))
+                      (.get ddbClient (clj->js data))))
+            response (js->clj res :keywordize-keys true)]
+        (.log js/console res)
+        ;;(log/debug response)
+        (-> response :Item))
       (catch js/Error err
         (log/error "ERROR:::: Unable to retrieve data: " (ex-cause err))))))
 
@@ -66,11 +81,15 @@
         (log/error "ERROR:::: Unable to delete data: " (ex-cause err))))))
 
 (defn query [ddbClient data]
+  (log/debug data)
+  (.log js/console (clj->js data))
   (go
     (try
       (let [res (<p! (.promise
-                      (.query ddbClient (clj->js data))))]
-        (js->clj res :keywordize-keys true))
+                      (.query ddbClient (clj->js data))))
+            reponse (js->clj res :keywordize-keys true)]
+        (log/debug response)
+        response)
       (catch js/Error err
         (log/error "ERROR:::: Unable to execute query: " (ex-cause err))))))
 

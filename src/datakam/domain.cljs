@@ -3,6 +3,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.set :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
+            [cljs.core.async :refer [go chan put! <!]]
             [taoensso.timbre :as log]
             [contractskam.specs.common-spec :as cspk]
             [contractskam.specs.thing-spec :as tspk]
@@ -50,16 +51,18 @@
 
 (defn get-document [dockey]
   {:pre  [(okspk? ::docspk/document-key (docspk/document-keys-localize dockey))]
-   :post [(okspk? ::docspk/document (docspk/document-keys-localize %))]}
-  (let [thing (dal/get-thing {:Name    (:Topic dockey)
-                              :ThingID (:DocumentID dockey)})
-        data (dal/query-data (select-keys thing [:ThingID]))
-        media (-> thing
-                  (select-keys [:ThingID])
-                  (rename-keys {:ThingID :Name})
-                  query-media)]
-    (-> (docspk/thing-data-to-document thing data)
-        (assoc :Media media))))
+   ;;:post [(okspk? ::docspk/document (docspk/document-keys-localize %))]
+   }
+  (go
+    (let [thing (<! (dal/get-thing {:Name    (:Topic dockey)
+                                    :ThingID (:DocumentID dockey)}))
+          data (<! (dal/query-data (select-keys thing [:ThingID])))
+          media (<! (-> thing
+                        (select-keys [:ThingID])
+                        (rename-keys {:ThingID :Name})
+                        query-media))]
+      (-> (docspk/thing-data-to-document thing data)
+          (assoc :Media media)))))
 
 (defn get-media [mkey]
   {:pre  [(okspk? ::mspk/media-key (mspk/media-keys-localize mkey))]
@@ -190,4 +193,9 @@
 
 (comment
   (query-document {:Name "com.kamestery.devdata:##:africa"}))
+
+;; (go
+;;   (let [res (<! (get-document {:Topic      "com.kamestery.devdata:##:africa"
+;;                                :DocumentID "com.kamestery.devdata:##:africa:##:project-kam"}))]
+;;     (log/debug res)))
 

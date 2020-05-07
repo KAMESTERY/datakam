@@ -20,7 +20,7 @@
   (ddb/batch-write client (:request params)))
 
 (defmethod invoke :GetItem [client params]
-  (ddb/get client (:request params)))
+  (ddb/get client (:request params) (:ch params)))
 
 (defmethod invoke :BatchGetItem [client params]
   (ddb/batch-get client (:request params)))

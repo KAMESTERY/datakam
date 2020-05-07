@@ -1,13 +1,12 @@
 (ns datakam.dal
-  (:require-macros [cljs.core.async.macros :refer [alt! go]]
-                   [contractskam.specs.macros :refer [okspk?]])
+  (:require-macros [contractskam.specs.macros :refer [okspk?]])
   (:require [clojure.set :refer [rename-keys]]
             [cljs.spec.alpha :as s]
             [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as cljstr]
             [clojure.walk :refer [stringify-keys]]
-            [cljs.core.async :refer [<!]]
+            [cljs.core.async :refer [go chan put! <!]]
             [com.rpl.specter :as S]
             [taoensso.timbre :as log]
             [contractskam.specs.common-spec :as cspk]
@@ -76,13 +75,19 @@
                    :request {:TableName table
                              :Item      item}}))
 
-(defn- get-item [table key & attrs-to-get]
-  (-> (aws/invoke ddb {:op      :GetItem
-                       :request {:TableName       table
-                                 :Key             key
-                                 :AttributesToGet attrs-to-get}})
-      :Item
-      into-map-value))
+;; (defn- get-item [table key & attrs-to-get]
+;;   (-> (aws/invoke ddb {:op      :GetItem
+;;                        :request {:TableName       table
+;;                                  :Key             key
+;;                                  :AttributesToGet attrs-to-get}})
+;;       :Item
+;;       into-map-value))
+
+(defn- get-item [table key ch & attrs-to-get]
+  (aws/invoke ddb {:op      :GetItem
+                   :request {:TableName       table
+                             :Key             key
+                             :AttributesToGet attrs-to-get}}))
 
 (defn- delete-item [table key]
   (aws/invoke ddb {:op      :DeleteItem
@@ -145,13 +150,16 @@
                                logic fop sffx fltr)
         qean (merge ean fean)
         qdata (merge m fltr)
-        eav (-> (condp = table
-                  :Things (tspk/thing-to-attrvals qdata)
-                  :Data (dspk/data-to-attrvals qdata)
-                  :User (uspk/user-to-attrvals qdata)
-                  :UserProfile (upspk/userprofile-to-attrvals qdata)
-                  :UserGroup (ugspk/usergroup-to-attrvals qdata)
-                  qdata)
+        ;; eav (-> (condp = table
+        ;;           :Things (tspk/thing-to-attrvals qdata)
+        ;;           :Data (dspk/data-to-attrvals qdata)
+        ;;           :User (uspk/user-to-attrvals qdata)
+        ;;           :UserProfile (upspk/userprofile-to-attrvals qdata)
+        ;;           :UserGroup (ugspk/usergroup-to-attrvals qdata)
+        ;;           qdata)
+        ;;         (keys-append-suffix sffx)
+        ;;         (keys-prepend-prefix prfx :tfn str))
+        eav (-> qdata
                 (keys-append-suffix sffx)
                 (keys-prepend-prefix prfx :tfn str))
         req {:TableName                 table
@@ -163,13 +171,24 @@
     ;; (log/debug "ExpressionAttributeValues: " eav)
     ;; (log/debug "KCE: " kce)
     ;; (log/debug "FKCE: " fkce)
-    (map into-map-value
-         (-> (aws/invoke ddb
-                         {:op      :Query
-                          :request (if (-> fkce cljstr/blank? not)
-                                     (merge req {:FilterExpression fkce})
-                                     req)})
-             :Items))))
+    ;; (map into-map-value
+    ;;      (-> (aws/invoke ddb
+    ;;                      {:op      :Query
+    ;;                       :request (if (-> fkce cljstr/blank? not)
+    ;;                                  (merge req {:FilterExpression fkce})
+    ;;                                  req)})
+    ;;          :Items))
+    ;; (-> (aws/invoke ddb
+    ;;                 {:op      :Query
+    ;;                  :request (if (-> fkce cljstr/blank? not)
+    ;;                             (merge req {:FilterExpression fkce})
+    ;;                             req)})
+    ;;     :Items)
+    (aws/invoke ddb
+                {:op      :Query
+                 :request (if (-> fkce cljstr/blank? not)
+                            (merge req {:FilterExpression fkce})
+                            req)})))
 
 
 ;;;; API
@@ -216,10 +235,11 @@
 (defn get-thing [tkey & attrs]
   {:pre  [(s/valid? ::tspk/thing-key (tspk/thing-keys-localize tkey))
           (s/valid? ::cspk/resource-attrs attrs)]
-   :post [(s/valid? ::tspk/thing (tspk/thing-keys-localize %))]}
+   ;;:post [(s/valid? ::tspk/thing (tspk/thing-keys-localize %))]
+   }
   (apply get-item
          "Things"
-         (tspk/thing-to-attrvals tkey)
+         tkey
          attrs))
 
 
@@ -229,7 +249,8 @@
 (defn get-data [dkey & attrs]
   {:pre  [(s/valid? ::dspk/data-key (dspk/data-keys-localize dkey))
           (s/valid? ::cspk/resource-attrs attrs)]
-   :post [(s/valid? ::dspk/data (dspk/data-keys-localize %))]}
+   ;;:post [(s/valid? ::dspk/data (dspk/data-keys-localize %))]
+   }
   (apply get-item
          "Data"
          (dspk/data-to-attrvals dkey)
@@ -238,7 +259,8 @@
 (defn get-user [ukey & attrs]
   {:pre  [(s/valid? ::uspk/user-key (uspk/user-keys-localize ukey))
           (s/valid? ::cspk/resource-attrs attrs)]
-   :post [(s/valid? ::uspk/user (uspk/user-keys-localize %))]}
+   ;;:post [(s/valid? ::uspk/user (uspk/user-keys-localize %))]
+   }
   (apply get-item
          "User"
          (uspk/user-to-attrvals ukey)
@@ -247,7 +269,8 @@
 (defn get-userprofile [upkey & attrs]
   {:pre  [(s/valid? ::upspk/userprofile-key (upspk/userprofile-keys-localize upkey))
           (s/valid? ::cspk/resource-attrs attrs)]
-   :post [(s/valid? ::upspk/userprofile (upspk/userprofile-keys-localize %))]}
+   ;;:post [(s/valid? ::upspk/userprofile (upspk/userprofile-keys-localize %))]
+   }
   (apply get-item
          "UserProfile"
          (upspk/userprofile-to-attrvals upkey)
@@ -256,7 +279,8 @@
 (defn get-usergroup [ugkey & attrs]
   {:pre  [(s/valid? ::ugspk/usergroup-key (ugspk/usergroup-keys-localize ugkey))
           (s/valid? ::cspk/resource-attrs attrs)]
-   :post [(s/valid? ::ugspk/usergroup (ugspk/usergroup-keys-localize %))]}
+   ;;:post [(s/valid? ::ugspk/usergroup (ugspk/usergroup-keys-localize %))]
+   }
   (apply get-item
          "UserGroups"
          (ugspk/usergroup-to-attrvals ugkey)
@@ -340,57 +364,62 @@
 
 (defn query-thing [m & options]
   {:pre [(s/valid? ::tspk/thing-like (tspk/thing-keys-localize m))]
-   :post [(s/valid? ::tspk/many-things-type (map tspk/thing-keys-localize %))]}
+   ;;:post [(s/valid? ::tspk/many-things-type (map tspk/thing-keys-localize %))]
+   }
   (apply query :Things m options))
 
 (defn query-data [m & options]
   {:pre [(s/valid? ::dspk/data-like (dspk/data-keys-localize m))]
-   :post [(s/valid? ::dspk/many-data-type (map dspk/data-keys-localize %))]}
+   ;;:post [(s/valid? ::dspk/many-data-type (map dspk/data-keys-localize %))]
+   }
   (apply query :Data m options))
 
 (defn query-user [m & options]
   {:pre [(s/valid? ::uspk/user-like (uspk/user-keys-localize m))]
-   :post [(s/valid? ::uspk/many-user-type (map uspk/user-keys-localize %))]}
+   ;;:post [(s/valid? ::uspk/many-user-type (map uspk/user-keys-localize %))]
+   }
   (apply query :User m options))
 
 (defn query-userprofile [m & options]
   {:pre [(s/valid? ::upspk/userprofile-like (upspk/userprofile-keys-localize m))]
-   :post [(s/valid? ::upspk/many-userprofile-type (map upspk/userprofile-keys-localize %))]}
+   ;;:post [(s/valid? ::upspk/many-userprofile-type (map upspk/userprofile-keys-localize %))]
+   }
   (apply query :UserProfile m options))
 
 (defn query-usergroup [m & options]
   {:pre [(s/valid? ::ugspk/userproup-like (ugspk/usergroup-keys-localize m))]
-   :post [(s/valid? ::ugspk/many-usergroup-type (map ugspk/usergroup-keys-localize %))]}
+   ;;:post [(s/valid? ::ugspk/many-usergroup-type (map ugspk/usergroup-keys-localize %))]
+   }
   (apply query :UserGroup m options))
 
 ;;; Protocols
 
-(defprotocol Crud
-  "CRUD Protocol"
-  (get-record [this tkey & attrs] "Retrieve one Record")
-  (put-record [this data] "Put one Record")
-  (query-records [this m & options] "Query Records")
-  (delete-record [this tkey] "Delete Record"))
+;; (defprotocol Crud
+;;   "CRUD Protocol"
+;;   (get-record [this tkey & attrs] "Retrieve one Record")
+;;   (put-record [this data] "Put one Record")
+;;   (query-records [this m & options] "Query Records")
+;;   (delete-record [this tkey] "Delete Record"))
 
 ;;;; Records
 
-(defrecord Thing [Name
-                  ThingID
-                  UserID
-                  Tags
-                  Score
-                  Version
-                  CreatedAt
-                  UpdatedAt]
-  Crud
-  (get-record [this tkey & attrs]
-    (apply get-thing tkey attrs))
-  (put-record [this data]
-    (put-thing data))
-  (query-records [this m & options]
-    (apply query-thing m options))
-  (delete-record [this tkey]
-    (delete-thing tkey)))
+;; (defrecord Thing [Name
+;;                   ThingID
+;;                   UserID
+;;                   Tags
+;;                   Score
+;;                   Version
+;;                   CreatedAt
+;;                   UpdatedAt]
+;;   Crud
+;;   (get-record [this tkey & attrs]
+;;     (apply get-thing tkey attrs))
+;;   (put-record [this data]
+;;     (put-thing data))
+;;   (query-records [this m & options]
+;;     (apply query-thing m options))
+;;   (delete-record [this tkey]
+;;     (delete-thing tkey)))
 
 
 
@@ -441,9 +470,28 @@
 
   (get-item :Data
             {:DataID  {:S "27ed56f9-05ec-4105-abfb-103b9d4a8854"}
-             :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}}))
+             :ThingID {:S "com.kamestery.devdata:##:africa:##:project-kam"}})
 
-(get-item :Things {:Name    "com.kamestery.devdata:##:africa"
-                   :ThingID "com.kamestery.devdata:##:africa:##:project-kam"})
+  (go
+    (let [res (<! (get-item :Things {:Name    "com.kamestery.devdata:##:africa"
+                                     :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
+      (log/debug res)))
 
+  (go
+    (let [res (<! (get-thing {:Name    "com.kamestery.devdata:##:africa"
+                              :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
+      (log/debug res))))
+
+(go
+  (let [res (<! (get-thing {:Name    "com.kamestery.devdata:##:africa"
+                            :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
+    (log/debug res)))
+
+;; (query-thing
+;;  {:Name    "com.kamestery.devdata:##:africa"})
+
+(go
+  (let [res (<! (query-thing
+                 {:Name    "com.kamestery.devdata:##:africa"}))]
+    (log/debug res)))
 
