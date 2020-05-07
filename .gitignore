@@ -45,3 +45,11 @@ build/
 *.der
 *.pem
 
+.vscode
+src/datakam/bin
+src/datakam/obj
+test/datakam.Tests/bin
+test/datakam.Tests/obj
+
+.fake
+.ionide
