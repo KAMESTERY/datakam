@@ -46,10 +46,23 @@ build/
 *.pem
 
 .vscode
-src/datakam/bin
-src/datakam/obj
-test/datakam.Tests/bin
-test/datakam.Tests/obj
+services/src/datakam/bin
+services/src/datakam/obj
+services/test/datakam.Tests/bin
+services/test/datakam.Tests/obj
+
+realtime/src/realtime/bin
+realtime/src/realtime/obj
+realtime/test/realtime.Tests/bin
+realtime/test/realtime.Tests/obj
+
+domain/bin
+domain/obj
 
 .fake
 .ionide
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+

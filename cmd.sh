@@ -1,21 +1,31 @@
 #!/bin/bash
-set -x #echo on
+#set -x #echo on
 
-APPDIR=`dirname $0`
+BASEDIR=`pwd`
+unamestr=`uname`
 
-set -ex
-export AWS_REGION=us-east-1
-export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-export PORT=$PORT
-#export JAVA_OPTS="-Xms50m -Xmx100m"
+awsLambda() {
+    echo "https://github.com/aws/aws-extensions-for-dotnet-cli"
+    $DOTNET new -i Amazon.Lambda.Template
+    $DOTNET tool install -g Amazon.Lambda.Tools
+    $DOTNET tool install -g Amazon.ECS.Tools
+    $DOTNET tool install -g Amazon.ElasticBeanstalk.Tools
+}
 
-if [ "$1" = "start" ]
-then
-    exec java -jar $APPDIR/app.jar
-fi
+case $1 in
+    dotnet.info)
+        which $DOTNET
+        $DOTNET --version
+        ;;
+    aws.lambda.setup)
+        awsLambda
+        ;;
+    aws.serverless.deploy)
+        $DOTNET lambda deploy-serverless -pl $2
+        ;;
+    aws.delete.serverless)
+        $DOTNET lambda delete-serverless -pl $2
+        ;;
 
-exec "$@"
-
+    esac
 exit 0
-
