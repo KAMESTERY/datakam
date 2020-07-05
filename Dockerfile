@@ -1,10 +1,10 @@
-FROM clojure:openjdk-13-lein-2.9.1 AS builder
+FROM clojure:openjdk-11-lein-2.9.3 AS builder
 
 RUN apt-get update && apt-get install -y curl
-RUN curl -O https://download.clojure.org/install/linux-install-1.10.1.469.sh
-RUN chmod +x linux-install-1.10.1.469.sh
-RUN ./linux-install-1.10.1.469.sh
-RUN rm ./linux-install-1.10.1.469.sh
+RUN curl -O https://download.clojure.org/install/linux-install-1.10.1.536.sh
+RUN chmod +x linux-install-1.10.1.536.sh
+RUN ./linux-install-1.10.1.536.sh
+RUN rm ./linux-install-1.10.1.536.sh
 
 RUN mkdir $HOME/.aws
 RUN echo "[default]" > $HOME/.aws/config
@@ -21,7 +21,8 @@ RUN openssl ec -in ./resources/ecprivkey.pem -pubout -out ./resources/ecpubkey.p
 RUN lein uberjar
 
 
-FROM openjdk:13-alpine
+#FROM openjdk:11-alpine
+FROM oracle/graalvm-ce:20.1.0-java11
 MAINTAINER outcastgeek <outcastgeek+git@gmail.com>
 
 RUN mkdir /datakam

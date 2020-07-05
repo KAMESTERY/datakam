@@ -157,8 +157,8 @@
 
               ;; Either :jetty, :immutant or :tomcat (see comments in project.clj)
               ;;  This can also be your own chain provider/server-fn -- http://pedestal.io/reference/architecture-overview#_chain_provider
-              ;;::http/type :jetty
-              ::http/type :immutant
+              ::http/type :jetty
+              ;;::http/type :immutant
               ;;::http/host "localhost"
               ::http/host "0.0.0.0"
               ::http/port (utils/get-port 8080)
