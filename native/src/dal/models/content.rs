@@ -5,23 +5,7 @@ use rusoto_dynamodb::AttributeValue;
 
 use crate::dal::dynamodb::{attr_n, attr_s, attr_ss, attr_bool, DynaDB};
 use crate::dal::dynatraits::ModelDynaConv;
-
-const TOPIC: &str = "Topic";
-const DOCUMENT_ID: &str = "DocumentID";
-const USER_ID: &str = "UserID";
-const TAGS: &str = "Tags";
-const SCORE: &str = "Score";
-const VERSION: &str = "Version";
-const CREATED_AT: &str = "CreatedAt";
-const UPDATED_AT: &str = "UpdatedAt";
-const SLUG: &str = "Slug";
-const TITLE: &str = "Title";
-const IDENTIFIER: &str = "Identifier";
-const BODY: &str = "Body";
-const PUBLISH: &str = "Publish";
-const FILTRE_VISUEL: &str = "FiltreVisuel";
-const LANGUE: &str = "Langue";
-const NIVEAU: &str = "Niveau";
+use crate::dal::models::constants::*;
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Document {

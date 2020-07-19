@@ -6,6 +6,7 @@ use crate::dal::dynamodb::{attr_n, attr_s, DynaDB};
 use crate::dal::dynatraits::ModelDynaConv;
 use crate::security as sec;
 use crate::validation::{AuthDataTrait, AuthTrait};
+use crate::dal::models::constants::*;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct UserAuthData {
@@ -91,7 +92,7 @@ impl User {
 
         debug!("Put User Data: {:?}", user_data);
 
-        let put_response = DynaDB::put(String::from("User"), user_data).await;
+        let put_response = DynaDB::put(USER_TABLE.into(), user_data).await;
 
         debug!("Put Response: {:?}", put_response);
 
@@ -106,7 +107,7 @@ impl User {
 
         debug!("Get User Key: {:?}", key);
 
-        let user: Option<User> = DynaDB::get(String::from("User"), key.clone()).await;
+        let user: Option<User> = DynaDB::get(USER_TABLE.into(), key.clone()).await;
 
         debug!("User: {:?}", user);
 
@@ -147,13 +148,13 @@ impl ModelDynaConv for User {
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {
-                "UserID" => self.user_id = value.s,
-                "Email" => self.email = value.s,
-                "Username" => self.username = value.s,
-                "Role" => self.role = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
-                "Confirmed" => self.confirmed = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
-                "PasswordHash" => self.password_hash = value.s,
-                "LastSeen" => self.last_seen = value.s,
+                USER_ID => self.user_id = value.s,
+                EMAIL => self.email = value.s,
+                USERNAME => self.username = value.s,
+                ROLE => self.role = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
+                CONFIRMED => self.confirmed = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
+                PASSWORD_HASH => self.password_hash = value.s,
+                LAST_SEEN => self.last_seen = value.s,
                 _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
@@ -163,13 +164,13 @@ impl ModelDynaConv for User {
     fn drain(self) -> HashMap<String, AttributeValue> {
         let data: HashMap<String, AttributeValue> =
             [
-                (String::from("UserID"), attr_s(self.user_id)),
-                (String::from("Email"), attr_s(self.email)),
-                (String::from("Username"), attr_s(self.username)),
-                (String::from("Role"), attr_n(self.role)),
-                (String::from("Confirmed"), attr_n(self.confirmed)),
-                (String::from("PasswordHash"), attr_s(self.password_hash)),
-                (String::from("LastSeen"), attr_s(self.last_seen))
+                (USER_ID.into(), attr_s(self.user_id)),
+                (EMAIL.into(), attr_s(self.email)),
+                (USERNAME.into(), attr_s(self.username)),
+                (ROLE.into(), attr_n(self.role)),
+                (CONFIRMED.into(), attr_n(self.confirmed)),
+                (PASSWORD_HASH.into(), attr_s(self.password_hash)),
+                (LAST_SEEN.into(), attr_s(self.last_seen))
             ]
                 .iter().cloned().collect();
         data
@@ -178,8 +179,8 @@ impl ModelDynaConv for User {
     fn key(self) -> HashMap<String, AttributeValue> {
         let key: HashMap<String, AttributeValue> =
             [
-                (String::from("UserID"), attr_s(Some(self.user_id.unwrap_or(String::from("NoUserID"))))),
-                (String::from("Email"), attr_s(Some(self.email.unwrap_or(String::from("NoEmail")))))
+                (USER_ID.into(), attr_s(self.user_id)),
+                (EMAIL.into(), attr_s(self.email))
             ]
                 .iter().cloned().collect();
         key
@@ -230,7 +231,7 @@ impl UserProfile {
 
         debug!("Put UserProfile Data: {:?}", userprofile_data);
 
-        let put_response = DynaDB::put(String::from("UserProfile"), userprofile_data).await;
+        let put_response = DynaDB::put(USER_PROFILE_TABLE.into(), userprofile_data).await;
 
         debug!("Put Response: {:?}", put_response);
 
@@ -243,7 +244,7 @@ impl UserProfile {
 
         debug!("Get User Key: {:?}", key);
 
-        let user_profile: Option<UserProfile> = DynaDB::get(String::from("UserProfile"), key.clone()).await;
+        let user_profile: Option<UserProfile> = DynaDB::get(USER_PROFILE_TABLE.into(), key.clone()).await;
 
         debug!("UserProfile: {:?}", user_profile);
 
@@ -284,13 +285,13 @@ impl ModelDynaConv for UserProfile {
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {
-                "UserID" => self.user_id = value.s,
-                "AvatarHash" => self.avatar_hash = value.s,
-                "Name" => self.name = value.s,
-                "Age" => self.age = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
-                "AboutMe" => self.about_me = value.s,
-                "Location" => self.location = value.s,
-                "MemberSince" => self.member_since = value.s,
+                USER_ID => self.user_id = value.s,
+                AVATAR_HASH => self.avatar_hash = value.s,
+                NAME => self.name = value.s,
+                AGE => self.age = value.n.and_then(|s| Some(s.parse::<i32>().unwrap_or(0))),
+                ABOUT_ME => self.about_me = value.s,
+                LOCATION => self.location = value.s,
+                MEMBER_SINCE => self.member_since = value.s,
                 _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
             }
         }
@@ -300,13 +301,13 @@ impl ModelDynaConv for UserProfile {
     fn drain(self) -> HashMap<String, AttributeValue> {
         let data: HashMap<String, AttributeValue> =
             [
-                (String::from("UserID"), attr_s(self.user_id)),
-                (String::from("AvatarHash"), attr_s(self.avatar_hash)),
-                (String::from("Name"), attr_s(self.name)),
-                (String::from("Age"), attr_n(self.age)),
-                (String::from("AboutMe"), attr_s(self.about_me)),
-                (String::from("Location"), attr_s(self.location)),
-                (String::from("MemberSince"), attr_s(self.member_since))
+                (USER_ID.into(), attr_s(self.user_id)),
+                (AVATAR_HASH.into(), attr_s(self.avatar_hash)),
+                (NAME.into(), attr_s(self.name)),
+                (AGE.into(), attr_n(self.age)),
+                (ABOUT_ME.into(), attr_s(self.about_me)),
+                (LOCATION.into(), attr_s(self.location)),
+                (MEMBER_SINCE.into(), attr_s(self.member_since))
             ]
                 .iter().cloned().collect();
         data
@@ -315,7 +316,7 @@ impl ModelDynaConv for UserProfile {
     fn key(self) -> HashMap<String, AttributeValue> {
         let key: HashMap<String, AttributeValue> =
             [
-                (String::from("UserID"), attr_s(Some(self.user_id.unwrap_or(String::from("NoUserID")))))
+                (USER_ID.into(), attr_s(self.user_id))
             ]
                 .iter().cloned().collect();
         key
@@ -335,7 +336,7 @@ impl UserGroup {
 
         let expr_attr_names: HashMap<String, String> =
             [
-                (String::from("#UserID"), String::from("UserID"))
+                (String::from("#UserID"), USER_ID.into())
             ].iter().cloned().collect();
         let data: HashMap<String, AttributeValue> =
             [
@@ -343,7 +344,7 @@ impl UserGroup {
             ].iter().cloned().collect();
 
         let usergroups = DynaDB::scan(
-            String::from("UserGroups"),
+            USER_GROUPS_TABLE.into(),
             Some(String::from("UserIDIndex")),
             Some(expr_attr_names),
             Some(data),
@@ -365,7 +366,7 @@ impl UserGroup {
 
         debug!("Put UserGroup Data: {:?}", usergroup_data);
 
-        let put_response = DynaDB::put(String::from("UserGroups"), usergroup_data).await;
+        let put_response = DynaDB::put(USER_GROUPS_TABLE.into(), usergroup_data).await;
 
         debug!("Put Response: {:?}", put_response);
 
@@ -379,7 +380,7 @@ impl UserGroup {
 
         debug!("Get UserGroup Key: {:?}", key);
 
-        let user_group: Option<UserGroup> = DynaDB::get(String::from("UserGroups"), key.clone()).await;
+        let user_group: Option<UserGroup> = DynaDB::get(USER_GROUPS_TABLE.into(), key.clone()).await;
 
         debug!("UserGroup: {:?}", user_group);
 
@@ -415,9 +416,9 @@ impl ModelDynaConv for UserGroup {
     fn drain(self) -> HashMap<String, AttributeValue> {
         let data: HashMap<String, AttributeValue> =
             [
-                (String::from("GroupID"), attr_s(self.group_id)),
-                (String::from("UserID"), attr_s(self.user_id)),
-                (String::from("Name"), attr_s(self.name))
+                (GROUP_ID.into(), attr_s(self.group_id)),
+                (USER_ID.into(), attr_s(self.user_id)),
+                (NAME.into(), attr_s(self.name))
             ]
                 .iter().cloned().collect();
         data
@@ -426,8 +427,8 @@ impl ModelDynaConv for UserGroup {
     fn key(self) -> HashMap<String, AttributeValue> {
         let key: HashMap<String, AttributeValue> =
             [
-                (String::from("GroupID"), attr_s(Some(self.group_id.unwrap_or(String::from("NoGroupID"))))),
-                (String::from("UserID"), attr_s(Some(self.user_id.unwrap_or(String::from("NoUserID")))))
+                (GROUP_ID.into(), attr_s(self.group_id)),
+                (USER_ID.into(), attr_s(self.user_id))
             ]
                 .iter().cloned().collect();
         key

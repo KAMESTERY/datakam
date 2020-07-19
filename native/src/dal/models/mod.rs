@@ -2,6 +2,7 @@
 //mod dynatraits;
 //modf self::pa
 mod things;
+mod constants;
 mod user_info;
 mod content;
 
@@ -16,6 +17,7 @@ pub use self::things::{
     Thing, Data, ThingDataTrait, ThingInput, ThingOutput,
     DocumentInput, MediaInput, QueryInput
 };
+pub use self::constants::*;
 pub use self::content::{
     Document
 };
