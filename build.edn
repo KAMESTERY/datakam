@@ -1,0 +1,9 @@
+
+{:main datakam.core
+ :target :nodejs
+ :output-to "app.js"
+ :optimizations :simple
+ :infer-externs :all
+ :output-feature-set :es7
+ :fn-invoke-direct true
+ }

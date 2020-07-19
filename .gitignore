@@ -51,3 +51,4 @@ native/cmake-build-debug
 native/target
 native/index.node
 native/artifacts.json
+.cljs_node_repl

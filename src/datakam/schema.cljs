@@ -1,9 +1,11 @@
 (ns datakam.schema
-  (:require [taoensso.timbre :as log]
+  (:require [cljs.nodejs :as nodejs]
+            [taoensso.timbre :as log]
             [datakam.domain]
             ["dknative" :as native]
             ["graphql" :as gqlmod]))
 
+; (def native (nodejs/require "dknative"))
 (def graphql (aget gqlmod "graphql"))
 (def build-schema (aget gqlmod "buildSchema"))
 
