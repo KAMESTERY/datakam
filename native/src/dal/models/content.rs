@@ -73,22 +73,22 @@ impl ModelDynaConv for Document {
     fn drain(self) -> HashMap<String, AttributeValue> {
         let data: HashMap<String, AttributeValue> =
             [
-                (String::from(TOPIC), attr_s(self.topic)),
-                (String::from(DOCUMENT_ID), attr_s(self.document_id)),
-                (String::from(USER_ID), attr_s(self.user_id)),
-                (String::from(TAGS), attr_ss(self.tags)),
-                (String::from(SCORE), attr_n(self.score)),
-                (String::from(VERSION), attr_n(self.version)),
-                (String::from(CREATED_AT), attr_s(self.created_at)),
-                (String::from(UPDATED_AT), attr_s(self.updated_at)),
-                (String::from(SLUG), attr_s(self.slug)),
-                (String::from(TITLE), attr_s(self.title)),
-                (String::from(IDENTIFIER), attr_s(self.identifier)),
-                (String::from(BODY), attr_s(self.body)),
-                (String::from(PUBLISH), attr_bool(self.publish)),
-                (String::from(FILTRE_VISUEL), attr_n(self.filtre_visuel)),
-                (String::from(LANGUE), attr_n(self.langue)),
-                (String::from(NIVEAU), attr_n(self.niveau)),
+                (TOPIC.into(), attr_s(self.topic)),
+                (DOCUMENT_ID.into(), attr_s(self.document_id)),
+                (USER_ID.into(), attr_s(self.user_id)),
+                (TAGS.into(), attr_ss(self.tags)),
+                (SCORE.into(), attr_n(self.score)),
+                (VERSION.into(), attr_n(self.version)),
+                (CREATED_AT.into(), attr_s(self.created_at)),
+                (UPDATED_AT.into(), attr_s(self.updated_at)),
+                (SLUG.into(), attr_s(self.slug)),
+                (TITLE.into(), attr_s(self.title)),
+                (IDENTIFIER.into(), attr_s(self.identifier)),
+                (BODY.into(), attr_s(self.body)),
+                (PUBLISH.into(), attr_bool(self.publish)),
+                (FILTRE_VISUEL.into(), attr_n(self.filtre_visuel)),
+                (LANGUE.into(), attr_n(self.langue)),
+                (NIVEAU.into(), attr_n(self.niveau)),
             ]
                 .iter().cloned().collect();
         data
@@ -97,8 +97,8 @@ impl ModelDynaConv for Document {
     fn key(self) -> HashMap<String, AttributeValue> {
         let key: HashMap<String, AttributeValue> =
             [
-                (String::from(TOPIC), attr_s(self.topic)),
-                (String::from(DOCUMENT_ID), attr_s(self.document_id))
+                (TOPIC.into(), attr_s(self.topic)),
+                (DOCUMENT_ID.into(), attr_s(self.document_id))
             ]
                 .iter().cloned().collect();
         key
