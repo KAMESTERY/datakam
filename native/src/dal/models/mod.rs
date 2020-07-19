@@ -3,6 +3,7 @@
 //modf self::pa
 mod things;
 mod user_info;
+mod content;
 
 pub use self::user_info::{
     create_complete_user,
@@ -14,6 +15,9 @@ pub use self::things::{
     create_complete_thing, delete_complete_thing,
     Thing, Data, ThingDataTrait, ThingInput, ThingOutput,
     DocumentInput, MediaInput, QueryInput
+};
+pub use self::content::{
+    Document
 };
 
 #[cfg(test)] mod tests;
