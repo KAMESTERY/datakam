@@ -45,7 +45,7 @@ impl DynaDB {
     pub async fn get<T: ModelDynaConv>(table: String, key: HashMap<String, AttributeValue>) -> Option<T> {
         let response = _get(table, key).await;
         match response {
-            Some(data) => Some(T::new()
+            Some(data) => Some(T::default()
                 .hydrate(data.clone())),
             None => None
         }
@@ -58,7 +58,7 @@ impl DynaDB {
         match response {
             Some(res) => match res.get(&table) {
                 Some(vec_t) => Some(vec_t.iter().map(|data|
-                    T::new()
+                    T::default()
                         .hydrate(data.clone()))
                     .collect()),
                 None => None
@@ -147,7 +147,7 @@ impl DynaDB {
 
         match response {
             Some(res) => Some(res.iter().map(|data|
-                T::new()
+                T::default()
                     .hydrate(data.clone()))
                 .collect()),
             None => None
@@ -176,7 +176,7 @@ impl DynaDB {
         
         match response {
             Some(res) => Some(res.iter().map(|data|
-                T::new()
+                T::default()
                     .hydrate(data.clone()))
                 .collect()),
             None => None

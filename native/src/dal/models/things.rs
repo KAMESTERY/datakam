@@ -373,7 +373,7 @@ async fn create_thing(name: String, user_id: String, data: HashMap<String, Strin
 
     let thing_tbl = String::from("Things");
     let mut thing_tbl_data = HashMap::new();
-    let thing_values = Thing::new()
+    let thing_values = Thing::default()
         .with_name(name)
         .with_user_id(user_id)
         .with_thing_id(thing_id.clone())
@@ -391,7 +391,7 @@ async fn create_thing(name: String, user_id: String, data: HashMap<String, Strin
     let mut data_tbl_data_vec = Vec::new();
     for (key, value) in data {
         let data_id = format!("{}", Uuid::new_v4());
-        let datum_values = Data::new()
+        let datum_values = Data::default()
             .with_data_id(data_id)
             .with_thing_id(thing_id.clone())
             .with_key(key)
@@ -429,7 +429,7 @@ pub async fn delete_complete_thing(name: String, thing_id: String) -> Option<Str
     let mut tables_data: Vec<HashMap<String, Vec<HashMap<String, AttributeValue>>>> = Vec::new();
 
     let mut thing_tbl_data = HashMap::new();
-    let thing_key = Thing::new()
+    let thing_key = Thing::default()
         .with_name(name)
         .with_thing_id(thing_id.clone())
         .key();
@@ -483,7 +483,7 @@ impl Thing {
         tags: Option<Vec<String>>
     ) -> Option<HashMap<String, AttributeValue>> {
         // TODO: Create Data for this Thing
-        let thing_values = Thing::new()
+        let thing_values = Thing::default()
             .with_name(name)
             .with_user_id(user_id)
             .with_thing_id(thing_id)
@@ -504,7 +504,7 @@ impl Thing {
     }
 
     pub async fn get_thing(name: String, thing_id: String) -> Option<Thing> {
-        let key = Thing::new()
+        let key = Thing::default()
             .with_name(name)
             .with_thing_id(thing_id)
             .key();
@@ -519,7 +519,7 @@ impl Thing {
     }
 
     pub async fn delete_thing(name: String, thing_id: String) -> Option<HashMap<String, AttributeValue>> {
-        let key = Thing::new()
+        let key = Thing::default()
             .with_name(name)
             .with_thing_id(thing_id)
             .key();
@@ -568,10 +568,6 @@ impl Thing {
 }
 
 impl ModelDynaConv for Thing {
-    fn new() -> Self {
-        Thing::default()
-    }
-
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {
@@ -625,16 +621,13 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new() -> Self {
-        Data::default()
-    }
     // API Functions
     pub async fn create_datum(
         data_id: String, thing_id: String,
         key: String, value: String
     ) -> Option<HashMap<String, AttributeValue>> {
         // TODO: Create Data for this Thing
-        let datum_values = Data::new()
+        let datum_values = Data::default()
             .with_data_id(data_id)
             .with_thing_id(thing_id)
             .with_key(key)
@@ -650,7 +643,7 @@ impl Data {
         put_response
     }
     pub async fn get_datum(thing_id: String, data_id: String) -> Option<Data> {
-        let key = Data::new()
+        let key = Data::default()
             .with_thing_id(thing_id)
             .with_data_id(data_id)
             .key();
@@ -677,7 +670,7 @@ impl Data {
         Some(delete_handles)
     }
     pub async fn delete_datum(thing_id: String, data_id: String) -> Option<HashMap<String, AttributeValue>> {
-        let key = Data::new()
+        let key = Data::default()
             .with_thing_id(thing_id)
             .with_data_id(data_id)
             .key();
@@ -709,10 +702,6 @@ impl Data {
 }
 
 impl ModelDynaConv for Data {
-    fn new() -> Self {
-        Data::default()
-    }
-
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {

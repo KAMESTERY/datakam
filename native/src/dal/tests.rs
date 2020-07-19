@@ -14,7 +14,7 @@ fn crud_user() {
 
     let table_name = String::from("User");
 
-    let user_data = User::new()
+    let user_data = User::default()
         .with_user_id(String::from(EMAIL))
         .with_email(String::from(EMAIL))
         .with_username(String::from(USERNAME))

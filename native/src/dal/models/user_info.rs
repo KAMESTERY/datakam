@@ -64,7 +64,7 @@ pub async fn create_complete_user(user_id: String, email: String, username: Stri
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub user_id: Option<String>,
     pub email: Option<String>,
@@ -76,21 +76,10 @@ pub struct User {
 }
 
 impl User {
-    pub fn new() -> Self {
-        User{
-            user_id: None,
-            email: None,
-            username: None,
-            role: None,
-            confirmed: None,
-            password_hash: None,
-            last_seen: None,
-        }
-    }
     // API Functions
     pub async fn create_user(user_id: String, email: String, username: String, password_hash: String) -> Option<HashMap<String, AttributeValue>> {
         // TODO: Create Profile and Group(s) as well
-        let user_data = User::new()
+        let user_data = User::default()
             .with_user_id(user_id)
             .with_email(email)
             .with_username(username)
@@ -110,7 +99,7 @@ impl User {
     }
     pub async fn get_user(user_id: String, email: String) -> Option<User> {
         //TODO: Retrieve Profile and Groups as well
-        let key = User::new()
+        let key = User::default()
             .with_user_id(user_id)
             .with_email(email)
             .key();
@@ -155,18 +144,6 @@ impl User {
 }
 
 impl ModelDynaConv for User {
-    fn new() -> Self {
-        User{
-            user_id: None,
-            email: None,
-            username: None,
-            role: None,
-            confirmed: None,
-            password_hash: None,
-            last_seen: None,
-        }
-    }
-
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {
@@ -220,14 +197,14 @@ impl AuthTrait<UserAuthData> for User {
     }
 
     fn from_auth_data(&mut self, auth_data: UserAuthData) -> User {
-        let user = User::new()
+        let user = User::default()
             .with_user_id(auth_data.clone().user_id.unwrap())
             .with_username(auth_data.email.unwrap());
         user
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct UserProfile {
     pub user_id: Option<String>,
     pub avatar_hash: Option<String>,
@@ -239,20 +216,9 @@ pub struct UserProfile {
 }
 
 impl UserProfile {
-    fn new() -> Self {
-        UserProfile {
-            user_id: None,
-            avatar_hash: None,
-            name: None,
-            age: None,
-            about_me: None,
-            location: None,
-            member_since: None,
-        }
-    }
     // API Functions
     pub async fn create_userprofile(user_id: String, avatar_hash: String, name: String, age: i32, about_me: String, location: String, member_since: String) -> Option<HashMap<String, AttributeValue>>  {
-        let userprofile_data = UserProfile::new()
+        let userprofile_data = UserProfile::default()
             .with_user_id(user_id)
             .with_avatar_hash(avatar_hash)
             .with_name(name)
@@ -271,7 +237,7 @@ impl UserProfile {
         put_response
     }
     pub async fn get_userprofile(user_id: String) -> Option<UserProfile> {
-        let key = UserProfile::new()
+        let key = UserProfile::default()
             .with_user_id(user_id)
             .key();
 
@@ -315,18 +281,6 @@ impl UserProfile {
 }
 
 impl ModelDynaConv for UserProfile {
-    fn new() -> Self {
-        UserProfile {
-            user_id: None,
-            avatar_hash: None,
-            name: None,
-            age: None,
-            about_me: None,
-            location: None,
-            member_since: None,
-        }
-    }
-
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {
@@ -368,7 +322,7 @@ impl ModelDynaConv for UserProfile {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct UserGroup {
     pub group_id: Option<String>,
     pub user_id: Option<String>,
@@ -376,13 +330,6 @@ pub struct UserGroup {
 }
 
 impl UserGroup {
-    pub fn new() -> Self {
-        UserGroup {
-            group_id: None,
-            user_id: None,
-            name: None,
-        }
-    }
     // API Functions
     pub async fn qet_usergroups_by_userid(user_id: String) -> Option<Vec<UserGroup>> {
 
@@ -410,7 +357,7 @@ impl UserGroup {
         usergroups
     }
     pub async fn create_usergroup(group_id: String, user_id: String, name: String) -> Option<HashMap<String, AttributeValue>>  {
-        let usergroup_data = UserGroup::new()
+        let usergroup_data = UserGroup::default()
             .with_group_id(group_id)
             .with_user_id(user_id)
             .with_name(name)
@@ -425,7 +372,7 @@ impl UserGroup {
         put_response
     }
     pub async fn get_usergroup(group_id: String, user_id: String) -> Option<UserGroup> {
-        let key = UserGroup::new()
+        let key = UserGroup::default()
             .with_group_id(group_id)
             .with_user_id(user_id)
             .key();
@@ -453,14 +400,6 @@ impl UserGroup {
 }
 
 impl ModelDynaConv for UserGroup {
-    fn new() -> Self {
-        UserGroup {
-            group_id: None,
-            user_id: None,
-            name: None,
-        }
-    }
-
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
         for (key, value) in dyna_data {
             match key.as_ref() {

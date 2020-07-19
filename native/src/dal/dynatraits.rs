@@ -9,8 +9,7 @@ use rusoto_dynamodb::{
 };
 use std::collections::HashMap;
 
-pub trait ModelDynaConv {
-    fn new() -> Self;
+pub trait ModelDynaConv : Default {
     fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self;
     fn drain(self) -> HashMap<String, AttributeValue>;
     fn key(self) -> HashMap<String, AttributeValue>;
