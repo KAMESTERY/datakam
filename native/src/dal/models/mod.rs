@@ -5,6 +5,8 @@ mod things;
 mod constants;
 mod user_info;
 mod content;
+mod media;
+mod document;
 
 pub use self::user_info::{
     create_complete_user,
@@ -19,6 +21,12 @@ pub use self::things::{
 };
 pub use self::constants::*;
 pub use self::content::{
+    ContentRef
+};
+pub use self::media::{
+    Media
+};
+pub use self::document::{
     Document
 };
 

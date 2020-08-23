@@ -19,6 +19,9 @@ pub const MEMBER_SINCE: &'static str = "MemberSince";
 pub const USER_GROUPS_TABLE: &'static str = "UserGroups";
 pub const GROUP_ID: &'static str = "GroupID";
 
+pub const NAMESPACE: &'static str = "Namespace";
+pub const CONTENT_ID: &'static str = "ContentID";
+
 pub const CONTENT_TABLE: &'static str = "Content";
 pub const TOPIC: &'static str = "Topic";
 pub const DOCUMENT_ID: &'static str = "DocumentID";
@@ -35,3 +38,9 @@ pub const PUBLISH: &'static str = "Publish";
 pub const FILTRE_VISUEL: &'static str = "FiltreVisuel";
 pub const LANGUE: &'static str = "Langue";
 pub const NIVEAU: &'static str = "Niveau";
+
+pub const PARENT_DOCUMENT_ID: &'static str = "ParentDocumentID";
+pub const TYPE: &'static str = "Type";
+pub const MEDIA_ID: &'static str = "MediaID";
+pub const POSITION: &'static str = "Position";
+pub const FILE_URL: &'static str = "FileUrl";
