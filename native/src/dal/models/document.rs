@@ -59,53 +59,7 @@ impl Document {
         let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await;
         match existing_doc {
             Some(_) => None,
-            None => {
-                let mut full_doc_data = vec![];
-                let doc_data = Document {
-                    media: None, // Ignore media list in this payload and handle it after in batch
-                    ..doc.clone()
-                }.drain();
-                full_doc_data.push(doc_data);
-                match doc.clone().media {
-                    None => (),
-                    Some(media) => {
-                        media.into_iter().for_each(|m| {
-                            full_doc_data.push(m.drain())
-                        });
-                    }
-                };
-                let tables_data: Vec<HashMap<String, Vec<HashMap<String, AttributeValue>>>> = vec![
-                    hash_map!{
-                        CONTENT_TABLE.into() => full_doc_data
-                    }
-                ];
-
-                let content_ref = Some(
-                    ContentRef {
-                        namespace: doc.clone().topic,
-                        content_id: doc.clone().document_id
-                    }
-                );
-
-                match DynaDB::batchput_data(tables_data.clone()).await {
-                    Some(output) => match output.unprocessed_items {
-                        Some(unprocessed_items) => {
-                            if unprocessed_items.is_empty() {
-                                content_ref
-                            } else {
-                                error!("CREATE_DOCUMENT_ERROR:::: Unprocessed Items: {:?}", unprocessed_items);
-                                DynaDB::batchdelete_data(tables_data).await;
-                                None
-                            }
-                        }
-                        None => content_ref
-                    }
-                    None => {
-                        error!("CREATE_DOCUMENT_ERROR:::: Could write Data: {:?}", tables_data);
-                        None
-                    }
-                }
-            }
+            None => Document::persist(doc).await
         }
     }
 
@@ -120,6 +74,84 @@ impl Document {
     //         }
     //     }
     // }
+
+    pub async fn update(doc: Document) -> Option<ContentRef> {
+        let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await;
+        match existing_doc {
+            Some(_) => Document::persist(doc).await,
+            None => None
+        }
+    }
+
+    pub async fn delete(content_ref: ContentRef) -> Option<ContentRef> {
+        let doc_key = Document {
+            topic: content_ref.clone().namespace,
+            document_id: content_ref.clone().content_id,
+            ..Document::default()
+        }.key();
+        let existing_doc: Document = DynaDB::get(CONTENT_TABLE.into(), doc_key.clone()).await?;
+
+        let mut delete_handles = vec![];
+        delete_handles.push(doc_key);
+        match existing_doc.clone().media {
+            None => (),
+            Some(media) => {
+                media.into_iter().for_each(|m| {
+                    delete_handles.push(m.key())
+                });
+            }
+        };
+        DynaDB::batchdelete_table(CONTENT_TABLE.into(), delete_handles).await?;
+        Some(content_ref)
+    }
+
+    async fn persist(doc: Document) -> Option<ContentRef> {
+        let mut full_doc_data = vec![];
+        let doc_data = Document {
+            media: None, // Ignore media list in this payload and handle it after in batch
+            ..doc.clone()
+        }.drain();
+        full_doc_data.push(doc_data);
+        match doc.clone().media {
+            None => (),
+            Some(media) => {
+                media.into_iter().for_each(|m| {
+                    full_doc_data.push(m.drain())
+                });
+            }
+        };
+        let tables_data: Vec<HashMap<String, Vec<HashMap<String, AttributeValue>>>> = vec![
+            hash_map! {
+                CONTENT_TABLE.into() => full_doc_data
+            }
+        ];
+
+        let content_ref = Some(
+            ContentRef {
+                namespace: doc.clone().topic,
+                content_id: doc.clone().document_id
+            }
+        );
+
+        match DynaDB::batchput_data(tables_data.clone()).await {
+            Some(output) => match output.unprocessed_items {
+                Some(unprocessed_items) => {
+                    if unprocessed_items.is_empty() {
+                        content_ref
+                    } else {
+                        error!("CREATE_DOCUMENT_ERROR:::: Unprocessed Items: {:?}", unprocessed_items);
+                        DynaDB::batchdelete_data(tables_data).await;
+                        None
+                    }
+                }
+                None => content_ref
+            }
+            None => {
+                error!("CREATE_DOCUMENT_ERROR:::: Could write Data: {:?}", tables_data);
+                None
+            }
+        }
+    }
 }
 
 impl ModelDynaConv for Document {
