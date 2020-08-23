@@ -76,11 +76,14 @@ impl Document {
     // }
 
     pub async fn update(doc: Document) -> Option<ContentRef> {
-        let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await;
-        match existing_doc {
-            Some(_) => Document::persist(doc).await,
-            None => None
-        }
+        let existing_doc: Document = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await?;
+        let content_ref = ContentRef {
+            namespace: existing_doc.topic,
+            content_id: existing_doc.document_id,
+            ..ContentRef::default()
+        };
+        Document::delete(content_ref).await?;
+        Document::persist(doc).await
     }
 
     pub async fn delete(content_ref: ContentRef) -> Option<ContentRef> {
