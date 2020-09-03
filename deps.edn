@@ -22,7 +22,7 @@
   com.taoensso/timbre        {:mvn/version "4.10.0"}
   com.cognitect/transit-cljs {:mvn/version "0.8.256"}
   tick                       {:mvn/version "0.4.26-alpha"}
-  thheller/shadow-cljs       {:mvn/version "2.10.21"}}
+  thheller/shadow-cljs       {:mvn/version "2.11.1"}}
 
  :aliases
  {:ancient {:main-opts  ["-m" "deps-ancient.deps-ancient"]

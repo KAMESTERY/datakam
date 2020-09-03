@@ -16,7 +16,7 @@
   "devDependencies": {
     "neon-cli": "^0.4.0",
     "nodemon": "^2.0.4",
-    "shadow-cljs": "2.10.21"
+    "shadow-cljs": "2.11.1"
   },
   "dependencies": {
     "@cljs-oss/module-deps": "^1.1.1",

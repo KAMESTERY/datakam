@@ -44,3 +44,7 @@ pub const TYPE: &'static str = "Type";
 pub const MEDIA_ID: &'static str = "MediaID";
 pub const POSITION: &'static str = "Position";
 pub const FILE_URL: &'static str = "FileUrl";
+
+pub const TEXT_BLOCK_ID: &'static str = "TextBlockID";
+pub const AUTHOR: &'static str = "Author";
+pub const TEXT: &'static str = "Text";

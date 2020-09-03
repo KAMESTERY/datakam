@@ -32,4 +32,3 @@ impl ModelDynaConv for ContentRef {
         unimplemented!()
     }
 }
-

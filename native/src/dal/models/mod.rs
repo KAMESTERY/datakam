@@ -7,6 +7,8 @@ mod user_info;
 mod content;
 mod media;
 mod document;
+mod text_block;
+mod doc_stream;
 
 pub use self::user_info::{
     create_complete_user,
@@ -28,6 +30,12 @@ pub use self::media::{
 };
 pub use self::document::{
     Document
+};
+pub use self::text_block::{
+    TextBlock
+};
+pub use self::doc_stream::{
+    DocStream
 };
 
 #[cfg(test)] mod tests;
