@@ -16,9 +16,10 @@ neon-build = "0.4.0"
 
 [dependencies]
 neon = "0.4"
-#neon-serde = "0.4"
+neon-serde = "0.4"
 bytes = "0.5"
 tokio = { version = "0.2", features = ["full"] }
+async-trait = "0.1"
 sqlx = "0.3"
 
 # Web

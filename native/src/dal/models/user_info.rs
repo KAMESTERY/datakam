@@ -343,7 +343,7 @@ impl UserGroup {
                 (String::from(":UserID"), attr_s(Some(user_id)))
             ].iter().cloned().collect();
 
-        let usergroups = DynaDB::scan(
+        let usergroups = DynaDB::scan_old(
             USER_GROUPS_TABLE.into(),
             Some(String::from("UserIDIndex")),
             Some(expr_attr_names),

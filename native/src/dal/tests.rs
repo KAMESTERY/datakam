@@ -52,7 +52,7 @@ fn crud_user() {
         ]
             .iter().cloned().collect();
 
-    let users: Option<Vec<User>> = DynaDB::query(
+    let users: Option<Vec<User>> = DynaDB::query_old(
         table_name.clone(),
         Some(data),
         None,

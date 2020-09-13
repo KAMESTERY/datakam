@@ -248,7 +248,7 @@ impl ThingOutput {
             }
         }
 
-        let things = DynaDB::scan(
+        let things = DynaDB::scan_old(
             String::from("Things"),
             index_name,
             expr_attr_names,
@@ -284,7 +284,7 @@ impl ThingOutput {
             }
         }
 
-        let things: Vec<Thing> = DynaDB::query(
+        let things: Vec<Thing> = DynaDB::query_old(
             String::from("Things"),
             index_name,
             expr_attr_names,
@@ -319,7 +319,7 @@ impl ThingOutput {
         let qdata: HashMap<String, AttributeValue> = [
             (String::from(":tid"), attr_s(thing_id))
         ].iter().cloned().collect();
-        let data: Option<Vec<Data>> = DynaDB::query(
+        let data: Option<Vec<Data>> = DynaDB::query_old(
             String::from("Data"),
             None,
             Some(expr_attr_names),

@@ -16,6 +16,30 @@ use crate::dal::{
     BatchGetItemInputBuilder, BatchWriteItemInputBuilder
 };
 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScanParams {
+    table: String,
+    index_name: Option<String>,
+    expr_attr_names: Option<HashMap<String, String>>,
+    data: Option<HashMap<String, AttributeValue>>,
+    filter_expr: Option<String>,
+    projection_expr: Option<String>,
+    limit: Option<i64>
+}
+
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryParams {
+    table: String,
+    index_name: Option<String>,
+    expr_attr_names: Option<HashMap<String, String>>,
+    data: Option<HashMap<String, AttributeValue>>,
+    filter_expr: Option<String>,
+    key_condition_expr: Option<String>,
+    projection_expr: Option<String>,
+    select: Option<String>,
+    limit: Option<i64>
+}
+
 // Group all DynamoDB API calls to this Struct
 pub struct DynaDB {}
 
@@ -122,6 +146,32 @@ impl DynaDB {
     }
 
     pub async fn query<T: ModelDynaConv>(
+        queryParams: QueryParams
+    ) -> Option<Vec<T>> {
+
+        let response = _query(
+            queryParams.table,
+            queryParams.index_name,
+            queryParams.expr_attr_names,
+            queryParams.data,
+            queryParams.filter_expr,
+            queryParams.key_condition_expr,
+            queryParams.projection_expr,
+            queryParams.select,
+            queryParams.limit
+        ).await;
+
+        match response {
+            Some(res) => Some(res.iter().map(|data|
+                T::default()
+                    .hydrate(data.clone()))
+                .collect()),
+            None => None
+        }
+    }
+
+    #[deprecated(note = "Please use function accepting input struct QueryParams")]
+    pub async fn query_old<T: ModelDynaConv>(
         table: String,
         index_name: Option<String>,
         expr_attr_names: Option<HashMap<String, String>>,
@@ -155,6 +205,30 @@ impl DynaDB {
     }
 
     pub async fn scan<T: ModelDynaConv>(
+        scanParams: ScanParams
+    ) -> Option<Vec<T>> {
+
+        let response = _scan(
+            scanParams.table,
+            scanParams.index_name,
+            scanParams.expr_attr_names,
+            scanParams.data,
+            scanParams.filter_expr,
+            scanParams.projection_expr,
+            scanParams.limit
+        ).await;
+
+        match response {
+            Some(res) => Some(res.iter().map(|data|
+                T::default()
+                    .hydrate(data.clone()))
+                .collect()),
+            None => None
+        }
+    }
+
+    #[deprecated(note = "Please use function accepting input struct ScanParams")]
+    pub async fn scan_old<T: ModelDynaConv>(
         table: String,
         index_name: Option<String>,
         expr_attr_names: Option<HashMap<String, String>>,

@@ -3,10 +3,12 @@ use std::collections::HashMap;
 
 use rusoto_dynamodb::AttributeValue;
 
-use crate::dal::dynamodb::{attr_n, attr_s, attr_ss, attr_bool, DynaDB};
+use crate::dal::dynamodb::{
+    attr_n, attr_s, attr_ss, attr_bool,
+    DynaDB, QueryParams, ScanParams
+};
 use crate::dal::dynatraits::ModelDynaConv;
 use crate::dal::models::constants::*;
-use crate::dal::models::content::{ContentRef};
 use crate::dal::models::media::{Media};
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -32,30 +34,43 @@ pub struct Document {
 
 impl Document {
     // API Functions
-    pub async fn get(content_ref: ContentRef) -> Option<Document> {
+    pub async fn query(query_params: QueryParams) -> Option<Vec<Document>> {
+        let docs = DynaDB::query(query_params).await;
+        docs
+    }
+
+    pub async fn scan(scan_params: ScanParams) -> Option<Vec<Document>> {
+        let docs = DynaDB::scan(scan_params).await;
+        docs
+    }
+
+    pub async fn get(content_ref: DocumentRef) -> Option<Document> {
         let doc_key = Document {
-            topic: content_ref.clone().namespace,
-            document_id: content_ref.clone().content_id,
+            topic: content_ref.clone().topic,
+            document_id: content_ref.clone().document_id,
             ..Document::default()
         }.key();
         let media_keys = vec![
             Media {
-                parent_document_id: content_ref.content_id,
+                parent_document_id: content_ref.document_id,
                 ..Media::default()
             }.key()
         ];
 
         let media = DynaDB::batchget_table(CONTENT_TABLE.into(), media_keys);
         let mut doc: Document = DynaDB::get(CONTENT_TABLE.into(), doc_key).await?;
-        doc = Document {
-            media: media.await,
-            ..doc
-        };
-
-        Some(doc)
+        if doc.body.is_some() {
+            doc = Document {
+                media: media.await,
+                ..doc
+            };
+            Some(doc)
+        } else {
+            None
+        }
     }
 
-    pub async fn create(doc: Document) -> Option<ContentRef> {
+    pub async fn create(doc: Document) -> Option<DocumentRef> {
         let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await;
         match existing_doc {
             Some(_) => None,
@@ -63,52 +78,45 @@ impl Document {
         }
     }
 
-    // pub async fn create(doc: Document) -> Option<ContentRef> {
-    //     let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc.key()).await;
-    //     match existing_doc {
-    //         Some(_) => None,
-    //         None => {
-    //             let put_response = DynaDB::put(CONTENT_TABLE.into(), doc.drain()).await?;
-    //             let content_ref = ContentRef::default().hydrate(put_response);
-    //             Some(content_ref)
-    //         }
-    //     }
-    // }
-
-    pub async fn update(doc: Document) -> Option<ContentRef> {
+    pub async fn update(doc: Document) -> Option<DocumentRef> {
         let existing_doc: Document = DynaDB::get(CONTENT_TABLE.into(), doc.clone().key()).await?;
-        let content_ref = ContentRef {
-            namespace: existing_doc.topic,
-            content_id: existing_doc.document_id,
-            ..ContentRef::default()
+        let content_ref = DocumentRef {
+            topic: existing_doc.topic,
+            document_id: existing_doc.document_id,
+            ..DocumentRef::default()
         };
         Document::delete(content_ref).await?;
         Document::persist(doc).await
     }
 
-    pub async fn delete(content_ref: ContentRef) -> Option<ContentRef> {
+    pub async fn delete(content_ref: DocumentRef) -> Option<DocumentRef> {
         let doc_key = Document {
-            topic: content_ref.clone().namespace,
-            document_id: content_ref.clone().content_id,
+            topic: content_ref.clone().topic,
+            document_id: content_ref.clone().document_id,
             ..Document::default()
         }.key();
-        let existing_doc: Document = DynaDB::get(CONTENT_TABLE.into(), doc_key.clone()).await?;
+        let existing_doc: Option<Document> = DynaDB::get(CONTENT_TABLE.into(), doc_key.clone()).await;
 
-        let mut delete_handles = vec![];
-        delete_handles.push(doc_key);
-        match existing_doc.clone().media {
-            None => (),
-            Some(media) => {
-                media.into_iter().for_each(|m| {
-                    delete_handles.push(m.key())
-                });
-            }
-        };
-        DynaDB::batchdelete_table(CONTENT_TABLE.into(), delete_handles).await?;
-        Some(content_ref)
+        match existing_doc {
+            Some(doc) => {
+                let mut delete_handles = vec![];
+                delete_handles.push(doc_key);
+                match doc.clone().media {
+                    None => (),
+                    Some(media) => {
+                        media.into_iter().for_each(|m| {
+                            delete_handles.push(m.key())
+                        });
+                    }
+                };
+                DynaDB::batchdelete_table(CONTENT_TABLE.into(), delete_handles).await?;
+                Some(content_ref)
+            },
+            None => None
+        }
     }
 
-    async fn persist(doc: Document) -> Option<ContentRef> {
+    async fn persist(doc: Document) -> Option<DocumentRef> {
         let mut full_doc_data = vec![];
         let doc_data = Document {
             media: None, // Ignore media list in this payload and handle it after in batch
@@ -130,9 +138,9 @@ impl Document {
         ];
 
         let content_ref = Some(
-            ContentRef {
-                namespace: doc.clone().topic,
-                content_id: doc.clone().document_id
+            DocumentRef {
+                topic: doc.clone().topic,
+                document_id: doc.clone().document_id
             }
         );
 
@@ -217,3 +225,31 @@ impl ModelDynaConv for Document {
         key
     }
 }
+
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DocumentRef {
+    pub topic: Option<String>,
+    pub document_id: Option<String>,
+}
+
+impl ModelDynaConv for DocumentRef {
+    fn hydrate(&mut self, dyna_data: HashMap<String, AttributeValue>) -> Self {
+        for (key, value) in dyna_data {
+            match key.as_ref() {
+                NAMESPACE => self.topic = value.s,
+                CONTENT_ID => self.document_id = value.s,
+                _ => warn!("Unexpected Data: [{} => {:?}]", key, value)
+            }
+        }
+        self.clone()
+    }
+
+    fn drain(self) -> HashMap<String, AttributeValue> {
+        unimplemented!()
+    }
+
+    fn key(self) -> HashMap<String, AttributeValue> {
+        unimplemented!()
+    }
+}
+

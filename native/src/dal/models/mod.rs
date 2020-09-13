@@ -4,7 +4,6 @@
 mod things;
 mod constants;
 mod user_info;
-mod content;
 mod media;
 mod document;
 mod text_block;
@@ -22,20 +21,17 @@ pub use self::things::{
     DocumentInput, MediaInput, QueryInput
 };
 pub use self::constants::*;
-pub use self::content::{
-    ContentRef
-};
 pub use self::media::{
     Media
 };
 pub use self::document::{
-    Document
+    Document, DocumentRef
 };
 pub use self::text_block::{
     TextBlock
 };
 pub use self::doc_stream::{
-    DocStream
+    DocStream, DocStreamRef
 };
 
 #[cfg(test)] mod tests;

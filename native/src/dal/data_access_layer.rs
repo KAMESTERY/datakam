@@ -1,76 +1,158 @@
 use futures::future::join_all;
 
 use crate::dal::models::{
-    create_documents, update_documents, delete_documents,
-    create_media_items, update_media_items, delete_media_items,
-    ThingOutput, DocumentInput, MediaInput, QueryInput
+    DocumentRef, Document, DocStreamRef, DocStream
 };
+use crate::dal::{ScanParams, QueryParams};
 
 #[derive(Debug)]
-pub enum InputData{
-    Documents {documents: Vec<DocumentInput>},
-    Media {media: Vec<MediaInput>}
+pub enum ContentListData{
+    Document {data: Option<Vec<Document>>},
+    DocStream {data: Option<Vec<DocStream>>}
 }
 
 #[derive(Debug)]
-pub enum DeleteData{
-    Documents {data: Vec<Vec<String>>},
-    Media {data: Vec<Vec<String>>}
+pub enum QueryData{
+    Document {data: QueryParams},
+    DocStream {data: QueryParams}
 }
 
-pub async fn query(queries: Vec<QueryInput>) -> Vec<ThingOutput> {
+#[derive(Debug)]
+pub enum ScanData{
+    Document {data: ScanParams},
+    DocStream {data: ScanParams}
+}
 
-    let mut handles = vec![];
+#[derive(Debug)]
+pub enum ContentRef{
+    Doc (DocumentRef),
+    Stream (DocStreamRef)
+}
 
-    for q in queries {
-        handles.push(async move {
-            let limit64 = match q.limit {
-                Some(l) => Some(i64::from(l)),
-                None => None
-            };
-            ThingOutput::query_les_choses(
-                q.index_name.clone(),
-                q.attr_names.clone(),
-                q.filter_expr.clone(),
-                q.key_condition_expr.clone(),
-                q.projection_expr.clone(),
-                q.select.clone(),
-                limit64,
-                q.raw_data.clone()
-            ).await
-        });
+pub trait ContentRefDocOrStream {
+    fn as_content_ref(self) -> ContentRef;
+    fn get_value(self) -> Box<dyn ContentRefDocOrStream>;
+}
+
+impl ContentRefDocOrStream for DocumentRef {
+    fn as_content_ref(self) -> ContentRef {
+        ContentRef::Doc(self)
     }
 
-    let res = join_all(handles).await;
-
-    let results = res.into_iter().filter(|c| {
-        c.is_some()
-    }).map(|x| x.unwrap()).flat_map(|res| res).collect();
-
-    results
-}
-
-pub async fn get(data: Vec<Vec<String>>) -> Option<Vec<ThingOutput>> {
-    ThingOutput::get_les_choses(data).await
-}
-
-pub async fn create(payload: InputData) -> Vec<String> {
-    match payload {
-        InputData::Documents {documents} => create_documents(documents).await,
-        InputData::Media {media} => create_media_items(media).await
+    fn get_value(self) -> Box<dyn ContentRefDocOrStream> {
+        Box::new(self)
     }
 }
 
-pub async fn update(payload: InputData) -> Vec<String> {
-    match payload {
-        InputData::Documents {documents} => update_documents(documents).await,
-        InputData::Media {media} => update_media_items(media).await
+impl ContentRefDocOrStream for DocStreamRef {
+    fn as_content_ref(self) -> ContentRef {
+        ContentRef::Stream(self)
+    }
+
+    fn get_value(self) -> Box<dyn ContentRefDocOrStream> {
+        Box::new(self)
     }
 }
 
-pub async fn delete(payload: DeleteData) -> Vec<String> {
+#[derive(Debug)]
+pub enum Content {
+    Doc(Document),
+    Stream(DocStream)
+}
+
+pub trait ContentDocOrStream {
+    fn as_content(self) -> Content;
+    fn get_value(self) -> Box<dyn ContentDocOrStream>;
+}
+
+impl ContentDocOrStream for Document {
+    fn as_content(self) -> Content {
+        Content::Doc(self)
+    }
+
+    fn get_value(self) -> Box<dyn ContentDocOrStream> {
+        Box::new(self)
+    }
+}
+
+impl ContentDocOrStream for DocStream {
+    fn as_content(self) -> Content {
+        Content::Stream(self)
+    }
+
+    fn get_value(self) -> Box<dyn ContentDocOrStream> {
+        Box::new(self)
+    }
+}
+
+pub async fn query(payload: QueryData) -> ContentListData {
     match payload {
-        DeleteData::Documents {data} => delete_documents(data).await,
-        DeleteData::Media {data} => delete_media_items(data).await
+        QueryData::Document {data} => {
+            let docs = Document::query(data).await;
+            ContentListData::Document {data: docs}
+        },
+        QueryData::DocStream {data} => {
+            let docs = DocStream::query(data).await;
+            ContentListData::DocStream {data: docs}
+        }
+    }
+}
+
+// pub async fn scan(payload: ScanParams) -> Option<Vec<Content>> {
+//     let mut handles = vec![];
+//     handles.push(
+//         Document::scan(payload.clone())
+//     );
+//     handles.push(
+//         DocStream::scan(payload)
+//     );
+//
+//     let res = join_all(handles).await;
+//
+//     let content_list = res.into_iter().filter(|c| {
+//         c.is_some()
+//     }).map(|x| x.unwrap().as_content()).collect();
+//
+//     content_list
+// }
+
+pub async fn scan(payload: ScanData) -> ContentListData {
+    match payload {
+        ScanData::Document {data} => {
+            let docs = Document::scan(data).await;
+            ContentListData::Document {data: docs}
+        },
+        ScanData::DocStream {data} => {
+            let docs = DocStream::scan(data).await;
+            ContentListData::DocStream {data: docs}
+        }
+    }
+}
+
+pub async fn get<T: ContentDocOrStream>(payload: S) -> Option<dyn ContentRefDocOrStream> {
+    match payload.as_content_ref() {
+        ContentRef::Doc(r) => Document::get(r).await,
+        ContentRef::Stream(r) => DocStream::get(r).await
+    }
+}
+
+pub async fn create<T: ContentDocOrStream>(payload: T) -> Option<dyn ContentRefDocOrStream> {
+    match payload.as_content() {
+        Content::Doc(d) => Document::create(d).await,
+        Content::Stream(s) => DocStream::create(s).await
+    }
+}
+
+pub async fn update<T: ContentDocOrStream>(payload: T) -> Option<dyn ContentRefDocOrStream> {
+    match payload.as_content() {
+        Content::Doc(d) => Document::update(d).await,
+        Content::Stream(s) => DocStream::update(s).await
+    }
+}
+
+pub async fn delete(payload: S) -> Option<dyn ContentRefDocOrStream> {
+    match payload.as_content_ref() {
+        ContentRef::Doc(r) => Document::delete(r).await,
+        ContentRef::Stream(r) => DocStream::delete(r).await
     }
 }
