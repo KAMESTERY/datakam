@@ -48,8 +48,9 @@
       (let [res (<p! (.promise
                       (.get ddbClient (clj->js data))))
             response (js->clj res :keywordize-keys true)]
-        (.log js/console res)
-        ;;(log/debug response)
+        ; (.log js/console res)
+        ; (.log js/console (str "Get Response: " res))
+        (log/debug response)
         (-> response :Item))
       (catch js/Error err
         (log/error "ERROR:::: Unable to retrieve data: " (ex-cause err))))))

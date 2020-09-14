@@ -21,23 +21,22 @@
 (defn home [req]
   (web/send "DataKam is Up!"))
 
-;; (defn gql [req]
-;;   (go
-;;     (let [query (-> req :body :query)
-;;           ;;query "{ authenticate(email: \"yzyz@yzyz.yz\", password: \"yzyzyzyz\") {token userId email role} }"
-;;           ;;query "{ enroll(email: \"yzyz@yzyz.yz\", password: \"yzyzyzyz\") }"
-;;           data-chan (chan 1)]
-;;       (schema/gql-exec query #(put! data-chan (.parse js/JSON %)))
-;;       (alt!
-;;         data-chan
-;;         ([data]
-;;          (web/send :json
-;;                    data
-;;                    {:headers {:Content-Type "application/json"}
-;;                     :status 200}))
-;;         (on-timeout 2000)
-;;         (web/send :json
-;;                   {} ;; No Data
-;;                   {:headers {:Content-Type "application/json"}
-;;                    :status 200})))))
-
+(defn gql [req]
+  (go
+    (let [query (-> req :body :query)
+          ;;query "{ authenticate(email: \"yzyz@yzyz.yz\", password: \"yzyzyzyz\") {token userId email role} }"
+          ;;query "{ enroll(email: \"yzyz@yzyz.yz\", password: \"yzyzyzyz\") }"
+          data-chan (chan 1)]
+      (schema/gql-exec query #(put! data-chan (.parse js/JSON %)))
+      (alt!
+        data-chan
+        ([data]
+         (web/send :json
+                   data
+                   {:headers {:Content-Type "application/json"}
+                    :status 200}))
+        (on-timeout 2000)
+        (web/send :json
+                  {} ;; No Data
+                  {:headers {:Content-Type "application/json"}
+                   :status 200})))))

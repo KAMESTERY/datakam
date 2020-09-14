@@ -4,7 +4,7 @@ PROJECTID=kamestery
 REGION=us-east1
 
 system-prep:
-	curl -O https://download.clojure.org/install/linux-install-1.10.1.469.sh
+	curl -O https://download.clojure.org/install/linux-install-1.10.1.561.sh
 	chmod +x linux-install-1.10.1.469.sh
 	./linux-install-1.10.1.469.sh
 	rm ./linux-install-1.10.1.469.sh
@@ -19,18 +19,24 @@ gen-rsa:
 	# Generate a public key from private key
 	openssl ec -in $(BASEDIR)/resources/ecprivkey.pem -pubout -out $(BASEDIR)/resources/ecpubkey.pem
 
-run-dev:
-	lein run-dev
+upgrade-node-deps:
+	npx npm-check-updates -u
 
-fat-dev-jar:
-	clj -A:uberjar
+deps:
+	rm -rf $(PWD)/node_modules; npm i
 
-dev-jar-run:
-	java -cp datakam.jar clojure.main -m datakam.server
+compile:
+	npx shadow-cljs compile app
+
+watch-cljs:
+	npm run start-dev
+
+release:
+	npx shadow-cljs release app
+
 
 container: gen-rsa
 	gcloud builds submit --tag gcr.io/$(PROJECTID)/$(APPNAME)
 
 deploy: container
 	gcloud beta run deploy $(APPNAME) --image gcr.io/$(PROJECTID)/$(APPNAME) --platform managed --region $(REGION)
-

@@ -490,8 +490,8 @@
 ;; (query-thing
 ;;  {:Name    "com.kamestery.devdata:##:africa"})
 
-(go
-  (let [res (<! (query-thing
-                 {:Name    "com.kamestery.devdata:##:africa"}))]
-    (log/debug res)))
+; (go
+;   (let [res (<! (query-thing
+;                  {:Name    "com.kamestery.devdata:##:africa"}))]
+;     (log/debug res)))
 

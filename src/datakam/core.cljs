@@ -1,10 +1,12 @@
 (ns datakam.core
   (:require-macros [fast-twitch.macros :as m])
   (:require [cljs.nodejs :as nodejs]
+            [mount.core :as mount]
             [taoensso.timbre :as log]
-            [fast-twitch.sugar :as ex]
+            [fast-twitch.sugar :as ft]
             [fast-twitch.web-api :as web]
-            [datakam.endpoints :as ep]
+            [fast-twitch.server]
+            [datakam.dispatch :refer [handle]]
             [datakam.routing :refer [routing-data]]
             ["morgan" :as logger]
             ["xhr2" :as xhr2]
@@ -15,34 +17,23 @@
 
 (set! js/XMLHttpRequest xhr2)
 
-(defmulti handle (fn [req-data] (:endpoint req-data)))
-
-;; protected
-(defmethod handle :home [req-data]
-  (ep/home (:req req-data)))
-
-;; ;; protected
-;; (defmethod handle :gql [req-data]
-;;   (ep/gql (:req req-data)))
-
-;; default
-(defmethod handle :default [_]
-  (web/send "Not Found"))
-
 (def routes
   (web/routes
     routing-data
     handle))
 
+(defn middlewares []
+  (let []
+    [(helmet)
+     (logger "combined")     ;; Logger
+     (body-parser/json)      ;; support json encoded bodies
+     (body-parser/urlencoded (clj->js {:extended true})) ;; support encoded bodies
+     ]))
+
 (defn main []
-      (let [portNumber (if-let [PORT (m/env-var "PORT")] PORT 1818)]
-           (log/debug "Port Number: " portNumber)
-           (-> (ex/app)
-               (ex/with-middleware (helmet))
-               (ex/with-middleware (logger "combined"))     ;; Logger
-               (ex/with-middleware (body-parser/json))      ;; support json encoded bodies
-               (ex/with-middleware (body-parser/urlencoded (clj->js {:extended true}))) ;; support encoded bodies
-               (ex/with-middleware "/" routes)
-               (ex/listen portNumber))))
+  (-> (mount/with-args
+        {:ft {:middlewares (middlewares)
+              :routes routes}})
+      (mount/start)))
 
 (set! *main-cli-fn* main)
