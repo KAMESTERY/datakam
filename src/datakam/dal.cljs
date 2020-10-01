@@ -11,6 +11,7 @@
             [taoensso.timbre :as log]
             [contractskam.specs.common-spec :as cspk]
             [contractskam.specs.thing-spec :as tspk]
+            [contractskam.specs.document-spec :as docspk]
             [contractskam.specs.data-spec :as dspk]
             [contractskam.specs.user-spec :as uspk]
             [contractskam.specs.userprofile-spec :as upspk]
@@ -263,7 +264,8 @@
    }
   (apply get-item
          "User"
-         (uspk/user-to-attrvals ukey)
+         ukey
+         ;(uspk/user-to-attrvals ukey)
          attrs))
 
 (defn get-userprofile [upkey & attrs]
@@ -273,7 +275,8 @@
    }
   (apply get-item
          "UserProfile"
-         (upspk/userprofile-to-attrvals upkey)
+         upkey
+         ;(upspk/userprofile-to-attrvals upkey)
          attrs))
 
 (defn get-usergroup [ugkey & attrs]
@@ -283,7 +286,8 @@
    }
   (apply get-item
          "UserGroups"
-         (ugspk/usergroup-to-attrvals ugkey)
+         ugkey
+         ;(ugspk/usergroup-to-attrvals ugkey)
          attrs))
 
 ;; PUT
@@ -303,11 +307,13 @@
    (dspk/data-to-attrvals data)))
 
 (defn put-user [user]
+  (log/debug "User Data: " user)
   {:pre  [(s/valid? ::uspk/user (uspk/user-keys-localize user))]
    :post [(s/valid? empty? %)]}
   (put-item
    :User
-   (uspk/user-to-attrvals user)))
+   ;(uspk/user-to-attrvals user)
+   user))
 
 (defn put-userprofile [userprofile]
   {:pre  [(s/valid? ::upspk/userprofile (upspk/userprofile-keys-localize userprofile))]
@@ -482,10 +488,21 @@
                               :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
       (log/debug res))))
 
-(go
-  (let [res (<! (get-thing {:Name    "com.kamestery.devdata:##:africa"
-                            :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
-    (log/debug res)))
+;(go
+;  (let [res (<! (get-thing {:Name    "com.kamestery.devdata:##:africa"
+;                            :ThingID "com.kamestery.devdata:##:africa:##:project-kam"}))]
+;    (log/debug res)))
+
+;(go
+;  (let [res (<! (put-user {:UserID    "rigorigo@builder.kmt"
+;                           :Email    "rigorigo@builder.kmt"
+;                           :Username "RigoRigo"}))]
+;    (log/debug res)))
+
+;(go
+;  (let [res (<! (get-user {:UserID    "rigorigo@builder.kmt"
+;                           :Email    "rigorigo@builder.kmt"}))]
+;    (log/debug "Retrieved User: " res)))
 
 ;; (query-thing
 ;;  {:Name    "com.kamestery.devdata:##:africa"})

@@ -3,14 +3,14 @@
 var shadow$provide = {};
 
 var SHADOW_IMPORT_PATH = __dirname + '/.shadow-cljs/builds/app/dev/out/cljs-runtime';
-if (__dirname == '.') { SHADOW_IMPORT_PATH = "/home/ae/oss/datakam/.shadow-cljs/builds/app/dev/out/cljs-runtime"; }
+if (__dirname == '.') { SHADOW_IMPORT_PATH = "/Users/chiefkemist/projects_workspace/datakam/.shadow-cljs/builds/app/dev/out/cljs-runtime"; }
 global.$CLJS = global;
 global.shadow$provide = {};
 try {require('source-map-support').install();} catch (e) {console.warn('no "source-map-support" (run "npm install source-map-support --save-dev" to get it)');}
 
 global.CLOSURE_NO_DEPS = true;
 
-global.CLOSURE_DEFINES = {"shadow.cljs.devtools.client.env.repl_pprint":false,"shadow.cljs.devtools.client.env.reload_strategy":"optimized","shadow.cljs.devtools.client.env.devtools_url":"","shadow.cljs.devtools.client.env.autoload":true,"shadow.cljs.devtools.client.env.proc_id":"27a5362d-ac29-4efc-b4e3-3a4949648bd9","shadow.cljs.devtools.client.env.use_document_protocol":false,"goog.ENABLE_DEBUG_LOADER":false,"shadow.cljs.devtools.client.env.server_port":9630,"shadow.cljs.devtools.client.env.server_token":"0d85bb7a-a6d9-45f8-ae03-686469ecc0f8","shadow.cljs.devtools.client.env.use_document_host":true,"shadow.cljs.devtools.client.env.module_format":"goog","goog.LOCALE":"en","shadow.cljs.devtools.client.env.build_id":"app","shadow.cljs.devtools.client.env.ignore_warnings":false,"goog.DEBUG":true,"cljs.core._STAR_target_STAR_":"nodejs","shadow.cljs.devtools.client.env.log":true,"shadow.cljs.devtools.client.env.ssl":false,"shadow.cljs.devtools.client.env.enabled":true,"shadow.cljs.devtools.client.env.server_host":"localhost","shadow.cljs.devtools.client.env.worker_client_id":2,"goog.TRANSPILE":"never"};
+global.CLOSURE_DEFINES = {"shadow.cljs.devtools.client.env.repl_pprint":false,"shadow.cljs.devtools.client.env.reload_strategy":"optimized","shadow.cljs.devtools.client.env.devtools_url":"","shadow.cljs.devtools.client.env.autoload":true,"shadow.cljs.devtools.client.env.proc_id":"06f0c900-4247-4994-96d0-386a128e25e9","shadow.cljs.devtools.client.env.use_document_protocol":false,"goog.ENABLE_DEBUG_LOADER":false,"shadow.cljs.devtools.client.env.server_port":9630,"shadow.cljs.devtools.client.env.server_token":"fe0d9444-347c-4ea6-a2f3-6807ca501d45","shadow.cljs.devtools.client.env.use_document_host":true,"shadow.cljs.devtools.client.env.module_format":"goog","goog.LOCALE":"en","shadow.cljs.devtools.client.env.build_id":"app","shadow.cljs.devtools.client.env.ignore_warnings":false,"goog.DEBUG":true,"cljs.core._STAR_target_STAR_":"nodejs","shadow.cljs.devtools.client.env.log":true,"shadow.cljs.devtools.client.env.ssl":false,"shadow.cljs.devtools.client.env.enabled":true,"shadow.cljs.devtools.client.env.server_host":"localhost","shadow.cljs.devtools.client.env.worker_client_id":2,"goog.TRANSPILE":"never"};
 
 var goog = global.goog = {};
 
@@ -1831,6 +1831,7 @@ SHADOW_IMPORT("camel_snake_kebab.internals.string_separator.js");
 SHADOW_IMPORT("camel_snake_kebab.internals.misc.js");
 SHADOW_IMPORT("camel_snake_kebab.internals.alter_name.js");
 SHADOW_IMPORT("camel_snake_kebab.core.js");
+SHADOW_IMPORT("contractskam.specs.content_spec.js");
 SHADOW_IMPORT("contractskam.specs.media_spec.js");
 SHADOW_IMPORT("contractskam.specs.document_spec.js");
 SHADOW_IMPORT("contractskam.specs.user_spec.js");
