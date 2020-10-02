@@ -9,10 +9,10 @@
   ;;outcastgeek/fast-twitch {:local/root "/Users/chiefkemist/projects_workspace/fast-twitch"}
   OUTCASTGEEK-TECH/fast-twitch    {:git/url "https://github.com/OUTCASTGEEK-TECH/fast-twitch"
                                    :sha     "54982d9ef3eb00115c3d906ad32057e38069096c"}
-  ;; kamestery/contractskam         {:git/url "https://github.com/kamestery/contractskam"
-  ;;                                 :sha     "a532761c407abe6c23a421155062335e57c37c7e"}
+  kamestery/contractskam         {:git/url "https://github.com/kamestery/contractskam"
+                                  :sha     "a532761c407abe6c23a421155062335e57c37c7e"}
   ;;kamestery/contractskam {:local/root "/path/to/contractskam"}
-  kamestery/contractskam {:local/root "/Users/chiefkemist/projects_workspace/contractskam"}
+  ;;kamestery/contractskam {:local/root "/Users/chiefkemist/projects_workspace/contractskam"}
   cljs-ajax                  {:mvn/version "0.8.0"}
   cljs-http                  {:mvn/version "0.1.46"}
   org.clojure/core.match     {:mvn/version "1.0.0"}
