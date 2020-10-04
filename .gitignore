@@ -1,53 +1,36 @@
-# Project related
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
 
-# Java related
-pom.xml
-pom.xml.asc
-*jar
-*.class
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
 
-# Leiningen
-classes/
-lib/
-checkouts/
-target/
-.lein-*
-repl-port
-.nrepl-port
-.repl
+# NetBeans
+nb-configuration.xml
 
-# Deps dot edn
-.cpcache/
+# Visual Studio Code
+.vscode
+.factorypath
 
-# Temp Files
-*.orig
-*~
-.*.swp
-.*.swo
-*.tmp
-*.bak
-
-# OS X
+# OSX
 .DS_Store
 
-# Logging
-*.log
-/logs/
+# Vim
+*.swp
+*.swo
 
-# Builds
-out/
-build/
+# patch
+*.orig
+*.rej
 
-# Project
-.idea
-*.iml
-*.der
-*.pem
-
-node_modules
-.shadow-cljs
-native/.idea
-native/cmake-build-debug
-native/target
-native/index.node
-native/artifacts.json
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties

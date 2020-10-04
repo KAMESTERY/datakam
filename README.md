@@ -1,45 +1,30 @@
-# datakam
+# datakam project
 
-FIXME
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
-## Getting Started
+If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-1. Start the application: `lein run`
-2. Go to [localhost:8080](http://localhost:8080/) to see: `Hello World!`
-3. Read your app's source code at src/the_next_big_server_side_thing/service.clj. Explore the docs of functions
-   that define routes and responses.
-4. Run your app's tests with `lein test`. Read the tests at test/the_next_big_server_side_thing/service_test.clj.
-5. Learn more! See the [Links section below](#links).
+## Running the application in dev mode
 
+You can run your application in dev mode that enables live coding using:
+```
+./mvnw quarkus:dev
+```
 
-## Configuration
+## Packaging and running the application
 
-To configure logging see config/logback.xml. By default, the app logs to stdout and logs/.
-To learn more about configuring Logback, read its [documentation](http://logback.qos.ch/documentation.html).
+The application can be packaged using `./mvnw package`.
+It produces the `datakam-1.0-SNAPSHOT-runner.jar` file in the `/target` directory.
+Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
 
+The application is now runnable using `java -jar target/datakam-1.0-SNAPSHOT-runner.jar`.
 
-## Developing your service
+## Creating a native executable
 
-1. Start a new REPL: `lein repl`
-2. Start your service in dev-mode: `(def dev-serv (run-dev))`
-3. Connect your editor to the running REPL session.
-   Re-evaluated code will be seen immediately in the service.
+You can create a native executable using: `./mvnw package -Pnative`.
 
-### [Docker](https://www.docker.com/) container support
+Or, if you don't have GraalVM installed, you can run the native executable build in a container using: `./mvnw package -Pnative -Dquarkus.native.container-build=true`.
 
-1. Build an uberjar of your service: `lein uberjar`
-2. Build a Docker image: `sudo docker build -t datakam .`
-3. Run your Docker image: `docker run -p 8080:8080 datakam`
+You can then execute your native executable with: `./target/datakam-1.0-SNAPSHOT-runner`
 
-### [OSv](http://osv.io/) unikernel support with [Capstan](http://osv.io/capstan/)
-
-1. Build and run your image: `capstan run -f "8080:8080"`
-
-Once the image it built, it's cached.  To delete the image and build a new one:
-
-1. `capstan rmi datakam; capstan build`
-
-
-## Links
-* [Other examples](https://github.com/pedestal/samples)
-
+If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image.

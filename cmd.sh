@@ -15,6 +15,31 @@ then
     exec java -jar $APPDIR/app.jar
 fi
 
+if [ "$1" = "quarkus-mvn-create" ]
+then
+    exec mvn io.quarkus:quarkus-maven-plugin:1.8.1.Final:create \
+            -DprojectGroupId=com.kamestery.datakam \
+            -DprojectArtifactId=datakam \
+            -DclassName="com.kamestery.security.Auth" \
+            -Dpath="/" \
+            -Dextensions="kotlin,resteasy-jsonb"
+fi
+
+if [ "$1" = "quarkus-add-extensions" ]
+then
+    ./mvnw quarkus:add-extension -Dextensions="spring-di"
+    ./mvnw quarkus:add-extension -Dextensions="graphql"
+    ./mvnw quarkus:add-extension -Dextensions="jwt"
+    ./mvnw quarkus:add-extension -Dextensions="amazon-dynamodb"
+    ./mvnw quarkus:add-extension -Dextensions="resteasy-mutiny"
+    ./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-openapi"
+fi
+
+if [ "$1" = "quarkus-list-extensions" ]
+then
+    ./mvnw quarkus:list-extensions
+fi
+
 exec "$@"
 
 exit 0
