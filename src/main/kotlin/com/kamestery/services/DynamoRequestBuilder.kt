@@ -8,7 +8,7 @@ import software.amazon.awssdk.services.dynamodb.model.ScanRequest
 
 class DynamoRequestBuilder(val tableName: String) {
 
-    fun scanRequest(selection: List<String> = emptyList()) =
+    fun scanRequest(selection: Set<String> = emptySet()) =
             ScanRequest.builder()
                     .tableName(this.tableName)
                     .attributesToGet(selection).build()
@@ -18,7 +18,7 @@ class DynamoRequestBuilder(val tableName: String) {
                     .tableName(tableName)
                     .item(item).build()
 
-    fun getRequest(key: Map<String, AttributeValue>, selection: List<String> = emptyList()) =
+    fun getRequest(key: Map<String, AttributeValue>, selection: Set<String> = emptySet()) =
             GetItemRequest.builder()
                     .tableName(tableName)
                     .key(key)

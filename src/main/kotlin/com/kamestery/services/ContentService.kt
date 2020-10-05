@@ -16,26 +16,30 @@ class ContentService {
 
 
     fun createDocument(doc: Document): ContentRef? {
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(doc.asInput())
+        val input = doc.asInput()
+        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
         val res = dynamoDB.putItem(request)
         return Document.from(res.attributes())?.ref()
     }
 
     fun getDocument(cr: ContentRef): Document? {
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).getRequest(cr.key())
+        val request = DynamoRequestBuilder(Content.CONTENT_TBL).getRequest(
+                cr.key(),
+                Document.attributes()
+        )
         val res = dynamoDB.getItem(request).item()
-        System.out.println(res)
         return Document.from(res)
     }
 
     fun updateDocument(doc: Document): ContentRef? {
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(doc.asInput())
+        val input = doc.asInput()
+        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
         val res = dynamoDB.putItem(request)
         return Document.from(res.attributes())?.ref()
     }
 
     fun listDocuments(): Set<Document?> {
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).scanRequest(Document.attributes().toList())
+        val request = DynamoRequestBuilder(Content.CONTENT_TBL).scanRequest(Document.attributes())
         return dynamoDB.scanPaginator(request).items().stream().map {
             it -> Document.from(it)
         }.toList().toSet()
