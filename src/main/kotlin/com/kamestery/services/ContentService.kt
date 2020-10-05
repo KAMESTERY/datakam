@@ -16,10 +16,11 @@ class ContentService {
 
 
     fun createDocument(doc: Document): ContentRef? {
+        if (getDocument(doc.ref()) != null) return null
         val input = doc.asInput()
         val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
-        val res = dynamoDB.putItem(request)
-        return Document.from(res.attributes())?.ref()
+        dynamoDB.putItem(request)
+        return doc.ref()
     }
 
     fun getDocument(cr: ContentRef): Document? {
@@ -32,10 +33,13 @@ class ContentService {
     }
 
     fun updateDocument(doc: Document): ContentRef? {
-        val input = doc.asInput()
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
-        val res = dynamoDB.putItem(request)
-        return Document.from(res.attributes())?.ref()
+        val ref = getDocument(doc.ref())?.let {
+            val input = doc.asInput()
+            val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
+            dynamoDB.putItem(request)
+            doc.ref()
+        }
+        return ref
     }
 
     fun listDocuments(): Set<Document?> {
@@ -46,8 +50,11 @@ class ContentService {
     }
 
     fun deleteDocument(cr: ContentRef): ContentRef? {
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).deleteRequest(cr.key())
-        val res = dynamoDB.deleteItem(request)
-        return Document.from(res.attributes())?.ref()
+        val ref = getDocument(cr)?.let {
+            val request = DynamoRequestBuilder(Content.CONTENT_TBL).deleteRequest(cr.key())
+            dynamoDB.deleteItem(request)
+            cr
+        }
+        return ref
     }
 }

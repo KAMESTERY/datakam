@@ -24,7 +24,7 @@ data class Document(
         var filtreVisuel: Int = FiltreVisuel.IG_WILLOW.value,
         var langue: Int = Langue.ENGLISH.value,
         var niveau: Int = Niveau.LOW.value,
-        var Media: List<Media> = emptyList()
+        var media: List<Media> = emptyList()
 ) {
     enum class FiltreVisuel(val value: Int) {
         IG_WILLOW(0),
@@ -78,7 +78,7 @@ data class Document(
         ) + Content.attributes()
 
         fun from(item: Map<String, AttributeValue>?): Document? {
-            return item?.let {
+            return item?.get(Content.CONTENTID)?.let {
                 Document(
                         topic = item.get(Content.NAMESPACE)?.s() ?: "",
                         documentID = item.get(Content.CONTENTID)?.s() ?: "",
