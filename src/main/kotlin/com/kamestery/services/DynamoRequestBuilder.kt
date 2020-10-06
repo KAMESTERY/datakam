@@ -1,6 +1,7 @@
 package com.kamestery.services
 
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest
@@ -17,6 +18,11 @@ class DynamoRequestBuilder(val tableName: String) {
             PutItemRequest.builder()
                     .tableName(tableName)
                     .item(item).build()
+
+//     fun batchWriteRequest(item: Map<String, AttributeValue>) =
+//             BatchWriteItemRequest.builder().requestItems(p0)
+//                     .tableName(tableName)
+//                     .item(item).build()
 
     fun getRequest(key: Map<String, AttributeValue>, selection: Set<String> = emptySet()) =
             GetItemRequest.builder()

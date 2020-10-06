@@ -16,11 +16,20 @@ class ContentService {
 
 
     fun createDocument(doc: Document): ContentRef? {
-        if (getDocument(doc.ref()) != null) return null
-        val input = doc.asInput()
-        val request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
-        dynamoDB.putItem(request)
-        return doc.ref()
+        return if (getDocument(doc.ref()) != null) null else {
+            val input = doc.asInput()
+            var request = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(input)
+            dynamoDB.putItem(request)
+            // doc.media.map {
+            //     m -> {
+            //         m.parentDocumentID = doc.documentID
+            //         val mInput = m.asInput()
+            //         var mRequest = DynamoRequestBuilder(Content.CONTENT_TBL).putRequest(mInput)
+            //         dynamoDB.putItem(mRequest)
+            //     }
+            // }
+            doc.ref()
+        }
     }
 
     fun getDocument(cr: ContentRef): Document? {
