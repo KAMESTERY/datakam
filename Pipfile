@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+fastapi = "*"
+ujson = "*"
+email-validator = "*"
+requests = "*"
+aiofiles = "*"
+jinja2 = "*"
+python-multipart = "*"
+itsdangerous = "*"
+pyyaml = "*"
+graphene = "*"
+uvicorn = "*"
+orjson = "*"
+boto3 = "*"
+typer = "*"
+pylint = "*"
+
+[requires]
+python_version = "3.8"
