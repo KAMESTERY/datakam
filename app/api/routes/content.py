@@ -1,21 +1,50 @@
-
 from fastapi import APIRouter
+
+from app.api.routes import (
+    ADMIN,
+    PROVISIONERS,
+    READERS
+)
+from app.models.domain.document import Document
+from app.models.schemas.document import DocumentWriteResponse
+from app.services.dal import content_svc
 
 router = APIRouter()
 
-@router.post("/")
-async def create():
+
+@router.post(
+    "/document",
+    response_model=DocumentWriteResponse,
+    name="Create a Document",
+    tags=[PROVISIONERS]
+)
+async def create_document(doc: Document) -> DocumentWriteResponse:
+    resp = await content_svc.create_document(doc)
+    return resp
+
+
+@router.get(
+    "/document/{documentId}",
+    name="Retrieve Document",
+    tags=[READERS]
+)
+async def retrieve_document(document_id: str):
     pass
 
-@router.get("/{contentId}")
-async def retrieve(contentId: str):
+
+@router.put(
+    "/document/{documentId}",
+    name="Update Document",
+    tags=[ADMIN]
+)
+async def update_document(document_id: str):
     pass
 
-@router.update("/{contentId}")
-async def update(contentId: str):
-    pass
 
-
-@router.delete("/{contentId}")
-async def delete(contentId: str):
+@router.delete(
+    "/document/{documentId}",
+    name="Delete Document",
+    tags=[PROVISIONERS]
+)
+async def delete_document(document_id: str):
     pass

@@ -21,6 +21,8 @@ orjson = "*"
 boto3 = "*"
 typer = "*"
 pylint = "*"
+httpx = "*"
+loguru = "*"
 
 [requires]
 python_version = "3.8"

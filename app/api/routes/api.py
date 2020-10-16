@@ -1,6 +1,13 @@
 from fastapi import APIRouter
 
+from app.api.routes import content
+
 router = APIRouter()
+
+router.include_router(
+    content.router,
+    prefix="/content"
+)
 
 
 @router.get("/hello/{name}")
