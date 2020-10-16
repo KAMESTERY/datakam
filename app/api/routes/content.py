@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter
 
 from app.api.routes import (
@@ -6,7 +8,7 @@ from app.api.routes import (
     READERS
 )
 from app.models.domain.document import Document
-from app.models.schemas.document import DocumentWriteResponse
+from app.models.schemas.document import DocumentWriteResponse, DocumentUpdateIn
 from app.services.dal import content_svc
 
 router = APIRouter()
@@ -29,8 +31,30 @@ async def create_document(doc: Document) -> DocumentWriteResponse:
     name="Retrieve Document",
     tags=[READERS]
 )
-async def retrieve_document(ns: str, content_id: str):
-    pass
+async def retrieve_document(ns: str, content_id: str) -> Document:
+    resp = await content_svc.get_document(
+        ns=ns,
+        content_id=content_id
+    )
+    return resp
+
+
+@router.patch(
+    "/document/{ns}/{content_id}",
+    response_model=DocumentWriteResponse,
+    name="Patch Document",
+    tags=[ADMIN]
+)
+async def patch_document(
+        ns: str,
+        content_id: str,
+        doc: DocumentUpdateIn) -> DocumentWriteResponse:
+    resp = await content_svc.update_document(
+        ns=ns,
+        content_id=content_id,
+        doc=doc
+    )
+    return resp
 
 
 @router.put(

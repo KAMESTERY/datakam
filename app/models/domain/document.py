@@ -13,7 +13,7 @@ from pydantic import (
 
 from app.models.common import (
     DateTimeModelMixin,
-    ModelConfigMixin, convert_json_to_realworld
+    ModelConfigMixin, convert_json_to_realworld, convert_string_to_datetime
 )
 from app.models.domain import (
     EXAMPLE_NAMESPACE,
@@ -66,7 +66,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
     niveau: int = EXAMPLE_NUMBER
     media: Optional[List[Media]]
 
-    def to_dynamo_update(self):
+    def to_dynamo_update(self) -> dict:
         dyn_update_dict = dict()
 
         if self.user_id: dyn_update_dict[USERID] = self.user_id
@@ -77,6 +77,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
         if self.title: dyn_update_dict[TITLE] = self.title
         if self.identifier: dyn_update_dict[IDENTIFIER] = self.identifier
         if self.body: dyn_update_dict[BODY] = self.body
+        if self.publish: dyn_update_dict[PUBLISH] = self.publish
         if self.filtre_visuel: dyn_update_dict[FILTREVISUEL] = self.filtre_visuel
         if self.langue: dyn_update_dict[LANGUE] = self.langue
         if self.niveau: dyn_update_dict[NIVEAU] = self.niveau
@@ -84,7 +85,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
 
         return dyn_update_dict
 
-    def to_dynamo(self):
+    def to_dynamo(self) -> dict:
         dyn_dict = dict()
 
         dyn_dict[NAMESPACE] = self.topic
@@ -97,6 +98,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
         dyn_dict[TITLE] = self.title
         dyn_dict[IDENTIFIER] = self.identifier
         dyn_dict[BODY] = self.body
+        dyn_dict[PUBLISH] = self.publish
         dyn_dict[FILTREVISUEL] = self.filtre_visuel
         dyn_dict[LANGUE] = self.langue
         dyn_dict[NIVEAU] = self.niveau
@@ -104,3 +106,27 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
         dyn_dict[UPDATEDAT] = convert_json_to_realworld(self.updated_at)
 
         return dyn_dict
+
+    @classmethod
+    def from_dynamo(cls, item: dict) -> 'Document':
+
+        doc = cls(
+            topic=item[NAMESPACE],
+            document_id=item[CONTENTID],
+            user_id=item[USERID],
+            tags=item[TAGS],
+            score=item[SCORE],
+            version=item[VERSION],
+            slug=item[SLUG],
+            title=item[TITLE],
+            identifier=item[IDENTIFIER],
+            body=item[BODY],
+            publish=item[PUBLISH],
+            filtre_visuel=item[FILTREVISUEL],
+            langue=item[LANGUE],
+            niveau=item[NIVEAU],
+            created_at=convert_string_to_datetime(item[CREATEDAT]),
+            updated_at=convert_string_to_datetime(item[UPDATEDAT]),
+        )
+
+        return doc

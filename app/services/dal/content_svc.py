@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from loguru import logger
 
 from app.models.domain.content import (
@@ -6,7 +8,7 @@ from app.models.domain.content import (
     CONTENT_TBL
 )
 from app.models.domain.document import Document
-from app.models.schemas.document import DocumentWriteResponse
+from app.models.schemas.document import DocumentWriteResponse, DocumentUpdateIn
 from app.services.dal import dynamodb_svc
 
 
@@ -26,6 +28,30 @@ async def create_document(doc: Document, dynamodb=None) -> DocumentWriteResponse
         namespace=doc.topic,
         content_id=doc.document_id
     )
+
+
+async def get_document(
+        ns: str,
+        content_id: str,
+        dynamodb=None
+) -> Document:
+    key = dict()
+    key[NAMESPACE] = ns
+    key[CONTENTID] = content_id
+    response = await dynamodb_svc.get_item(
+        tbl_name=CONTENT_TBL,
+        key=key,
+        dynamodb=dynamodb,
+    )
+
+    logger.debug(f"Get Response: {response}")
+
+    if response:
+        doc = Document.from_dynamo(response)
+        logger.debug(f"Retrieved Document: {doc}")
+        return doc
+    else:
+        return None
 
 
 async def delete_document(
@@ -54,7 +80,7 @@ async def delete_document(
 async def update_document(
         ns: str,
         content_id: str,
-        doc: Document,
+        doc: Union[Document,DocumentUpdateIn],
         dynamodb=None
 ) -> DocumentWriteResponse:
     key = dict()
