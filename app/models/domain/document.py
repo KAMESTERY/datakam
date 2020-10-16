@@ -67,29 +67,22 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
     media: Optional[List[Media]]
 
     def to_dynamo_update(self):
-        dyn_key_dict = dict()
+        dyn_update_dict = dict()
 
-        dyn_key_dict[NAMESPACE] = self.topic
-        dyn_key_dict[CONTENTID] = self.document_id
+        if self.user_id: dyn_update_dict[USERID] = self.user_id
+        if self.tags: dyn_update_dict[TAGS] = self.tags
+        if self.score: dyn_update_dict[SCORE] = self.score
+        if self.version: dyn_update_dict[VERSION] = self.version
+        if self.slug: dyn_update_dict[SLUG] = self.slug
+        if self.title: dyn_update_dict[TITLE] = self.title
+        if self.identifier: dyn_update_dict[IDENTIFIER] = self.identifier
+        if self.body: dyn_update_dict[BODY] = self.body
+        if self.filtre_visuel: dyn_update_dict[FILTREVISUEL] = self.filtre_visuel
+        if self.langue: dyn_update_dict[LANGUE] = self.langue
+        if self.niveau: dyn_update_dict[NIVEAU] = self.niveau
+        dyn_update_dict[UPDATEDAT] = convert_json_to_realworld(datetime.datetime.now())
 
-
-        dyn_dict = dict()
-
-        dyn_dict[USERID] = self.user_id
-        dyn_dict[TAGS] = self.tags
-        dyn_dict[SCORE] = self.score
-        dyn_dict[VERSION] = self.version
-        dyn_dict[SLUG] = self.slug
-        dyn_dict[TITLE] = self.title
-        dyn_dict[IDENTIFIER] = self.identifier
-        dyn_dict[BODY] = self.body
-        dyn_dict[FILTREVISUEL] = self.filtre_visuel
-        dyn_dict[LANGUE] = self.langue
-        dyn_dict[NIVEAU] = self.niveau
-        dyn_dict[CREATEDAT] = convert_json_to_realworld(self.created_at)
-        dyn_dict[UPDATEDAT] = convert_json_to_realworld(self.updated_at)
-
-        return dyn_key_dict, dyn_dict
+        return dyn_update_dict
 
     def to_dynamo(self):
         dyn_dict = dict()

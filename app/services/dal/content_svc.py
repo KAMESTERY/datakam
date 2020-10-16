@@ -1,10 +1,13 @@
 from loguru import logger
 
+from app.models.domain.content import (
+    NAMESPACE,
+    CONTENTID,
+    CONTENT_TBL
+)
 from app.models.domain.document import Document
 from app.models.schemas.document import DocumentWriteResponse
 from app.services.dal import dynamodb_svc
-
-CONTENT_TBL = "Content"
 
 
 async def create_document(doc: Document, dynamodb=None) -> DocumentWriteResponse:
@@ -25,8 +28,39 @@ async def create_document(doc: Document, dynamodb=None) -> DocumentWriteResponse
     )
 
 
-async def update_document(doc: Document, dynamodb=None) -> DocumentWriteResponse:
-    key, new_item = doc.to_dynamo_update()
+async def delete_document(
+        ns: str,
+        content_id: str,
+        dynamodb=None
+) -> DocumentWriteResponse:
+    key = dict()
+    key[NAMESPACE] = ns
+    key[CONTENTID] = content_id
+    response = await dynamodb_svc.delete_item(
+        tbl_name=CONTENT_TBL,
+        key=key,
+        dynamodb=dynamodb,
+    )
+
+    logger.debug(f"Delete Response: {response}")
+
+    return DocumentWriteResponse(
+        message="Document was deleted.",
+        namespace=ns,
+        content_id=content_id
+    )
+
+
+async def update_document(
+        ns: str,
+        content_id: str,
+        doc: Document,
+        dynamodb=None
+) -> DocumentWriteResponse:
+    key = dict()
+    key[NAMESPACE] = ns
+    key[CONTENTID] = content_id
+    new_item = doc.to_dynamo_update()
     logger.debug(f"Document Item new: {new_item}")
     response = await dynamodb_svc.update_item(
         tbl_name=CONTENT_TBL,
@@ -39,6 +73,6 @@ async def update_document(doc: Document, dynamodb=None) -> DocumentWriteResponse
 
     return DocumentWriteResponse(
         message="Document was updated.",
-        namespace=doc.topic,
-        content_id=doc.document_id
+        namespace=ns,
+        content_id=content_id
     )

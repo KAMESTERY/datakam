@@ -29,6 +29,33 @@ async def put_item(tbl_name: str, item: dict, dynamodb = None):
         raise error
 
 
+async def delete_item(tbl_name: str, key: dict, dynamodb: None):
+    if not dynamodb:
+        dynamodb = boto3.resource('dynamodb')
+
+    try:
+        table = dynamodb.Table(tbl_name)
+
+        loop = asyncio.get_event_loop()
+
+        response = await loop.run_in_executor(
+            None,
+            lambda: table.delete_item(
+                **dict(
+                    Key=key
+                )
+            )
+        )
+
+        return response
+
+    except ClientError as error:
+        handle_error(error)
+    except BaseException as error:
+        logger.error(f"Unknown error while updating item: {error.response['Error']['Message']}")
+        raise error
+
+
 async def update_item(tbl_name: str, key: dict, new_item: dict, dynamodb: None):
     if not dynamodb:
         dynamodb = boto3.resource('dynamodb')

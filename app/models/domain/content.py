@@ -10,6 +10,7 @@ from app.models.common import (
 from app.models.domain import EXAMPLE_NAMESPACE, EXAMPLE_CONTENT_ID, EXAMPLE_EMAIL
 
 
+CONTENT_TBL = "Content"
 NAMESPACE = "Namespace"
 CONTENTID = "ContentID"
 USERID = "UserID"

@@ -24,30 +24,42 @@ async def create_document(doc: Document) -> DocumentWriteResponse:
 
 
 @router.get(
-    "/document/{documentId}",
+    "/document/{ns}/{content_id}",
     response_model=Document,
     name="Retrieve Document",
     tags=[READERS]
 )
-async def retrieve_document(document_id: str):
+async def retrieve_document(ns: str, content_id: str):
     pass
 
 
 @router.put(
-    "/document/{documentId}",
+    "/document/{ns}/{content_id}",
     response_model=DocumentWriteResponse,
     name="Update Document",
     tags=[ADMIN]
 )
-async def update_document(doc: Document) -> DocumentWriteResponse:
-    resp = await content_svc.update_document(doc)
+async def update_document(
+        ns: str,
+        content_id: str,
+        doc: Document) -> DocumentWriteResponse:
+    resp = await content_svc.update_document(
+        ns=ns,
+        content_id=content_id,
+        doc=doc
+    )
     return resp
 
 
 @router.delete(
-    "/document/{documentId}",
+    "/document/{ns}/{content_id}",
+    response_model=DocumentWriteResponse,
     name="Delete Document",
     tags=[PROVISIONERS]
 )
-async def delete_document(document_id: str):
-    pass
+async def delete_document(ns: str, content_id: str) -> DocumentWriteResponse:
+    resp = await content_svc.delete_document(
+        ns=ns,
+        content_id=content_id
+    )
+    return resp
