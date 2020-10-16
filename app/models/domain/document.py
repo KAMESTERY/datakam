@@ -66,6 +66,31 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
     niveau: int = EXAMPLE_NUMBER
     media: Optional[List[Media]]
 
+    def to_dynamo_update(self):
+        dyn_key_dict = dict()
+
+        dyn_key_dict[NAMESPACE] = self.topic
+        dyn_key_dict[CONTENTID] = self.document_id
+
+
+        dyn_dict = dict()
+
+        dyn_dict[USERID] = self.user_id
+        dyn_dict[TAGS] = self.tags
+        dyn_dict[SCORE] = self.score
+        dyn_dict[VERSION] = self.version
+        dyn_dict[SLUG] = self.slug
+        dyn_dict[TITLE] = self.title
+        dyn_dict[IDENTIFIER] = self.identifier
+        dyn_dict[BODY] = self.body
+        dyn_dict[FILTREVISUEL] = self.filtre_visuel
+        dyn_dict[LANGUE] = self.langue
+        dyn_dict[NIVEAU] = self.niveau
+        dyn_dict[CREATEDAT] = convert_json_to_realworld(self.created_at)
+        dyn_dict[UPDATEDAT] = convert_json_to_realworld(self.updated_at)
+
+        return dyn_key_dict, dyn_dict
+
     def to_dynamo(self):
         dyn_dict = dict()
 
@@ -78,7 +103,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin):
         dyn_dict[SLUG] = self.slug
         dyn_dict[TITLE] = self.title
         dyn_dict[IDENTIFIER] = self.identifier
-        dyn_dict[BODY] = self.publish
+        dyn_dict[BODY] = self.body
         dyn_dict[FILTREVISUEL] = self.filtre_visuel
         dyn_dict[LANGUE] = self.langue
         dyn_dict[NIVEAU] = self.niveau

@@ -25,6 +25,7 @@ async def create_document(doc: Document) -> DocumentWriteResponse:
 
 @router.get(
     "/document/{documentId}",
+    response_model=Document,
     name="Retrieve Document",
     tags=[READERS]
 )
@@ -34,11 +35,13 @@ async def retrieve_document(document_id: str):
 
 @router.put(
     "/document/{documentId}",
+    response_model=DocumentWriteResponse,
     name="Update Document",
     tags=[ADMIN]
 )
-async def update_document(document_id: str):
-    pass
+async def update_document(doc: Document) -> DocumentWriteResponse:
+    resp = await content_svc.update_document(doc)
+    return resp
 
 
 @router.delete(
