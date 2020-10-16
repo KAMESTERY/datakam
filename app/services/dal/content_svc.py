@@ -83,6 +83,8 @@ async def update_document(
         doc: Union[Document,DocumentUpdateIn],
         dynamodb=None
 ) -> DocumentWriteResponse:
+    existing_doc = await get_document(ns=ns, content_id=content_id)
+    if not existing_doc: return None
     key = dict()
     key[NAMESPACE] = ns
     key[CONTENTID] = content_id

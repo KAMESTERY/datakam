@@ -10,8 +10,8 @@ from pydantic import (
 
 
 class DateTimeModelMixin(BaseModel):
-    created_at: datetime.datetime = None
-    updated_at: datetime.datetime = None
+    created_at: datetime.datetime = datetime.datetime.now()
+    updated_at: datetime.datetime = datetime.datetime.now()
 
     @validator("created_at", "updated_at", pre=True)
     def default_datetime(
