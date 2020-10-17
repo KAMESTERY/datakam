@@ -1,3 +1,4 @@
+import abc
 
 from pydantic import (
     EmailStr
@@ -19,6 +20,8 @@ SCORE = "Score"
 VERSION = "Version"
 CREATEDAT = "CreatedAt"
 UPDATEDAT = "UpdatedAt"
+TYPE = "Type"
+POSITION = "Position"
 
 
 class Content(DateTimeModelMixin, ModelConfigMixin):
@@ -31,3 +34,23 @@ class Content(DateTimeModelMixin, ModelConfigMixin):
 class ContentRef(ModelConfigMixin):
     namespace: str
     content_id: str
+
+
+class ContentDynaInOutInterface(metaclass=abc.ABCMeta):
+
+    @abc.abstractmethod
+    def to_dynamo(self) -> dict:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def from_dynamo(cls, item: dict):
+        raise NotImplementedError
+
+
+class ContentDynaUpdateInterface(metaclass=abc.ABCMeta):
+
+    @abc.abstractmethod
+    def to_dynamo_update(self) -> dict:
+        raise NotImplementedError
+

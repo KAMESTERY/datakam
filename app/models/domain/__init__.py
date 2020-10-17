@@ -4,7 +4,8 @@ from typing import List
 from pydantic import (
     EmailStr,
     Field,
-    HttpUrl
+    HttpUrl,
+    NameEmail
 )
 
 EXAMPLE_NAMESPACE: str = Field(..., example="com.kamestery.devdata:##:africa")
@@ -16,6 +17,7 @@ EXAMPLE_UPDATED_CONTENT_TEXT: str = Field(..., example="UPDATED UPDATED UPDATED 
 EXAMPLE_CHILD_ID: str = Field(..., example="com.kamestery.devdata:##:africa:##:some-child-content")
 EXAMPLE_OTHER_CHILD_ID: str = Field(..., example="com.kamestery.devdata:##:africa:##:some-other-child-content")
 EXAMPLE_EMAIL: EmailStr = Field(..., example="lb@lambert.kmt")
+EXAMPLE_AUTHOR: NameEmail = Field(..., example="Lambert Dagobert <lb@lambert.kmt>")
 EXAMPLE_TAGS: List[str] = Field(..., example=["dev-tag1", "dev-tag2", "dev-tag3", "dev-tag4"])
 EXAMPLE_NUMBER: int = Field(..., example=4)
 EXAMPLE_BOOL: bool = Field(..., example=True)

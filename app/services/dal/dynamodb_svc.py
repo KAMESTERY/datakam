@@ -1,6 +1,7 @@
 
 import asyncio
 import boto3
+from boto3.dynamodb.conditions import Key
 
 from botocore.exceptions import ClientError
 from loguru import logger
@@ -52,7 +53,39 @@ async def get_item(tbl_name: str, key: dict, dynamodb: None):
     except ClientError as error:
         handle_error(error)
     except BaseException as error:
-        logger.error(f"Unknown error while updating item: {error.response['Error']['Message']}")
+        logger.error(f"Unknown error while retrieving item: {error.response['Error']['Message']}")
+        raise error
+
+
+async def query_by_partition(
+        tbl_name: str,
+        partition_name: str,
+        partition_value: str,
+        dynamodb: None):
+    if not dynamodb:
+        dynamodb = boto3.resource('dynamodb')
+
+    try:
+        table = dynamodb.Table(tbl_name)
+
+        loop = asyncio.get_event_loop()
+
+        response = await loop.run_in_executor(
+            None,
+            lambda: table.query(
+                **dict(
+                    KeyConditionExpression=Key(partition_name).eq(partition_value),
+                    ScanIndexForward=False # true = ascending, false = descending
+                )
+            )
+        )
+
+        return response.get('Items', [])
+
+    except ClientError as error:
+        handle_error(error)
+    except BaseException as error:
+        logger.error(f"Unknown error while querying items: {error.response['Error']['Message']}")
         raise error
 
 
@@ -79,7 +112,7 @@ async def delete_item(tbl_name: str, key: dict, dynamodb: None):
     except ClientError as error:
         handle_error(error)
     except BaseException as error:
-        logger.error(f"Unknown error while updating item: {error.response['Error']['Message']}")
+        logger.error(f"Unknown error while deleting item: {error.response['Error']['Message']}")
         raise error
 
 

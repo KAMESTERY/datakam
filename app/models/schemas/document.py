@@ -14,7 +14,8 @@ from app.models.domain.content import (
     TAGS,
     SCORE,
     VERSION,
-    UPDATEDAT
+    UPDATEDAT,
+    ContentDynaUpdateInterface
 )
 from app.models.domain.document import (
     SLUG,
@@ -29,11 +30,11 @@ from app.models.domain.document import (
 from app.models.domain.media import Media
 
 
-class DocumentWriteResponse(ContentRef):
+class ContentWriteResponse(ContentRef):
     message: str
 
 
-class DocumentUpdateIn(ModelConfigMixin):
+class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
     topic: Optional[str] = None
     document_id: Optional[str] = None
     user_id: Optional[EmailStr] = None
