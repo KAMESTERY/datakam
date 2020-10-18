@@ -1,5 +1,11 @@
 
 import asyncio
+from functools import lru_cache
+from typing import (
+    Dict,
+    List
+)
+
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -7,9 +13,15 @@ from botocore.exceptions import ClientError
 from loguru import logger
 
 
-async def put_item(tbl_name: str, item: dict, dynamodb = None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+@lru_cache(maxsize=1)
+def get_dynamodb_resource():
+    dynamodb = boto3.resource('dynamodb')
+    return dynamodb
+
+
+async def put_item(tbl_name: str, item: dict):
+
+    dynamodb = get_dynamodb_resource()
 
     try:
         table = dynamodb.Table(tbl_name)
@@ -30,9 +42,36 @@ async def put_item(tbl_name: str, item: dict, dynamodb = None):
         raise error
 
 
-async def get_item(tbl_name: str, key: dict, dynamodb: None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+async def batch_put_item(tbl_name: str, items: List[dict]):
+
+    dynamodb = get_dynamodb_resource()
+
+    try:
+        table = dynamodb.Table(tbl_name)
+
+        loop = asyncio.get_event_loop()
+
+        await loop.run_in_executor(
+            None,
+            lambda: put_all_items(table, items)
+        )
+
+    except ClientError as error:
+        handle_error(error)
+    except BaseException as error:
+        logger.error(f"Unknown error while batch putting item: {error.response['Error']['Message']}")
+        raise error
+
+
+def put_all_items(table, items: List[dict]):
+    with table.batch_writer() as batch:
+        for item in items:
+            batch.put_item(Item=item)
+
+
+async def get_item(tbl_name: str, key: dict):
+
+    dynamodb = get_dynamodb_resource()
 
     try:
         table = dynamodb.Table(tbl_name)
@@ -57,13 +96,46 @@ async def get_item(tbl_name: str, key: dict, dynamodb: None):
         raise error
 
 
+async def batch_get_item(params: Dict[str, List[dict]]):
+
+    dynamodb = get_dynamodb_resource()
+
+    try:
+
+        loop = asyncio.get_event_loop()
+
+        request_items = dict(ReturnConsumedCapacity='TOTAL')
+
+        for tbl_name in params:
+            keys = params[tbl_name]
+            request_items[tbl_name] = dict(
+                Key=keys,
+                ConsistentRead=True,
+            )
+
+        response = await loop.run_in_executor(
+            None,
+            lambda: dynamodb.batch_get_item(
+                **dict(RequestItems=request_items)
+            )
+        )
+
+        return response.get('Responses', dict())
+
+    except ClientError as error:
+        handle_error(error)
+    except BaseException as error:
+        logger.error(f"Unknown error while batch retrieving items: {error.response['Error']['Message']}")
+        raise error
+
+
 async def query_by_partition(
         tbl_name: str,
         partition_name: str,
         partition_value: str,
         dynamodb: None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+
+    dynamodb = get_dynamodb_resource()
 
     try:
         table = dynamodb.Table(tbl_name)
@@ -89,9 +161,9 @@ async def query_by_partition(
         raise error
 
 
-async def delete_item(tbl_name: str, key: dict, dynamodb: None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+async def delete_item(tbl_name: str, key: dict):
+
+    dynamodb = get_dynamodb_resource()
 
     try:
         table = dynamodb.Table(tbl_name)
@@ -116,9 +188,9 @@ async def delete_item(tbl_name: str, key: dict, dynamodb: None):
         raise error
 
 
-async def update_item(tbl_name: str, key: dict, new_item: dict, dynamodb: None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+async def update_item(tbl_name: str, key: dict, new_item: dict):
+
+    dynamodb = get_dynamodb_resource()
 
     try:
         table = dynamodb.Table(tbl_name)

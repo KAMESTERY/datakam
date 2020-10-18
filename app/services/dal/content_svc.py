@@ -15,15 +15,13 @@ from app.services.dal import dynamodb_svc
 
 
 async def create_content(
-        content: ContentDynaInOutInterface,
-        dynamodb=None
+        content: ContentDynaInOutInterface
 ) -> ContentWriteResponse:
     item = content.to_dynamo()
     logger.debug(f"Content Item: {item}")
     response = await dynamodb_svc.put_item(
         tbl_name=CONTENT_TBL,
         item=item,
-        dynamodb=dynamodb,
     )
 
     logger.debug(f"Create Response: {response}")
@@ -37,8 +35,7 @@ async def create_content(
 
 async def get_document(
         ns: str,
-        content_id: str,
-        dynamodb=None
+        content_id: str
 ) -> Document:
     key = dict()
     key[NAMESPACE] = ns
@@ -46,7 +43,6 @@ async def get_document(
     response = await dynamodb_svc.get_item(
         tbl_name=CONTENT_TBL,
         key=key,
-        dynamodb=dynamodb,
     )
 
     logger.debug(f"Get Document Response: {response}")
@@ -60,14 +56,12 @@ async def get_document(
 
 
 async def get_documents_by_topic(
-        ns: str,
-        dynamodb=None
+        ns: str
 ) -> List[Document]:
     response = await dynamodb_svc.query_by_partition(
         tbl_name=CONTENT_TBL,
         partition_name=NAMESPACE,
         partition_value=ns,
-        dynamodb=dynamodb,
     )
 
     logger.debug(f"Query Document by Topic Response: {response}")
@@ -82,8 +76,7 @@ async def get_documents_by_topic(
 
 async def delete_content(
         ns: str,
-        content_id: str,
-        dynamodb=None
+        content_id: str
 ) -> ContentWriteResponse:
     key = dict()
     key[NAMESPACE] = ns
@@ -91,7 +84,6 @@ async def delete_content(
     response = await dynamodb_svc.delete_item(
         tbl_name=CONTENT_TBL,
         key=key,
-        dynamodb=dynamodb,
     )
 
     logger.debug(f"Delete Response: {response}")
@@ -106,8 +98,7 @@ async def delete_content(
 async def update_content(
         ns: str,
         content_id: str,
-        content: ContentDynaUpdateInterface,
-        dynamodb=None
+        content: ContentDynaUpdateInterface
 ) -> ContentWriteResponse:
 
     if type(content) is Document:
@@ -122,7 +113,6 @@ async def update_content(
         tbl_name=CONTENT_TBL,
         key=key,
         new_item=new_item,
-        dynamodb=dynamodb,
     )
 
     logger.debug(f"Update Response: {response}")
