@@ -35,9 +35,42 @@ async def create_content(
 
     return ContentWriteResponse(
         message="Document was created.",
-        namespace=content.topic,
-        content_id=content.document_id
+        namespace=ns,
+        content_id=content_id
     )
+
+
+async def batch_create_content(
+        contents: List[ContentDynaInOutInterface]
+) -> List[ContentWriteResponse]:
+    items = [content.to_dynamo() for content in contents]
+    for item in items:
+
+        ns = item[NAMESPACE]
+        content_id = item[CONTENTID]
+
+        existing_doc = await get_document(ns=ns, content_id=content_id)
+        if existing_doc: return None
+
+    logger.debug(f"Content Items: {items}")
+    responses = await dynamodb_svc.batch_put_item(
+        tbl_name=CONTENT_TBL,
+        item=items,
+    )
+
+    logger.debug(f"Create Response: {responses}")
+
+    return [
+        ContentWriteResponse(
+            message="Document was created.",
+            namespace=ns,
+            content_id=content_id
+        )
+        for item in items if (
+            ns := item[NAMESPACE],
+            content_id := item[CONTENTID]
+        )
+    ]
 
 
 async def get_document(

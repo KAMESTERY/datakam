@@ -18,6 +18,7 @@ from app.models.domain import (
 )
 from app.models.domain.content import ContentDynaInOutInterface
 from app.models.domain.content import (
+    ENTITY_TYPE,
     NAMESPACE,
     CONTENTID,
     USERID,
@@ -49,6 +50,7 @@ class TextBlock(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface)
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 
+        dyn_dict[ENTITY_TYPE] = "TextBlock"
         dyn_dict[NAMESPACE] = self.parentdocument_id
         dyn_dict[CONTENTID] = self.textblock_id
         dyn_dict[USERID] = self.user_id

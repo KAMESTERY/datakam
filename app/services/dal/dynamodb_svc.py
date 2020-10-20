@@ -51,10 +51,12 @@ async def batch_put_item(tbl_name: str, items: List[dict]):
 
         loop = asyncio.get_event_loop()
 
-        await loop.run_in_executor(
+        responses = await loop.run_in_executor(
             None,
             lambda: put_all_items(table, items)
         )
+
+        return responses
 
     except ClientError as error:
         handle_error(error)

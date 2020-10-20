@@ -22,6 +22,7 @@ from app.models.domain import (
 )
 from app.models.domain.content import ContentDynaInOutInterface
 from app.models.domain.content import (
+    ENTITY_TYPE,
     NAMESPACE,
     CONTENTID,
     USERID,
@@ -51,6 +52,7 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 
+        dyn_dict[ENTITY_TYPE] = "Media"
         dyn_dict[NAMESPACE] = self.parentdocument_id
         dyn_dict[TYPE] = self.type
         dyn_dict[CONTENTID] = self.media_id

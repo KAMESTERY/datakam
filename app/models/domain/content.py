@@ -1,3 +1,4 @@
+
 import abc
 
 from pydantic import (
@@ -8,8 +9,12 @@ from app.models.common import (
     DateTimeModelMixin,
     ModelConfigMixin
 )
-from app.models.domain import EXAMPLE_NAMESPACE, EXAMPLE_CONTENT_ID, EXAMPLE_EMAIL
-
+from app.models.domain import (
+    EXAMPLE_NAMESPACE,
+    EXAMPLE_CONTENT_ID,
+    EXAMPLE_EMAIL,
+    EXAMPLE_NUMBER
+)
 
 CONTENT_TBL = "Content"
 NAMESPACE = "Namespace"
@@ -21,6 +26,7 @@ VERSION = "Version"
 CREATEDAT = "CreatedAt"
 UPDATEDAT = "UpdatedAt"
 TYPE = "Type"
+ENTITY_TYPE = "EntityType"
 POSITION = "Position"
 
 
@@ -28,8 +34,8 @@ class Content(DateTimeModelMixin, ModelConfigMixin):
     namespace: str = EXAMPLE_NAMESPACE
     content_id: str = EXAMPLE_CONTENT_ID
     user_id: EmailStr = EXAMPLE_EMAIL
-    score: int
-    version: int
+    score: int = EXAMPLE_NUMBER
+    version: int = EXAMPLE_NUMBER
 
 class ContentRef(ModelConfigMixin):
     namespace: str
