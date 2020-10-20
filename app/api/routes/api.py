@@ -1,6 +1,10 @@
+
 from fastapi import APIRouter
 
-from app.api.routes import content
+from app.api.routes import (
+    content,
+    graphql
+)
 
 router = APIRouter()
 

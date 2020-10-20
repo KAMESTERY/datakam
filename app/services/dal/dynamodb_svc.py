@@ -133,7 +133,7 @@ async def query_by_partition(
         tbl_name: str,
         partition_name: str,
         partition_value: str,
-        dynamodb: None):
+):
 
     dynamodb = get_dynamodb_resource()
 

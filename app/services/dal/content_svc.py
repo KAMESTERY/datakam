@@ -18,6 +18,13 @@ async def create_content(
         content: ContentDynaInOutInterface
 ) -> ContentWriteResponse:
     item = content.to_dynamo()
+
+    ns = item[NAMESPACE]
+    content_id = item[CONTENTID]
+
+    existing_doc = await get_document(ns=ns, content_id=content_id)
+    if existing_doc: return None
+
     logger.debug(f"Content Item: {item}")
     response = await dynamodb_svc.put_item(
         tbl_name=CONTENT_TBL,

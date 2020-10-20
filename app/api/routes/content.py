@@ -19,12 +19,22 @@ router = APIRouter()
 @router.post(
     "/document",
     response_model=ContentWriteResponse,
+    responses={
+        409: {"model": Message,
+              "description": """
+              The request could not be completed due to a conflict\n
+              with the current state of the target resource
+              """}
+    },
     name="Create a Document",
     tags=[PROVISIONERS]
 )
 async def create_document(doc: Document) -> ContentWriteResponse:
     resp = await content_svc.create_content(doc)
-    return resp
+    return resp if resp else JSONResponse(
+        status_code=409,
+        content={"message": "Conflict"}
+    )
 
 
 @router.get(
