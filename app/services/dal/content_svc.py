@@ -10,7 +10,7 @@ from app.models.domain.content import (
     ContentDynaUpdateInterface
 )
 from app.models.domain.document import Document
-from app.models.schemas.document import ContentWriteResponse
+from app.models.schemas.content import ContentWriteResponse
 from app.services.dal import dynamodb_svc
 
 

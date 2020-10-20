@@ -2,6 +2,7 @@
 from typing import List
 
 from fastapi import APIRouter
+from starlette.responses import JSONResponse
 
 from app.api.routes import (
     ADMIN,
@@ -9,7 +10,7 @@ from app.api.routes import (
     READERS
 )
 from app.models.domain.document import Document
-from app.models.schemas.document import ContentWriteResponse, DocumentUpdateIn
+from app.models.schemas.content import ContentWriteResponse, DocumentUpdateIn, Message
 from app.services.dal import content_svc
 
 router = APIRouter()
@@ -29,6 +30,9 @@ async def create_document(doc: Document) -> ContentWriteResponse:
 @router.get(
     "/document/{ns}/{content_id}",
     response_model=Document,
+    responses={
+        404: {"model": Message, "description": "The item was not found"}
+    },
     name="Retrieve Document",
     tags=[READERS]
 )
@@ -37,7 +41,10 @@ async def retrieve_document(ns: str, content_id: str) -> Document:
         ns=ns,
         content_id=content_id
     )
-    return resp
+    return resp if resp else JSONResponse(
+        status_code=404,
+        content={"message": "Item not found"}
+    )
 
 
 @router.get(
@@ -56,6 +63,9 @@ async def get_documents_by_topic(ns: str) -> List[Document]:
 @router.patch(
     "/document/{ns}/{content_id}",
     response_model=ContentWriteResponse,
+    responses={
+        404: {"model": Message, "description": "The item was not found"}
+    },
     name="Patch Document",
     tags=[ADMIN]
 )
@@ -68,12 +78,18 @@ async def patch_document(
         content_id=content_id,
         content=doc
     )
-    return resp
+    return resp if resp else JSONResponse(
+        status_code=404,
+        content={"message": "Item not found"}
+    )
 
 
 @router.put(
     "/document/{ns}/{content_id}",
     response_model=ContentWriteResponse,
+    responses={
+        404: {"model": Message, "description": "The item was not found"}
+    },
     name="Update Document",
     tags=[ADMIN]
 )
@@ -86,7 +102,10 @@ async def update_document(
         content_id=content_id,
         content=doc
     )
-    return resp
+    return resp if resp else JSONResponse(
+        status_code=404,
+        content={"message": "Item not found"}
+    )
 
 
 @router.delete(

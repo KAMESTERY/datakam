@@ -5,7 +5,7 @@ from typing import (
     Optional
 )
 
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 
 from app.models.common import ModelConfigMixin, convert_json_to_realworld
 from app.models.domain.content import (
@@ -28,6 +28,10 @@ from app.models.domain.document import (
     NIVEAU
 )
 from app.models.domain.media import Media
+
+
+class Message(BaseModel):
+    message: str
 
 
 class ContentWriteResponse(ContentRef):
