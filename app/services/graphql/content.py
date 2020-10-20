@@ -37,3 +37,23 @@ class DocumentQuery:
     async def resolve_documents_by_topic(self, topic: str) -> List[Document]:
         docs = await content_svc.get_documents_by_topic(topic)
         return docs
+
+    document = graphene.Field(
+        DocumentOut,
+        topic=graphene.String(
+            required=True,
+            description='Topic'
+        ),
+        document_id=graphene.String(
+            required=True,
+            description='Documeent ID'
+        )
+    )
+
+    @resolve_only_args
+    async def resolve_document(self, topic: str, document_id: str) -> Document:
+        doc = await content_svc.get_document(
+            ns=topic,
+            content_id=document_id
+        )
+        return doc
