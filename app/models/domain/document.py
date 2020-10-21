@@ -27,6 +27,7 @@ from app.models.domain import (
 )
 from app.models.domain.content import (
     ENTITY_TYPE,
+    DOCUMENT_ENTITY,
     NAMESPACE,
     CONTENTID,
     USERID,
@@ -69,7 +70,7 @@ class Document(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 
-        dyn_dict[ENTITY_TYPE] = "Document"
+        dyn_dict[ENTITY_TYPE] = DOCUMENT_ENTITY
         dyn_dict[NAMESPACE] = self.topic
         dyn_dict[CONTENTID] = self.document_id
         dyn_dict[USERID] = self.user_id

@@ -2,14 +2,19 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
-    content,
-    graphql
+    document,
+    docstream
 )
 
 router = APIRouter()
 
 router.include_router(
-    content.router,
+    document.router,
+    prefix="/content"
+)
+
+router.include_router(
+    docstream.router,
     prefix="/content"
 )
 

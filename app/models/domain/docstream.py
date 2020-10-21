@@ -14,6 +14,7 @@ from app.models.domain.content import (
 )
 from app.models.domain.content import (
     ENTITY_TYPE,
+    DOCSTREAM_ENTITY,
     NAMESPACE,
     CONTENTID,
     USERID,
@@ -34,7 +35,7 @@ class DocStream(Content, ContentDynaInOutInterface):
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 
-        dyn_dict[ENTITY_TYPE] = "DocStream"
+        dyn_dict[ENTITY_TYPE] = DOCSTREAM_ENTITY
         dyn_dict[NAMESPACE] = self.namespace
         dyn_dict[CONTENTID] = self.content_id
         dyn_dict[USERID] = self.user_id

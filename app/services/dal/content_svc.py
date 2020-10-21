@@ -3,13 +3,19 @@ from typing import Union, List
 from loguru import logger
 
 from app.models.domain.content import (
+    ENTITY_TYPE,
+    MEDIA_ENTITY,
+    TEXTBLOCK_ENTITY,
     NAMESPACE,
     CONTENTID,
     CONTENT_TBL,
     ContentDynaInOutInterface,
     ContentDynaUpdateInterface
 )
+from app.models.domain.docstream import DocStream
 from app.models.domain.document import Document
+from app.models.domain.media import Media
+from app.models.domain.textblock import TextBlock
 from app.models.schemas.content import ContentWriteResponse
 from app.services.dal import dynamodb_svc
 
@@ -41,7 +47,7 @@ async def create_content(
 
 
 async def batch_create_content(
-        contents: List[ContentDynaInOutInterface]
+        *contents: ContentDynaInOutInterface
 ) -> List[ContentWriteResponse]:
     items = [content.to_dynamo() for content in contents]
     for item in items:
@@ -91,6 +97,44 @@ async def get_document(
         doc = Document.from_dynamo(response)
         logger.debug(f"Retrieved Document: {doc}")
         return doc
+    else:
+        return None
+
+
+async def get_document_stream(
+        ns: str,
+        content_id: str
+) -> DocStream:
+    key = dict()
+    key[NAMESPACE] = ns
+    key[CONTENTID] = content_id
+    response = await dynamodb_svc.get_item(
+        tbl_name=CONTENT_TBL,
+        key=key,
+    )
+
+    logger.debug(f"Get Document Stream Response: {response}")
+
+    if response:
+        ds = DocStream.from_dynamo(response)
+        logger.debug(f"Retrieved Document Stream: {ds}")
+
+        child_responses = await dynamodb_svc.query_by_partition(
+            CONTENT_TBL,
+            NAMESPACE,
+            content_id
+        )
+
+        ds.item_stream = []
+        for child_resp in child_responses:
+            if child_resp[ENTITY_TYPE] == MEDIA_ENTITY:
+                media = Media.from_dynamo(child_resp[ENTITY_TYPE])
+                ds.item_stream.append(media)
+            if child_resp[ENTITY_TYPE] == TEXTBLOCK_ENTITY:
+                tb = TextBlock.from_dynamo(child_resp[ENTITY_TYPE])
+                ds.item_stream.append(tb)
+
+        return ds
     else:
         return None
 

@@ -10,7 +10,11 @@ from app.api.routes import (
     READERS
 )
 from app.models.domain.document import Document
-from app.models.schemas.content import ContentWriteResponse, DocumentUpdateIn, Message
+from app.models.schemas.content import (
+    ContentWriteResponse,
+    DocumentUpdateIn,
+    Message
+)
 from app.services.dal import content_svc
 
 router = APIRouter()
@@ -82,7 +86,8 @@ async def get_documents_by_topic(ns: str) -> List[Document]:
 async def patch_document(
         ns: str,
         content_id: str,
-        doc: DocumentUpdateIn) -> ContentWriteResponse:
+        doc: DocumentUpdateIn
+) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
         content_id=content_id,
@@ -106,7 +111,8 @@ async def patch_document(
 async def update_document(
         ns: str,
         content_id: str,
-        doc: DocumentUpdateIn) -> ContentWriteResponse:
+        doc: DocumentUpdateIn
+) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
         content_id=content_id,

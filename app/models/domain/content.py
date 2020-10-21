@@ -26,8 +26,12 @@ VERSION = "Version"
 CREATEDAT = "CreatedAt"
 UPDATEDAT = "UpdatedAt"
 TYPE = "Type"
-ENTITY_TYPE = "EntityType"
 POSITION = "Position"
+ENTITY_TYPE = "EntityType"
+DOCUMENT_ENTITY = "Document"
+DOCSTREAM_ENTITY = "DocStream"
+MEDIA_ENTITY = "Media"
+TEXTBLOCK_ENTITY = "TextBlock"
 
 
 class Content(DateTimeModelMixin, ModelConfigMixin):
@@ -36,6 +40,7 @@ class Content(DateTimeModelMixin, ModelConfigMixin):
     user_id: EmailStr = EXAMPLE_EMAIL
     score: int = EXAMPLE_NUMBER
     version: int = EXAMPLE_NUMBER
+
 
 class ContentRef(ModelConfigMixin):
     namespace: str
