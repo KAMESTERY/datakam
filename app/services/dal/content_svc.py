@@ -1,3 +1,5 @@
+
+import asyncio
 from typing import Union, List
 
 from loguru import logger
@@ -10,7 +12,7 @@ from app.models.domain.content import (
     CONTENTID,
     CONTENT_TBL,
     ContentDynaInOutInterface,
-    ContentDynaUpdateInterface
+    ContentDynaUpdateInterface, DOCUMENT_ENTITY, DOCSTREAM_ENTITY
 )
 from app.models.domain.docstream import DocStream
 from app.models.domain.document import Document
@@ -22,61 +24,46 @@ from app.services.dal import dynamodb_svc
 
 async def create_content(
         content: ContentDynaInOutInterface
-) -> ContentWriteResponse:
-    item = content.to_dynamo()
+) -> Union[ContentWriteResponse, List[ContentWriteResponse]]:
+    key = content.get_key()
+    logger.debug(f"Content Key: {key}")
 
-    ns = item[NAMESPACE]
-    content_id = item[CONTENTID]
-
-    existing_doc = await get_document(ns=ns, content_id=content_id)
+    existing_doc = await dynamodb_svc.get_item(tbl_name=CONTENT_TBL, key=key)
     if existing_doc: return None
 
-    logger.debug(f"Content Item: {item}")
-    response = await dynamodb_svc.put_item(
-        tbl_name=CONTENT_TBL,
-        item=item,
-    )
+    new_content = content.to_dynamo()
+    entity_type = content.get_entity_type()
 
-    logger.debug(f"Create Response: {response}")
-
-    return ContentWriteResponse(
-        message="Document was created.",
-        namespace=ns,
-        content_id=content_id
-    )
-
-
-async def batch_create_content(
-        *contents: ContentDynaInOutInterface
-) -> List[ContentWriteResponse]:
-    items = [content.to_dynamo() for content in contents]
-    for item in items:
-
-        ns = item[NAMESPACE]
-        content_id = item[CONTENTID]
-
-        existing_doc = await get_document(ns=ns, content_id=content_id)
-        if existing_doc: return None
-
-    logger.debug(f"Content Items: {items}")
-    responses = await dynamodb_svc.batch_put_item(
-        tbl_name=CONTENT_TBL,
-        item=items,
-    )
-
-    logger.debug(f"Create Response: {responses}")
-
-    return [
-        ContentWriteResponse(
-            message="Document was created.",
-            namespace=ns,
-            content_id=content_id
+    if entity_type == DOCUMENT_ENTITY:
+        response = await dynamodb_svc.put_item(
+            tbl_name=CONTENT_TBL,
+            item=new_content,
         )
-        for item in items if (
-            ns := item[NAMESPACE],
-            content_id := item[CONTENTID]
+        logger.debug(f"Create Response: {response}")
+        return ContentWriteResponse(
+            message="Content was created.",
+            namespace=key[NAMESPACE],
+            content_id=key[CONTENTID]
         )
-    ]
+    elif entity_type == DOCSTREAM_ENTITY:
+        responses = await dynamodb_svc.batch_put_item(
+            tbl_name=CONTENT_TBL,
+            items=new_content,
+        )
+        logger.debug(f"Create Responses: {responses}")
+        return [
+            ContentWriteResponse(
+                message="Content was created.",
+                namespace=ns,
+                content_id=content_id
+            )
+            for item in new_content if (
+                ns := item[NAMESPACE],
+                content_id := item[CONTENTID]
+            )
+        ]
+    else:
+        return None
 
 
 async def get_document(
@@ -128,10 +115,10 @@ async def get_document_stream(
         ds.item_stream = []
         for child_resp in child_responses:
             if child_resp[ENTITY_TYPE] == MEDIA_ENTITY:
-                media = Media.from_dynamo(child_resp[ENTITY_TYPE])
+                media = Media.from_dynamo(child_resp)
                 ds.item_stream.append(media)
             if child_resp[ENTITY_TYPE] == TEXTBLOCK_ENTITY:
-                tb = TextBlock.from_dynamo(child_resp[ENTITY_TYPE])
+                tb = TextBlock.from_dynamo(child_resp)
                 ds.item_stream.append(tb)
 
         return ds
@@ -165,12 +152,31 @@ async def delete_content(
     key = dict()
     key[NAMESPACE] = ns
     key[CONTENTID] = content_id
-    response = await dynamodb_svc.delete_item(
-        tbl_name=CONTENT_TBL,
-        key=key,
-    )
 
-    logger.debug(f"Delete Response: {response}")
+    logger.debug(f"Content Key: {key}")
+
+    existing_doc = await dynamodb_svc.get_item(CONTENT_TBL, key)
+    if existing_doc is None: return None
+
+    if existing_doc[ENTITY_TYPE] == DOCUMENT_ENTITY:
+        response = await dynamodb_svc.delete_item(
+            tbl_name=CONTENT_TBL,
+            key=key,
+        )
+        logger.debug(f"Delete Response: {response}")
+
+    elif existing_doc[ENTITY_TYPE] == DOCSTREAM_ENTITY:
+        ds = await get_document_stream(ns=ns, content_id=content_id)
+
+        keys = [itms.get_key() for itms in ds.item_stream]
+        keys.append(key)
+        responses = await dynamodb_svc.batch_delete_item(
+            tbl_name=CONTENT_TBL,
+            keys=keys,
+        )
+        logger.debug(f"Delete Responses: {responses}")
+    else:
+        return None
 
     return ContentWriteResponse(
         message="Content was deleted.",
@@ -183,26 +189,49 @@ async def update_content(
         ns: str,
         content_id: str,
         content: ContentDynaUpdateInterface
-) -> ContentWriteResponse:
-
-    if type(content) is Document:
-        existing_doc = await get_document(ns=ns, content_id=content_id)
-        if not existing_doc: return None
+) -> Union[ContentWriteResponse,List[ContentWriteResponse]]:
     key = dict()
     key[NAMESPACE] = ns
     key[CONTENTID] = content_id
-    new_item = content.to_dynamo_update()
-    logger.debug(f"Content Item new: {new_item}")
-    response = await dynamodb_svc.update_item(
-        tbl_name=CONTENT_TBL,
-        key=key,
-        new_item=new_item,
-    )
 
-    logger.debug(f"Update Response: {response}")
+    existing_doc = await dynamodb_svc.get_item(tbl_name=CONTENT_TBL, key=key)
+    if existing_doc: return None
 
-    return ContentWriteResponse(
-        message="Content was updated.",
-        namespace=ns,
-        content_id=content_id
-    )
+    new_content = content.to_dynamo_update()
+    entity_type = content.get_entity_type()
+
+    if entity_type == DOCUMENT_ENTITY:
+        response = await dynamodb_svc.update_item(
+            tbl_name=CONTENT_TBL,
+            key=key,
+            new_item=new_content,
+        )
+        logger.debug(f"Update Response: {response}")
+        return ContentWriteResponse(
+            message="Content was updated.",
+            namespace=ns,
+            content_id=content_id
+        )
+    elif entity_type == DOCSTREAM_ENTITY:
+        tasks = []
+        for item in new_content:
+            task = dynamodb_svc.update_item(
+                tbl_name=CONTENT_TBL,
+                key=item.get_key(),
+                new_item=new_content,
+            )
+            tasks.append(task)
+        responses = await asyncio.wait(tasks)
+        logger.debug(f"Create Responses: {responses}")
+        return [
+            ContentWriteResponse(
+                message="Content was updated.",
+                namespace=item[NAMESPACE],
+                content_id=item[CONTENTID]
+            )
+            for item in new_content
+        ]
+    else:
+        return None
+
+

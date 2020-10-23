@@ -67,6 +67,17 @@ class Document(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
     niveau: int = EXAMPLE_NUMBER
     media: Optional[List[Media]]
 
+    def get_entity_type(self):
+        return DOCUMENT_ENTITY
+
+    def get_key(self):
+        key = dict()
+
+        key[NAMESPACE] = self.topic
+        key[CONTENTID] = self.document_id
+
+        return key
+
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 

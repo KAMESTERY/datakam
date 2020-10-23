@@ -49,12 +49,7 @@ async def batch_put_item(tbl_name: str, items: List[dict]):
     try:
         table = dynamodb.Table(tbl_name)
 
-        loop = asyncio.get_event_loop()
-
-        responses = await loop.run_in_executor(
-            None,
-            lambda: put_all_items(table, items)
-        )
+        responses = await put_all_items(table, items)
 
         return responses
 
@@ -65,10 +60,22 @@ async def batch_put_item(tbl_name: str, items: List[dict]):
         raise error
 
 
-def put_all_items(table, items: List[dict]):
+async def put_all_items(table, items: List[dict]):
+    loop = asyncio.get_event_loop()
+
+    tasks = []
+
     with table.batch_writer() as batch:
         for item in items:
-            batch.put_item(Item=item)
+            task = loop.run_in_executor(
+                None,
+                batch.put_item(Item=item)
+            )
+            tasks.append(task)
+
+    responses = await asyncio.wait(tasks, loop=loop)
+
+    return responses
 
 
 async def get_item(tbl_name: str, key: dict):
@@ -188,6 +195,42 @@ async def delete_item(tbl_name: str, key: dict):
     except BaseException as error:
         logger.error(f"Unknown error while deleting item: {error.response['Error']['Message']}")
         raise error
+
+
+async def batch_delete_item(tbl_name: str, keys: List[dict]):
+
+    dynamodb = get_dynamodb_resource()
+
+    try:
+        table = dynamodb.Table(tbl_name)
+
+        responses = await delete_all_items(table, keys)
+
+        return responses
+
+    except ClientError as error:
+        handle_error(error)
+    except BaseException as error:
+        logger.error(f"Unknown error while batch deleting item: {error.response['Error']['Message']}")
+        raise error
+
+
+async def delete_all_items(table, keys: List[dict]):
+    loop = asyncio.get_event_loop()
+
+    tasks = []
+
+    with table.batch_writer() as batch:
+        for key in keys:
+            task = loop.run_in_executor(
+                None,
+                batch.delete_item(Key=key)
+            )
+            tasks.append(task)
+
+    responses = await asyncio.wait(tasks, loop=loop)
+
+    return responses
 
 
 async def update_item(tbl_name: str, key: dict, new_item: dict):

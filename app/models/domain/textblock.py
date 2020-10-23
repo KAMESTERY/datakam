@@ -14,7 +14,7 @@ from app.models.domain import (
     EXAMPLE_EMAIL,
     EXAMPLE_TAGS,
     EXAMPLE_NUMBER,
-    EXAMPLE_AUTHOR
+    EXAMPLE_AUTHOR, EXAMPLE_CONTENT_TEXT, EXAMPLE_OTHER_CHILD_ID
 )
 from app.models.domain.content import ContentDynaInOutInterface
 from app.models.domain.content import (
@@ -38,15 +38,26 @@ TEXT = "Text"
 
 class TextBlock(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
     parentdocument_id: str = EXAMPLE_CONTENT_ID
-    textblock_id: str = EXAMPLE_CONTENT_ID
+    textblock_id: str = EXAMPLE_OTHER_CHILD_ID
     user_id: EmailStr = EXAMPLE_EMAIL
     tags: List[str] = EXAMPLE_TAGS
     score: int = EXAMPLE_NUMBER
     version: int = EXAMPLE_NUMBER
     position: int = EXAMPLE_NUMBER
     type: int = EXAMPLE_NUMBER
-    text: str = EXAMPLE_NUMBER
+    text: str = EXAMPLE_CONTENT_TEXT
     author: str = EXAMPLE_AUTHOR
+
+    def get_entity_type(self):
+        return TEXTBLOCK_ENTITY
+
+    def get_key(self):
+        key = dict()
+
+        key[NAMESPACE] = self.parentdocument_id
+        key[CONTENTID] = self.textblock_id
+
+        return key
 
     def to_dynamo(self) -> dict:
         dyn_dict = dict()

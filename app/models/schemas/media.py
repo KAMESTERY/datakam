@@ -12,7 +12,7 @@ from app.models.common import (
     ModelConfigMixin,
     convert_json_to_realworld
 )
-from app.models.domain.content import ContentDynaUpdateInterface
+from app.models.domain.content import ContentDynaUpdateInterface, MEDIA_ENTITY
 from app.models.domain.content import (
     NAMESPACE,
     CONTENTID,
@@ -28,7 +28,7 @@ from app.models.domain.content import (
 FILEURL = "FileUrl"
 
 
-class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
+class MediaUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
     parentdocument_id: str = None
     type: int = None
     media_id: str = None
@@ -38,6 +38,9 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
     version: int = None
     position: int = None
     file_url: HttpUrl = None
+
+    def get_entity_type(self) -> str:
+        return MEDIA_ENTITY
 
     def to_dynamo_update(self) -> dict:
         dyn_update_dict = dict()

@@ -12,9 +12,9 @@ from app.api.routes import (
 from app.models.domain.document import Document
 from app.models.schemas.content import (
     ContentWriteResponse,
-    DocumentUpdateIn,
     Message
 )
+from app.models.schemas.document import DocumentUpdateIn
 from app.services.dal import content_svc
 
 router = APIRouter()
@@ -127,6 +127,9 @@ async def update_document(
 @router.delete(
     "/document/{ns}/{content_id}",
     response_model=ContentWriteResponse,
+    responses={
+        404: {"model": Message, "description": "The item was not found"}
+    },
     name="Delete Document",
     tags=[PROVISIONERS]
 )
@@ -135,4 +138,7 @@ async def delete_document(ns: str, content_id: str) -> ContentWriteResponse:
         ns=ns,
         content_id=content_id
     )
-    return resp
+    return resp if resp else JSONResponse(
+        status_code=404,
+        content={"message": "Item not found"}
+    )

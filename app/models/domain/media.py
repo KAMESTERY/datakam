@@ -50,6 +50,17 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
     position: int = EXAMPLE_NUMBER
     file_url: HttpUrl = EXAMPLE_MEDIA_URL
 
+    def get_entity_type(self):
+        return MEDIA_ENTITY
+
+    def get_key(self):
+        key = dict()
+
+        key[NAMESPACE] = self.parentdocument_id
+        key[CONTENTID] = self.media_id
+
+        return key
+
     def to_dynamo(self) -> dict:
         dyn_dict = dict()
 

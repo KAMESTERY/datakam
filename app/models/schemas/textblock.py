@@ -14,7 +14,7 @@ from app.models.domain.content import (
     CONTENTID,
     POSITION,
     TYPE,
-    ContentDynaUpdateInterface
+    ContentDynaUpdateInterface, TEXTBLOCK_ENTITY
 )
 from app.models.domain.content import (
     USERID,
@@ -28,7 +28,7 @@ AUTHOR = "Author"
 TEXT = "Text"
 
 
-class TextBlock(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
+class TextBlockUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
     parentdocument_id: str = None
     textblock_id: str = None
     user_id: EmailStr = None
@@ -39,6 +39,9 @@ class TextBlock(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface
     type: int = None
     text: str = None
     author: str = None
+
+    def get_entity_type(self) -> str:
+        return TEXTBLOCK_ENTITY
 
     def to_dynamo_update(self) -> dict:
         dyn_update_dict = dict()

@@ -1,6 +1,11 @@
 
 import abc
 
+from typing import (
+    Union,
+    List
+)
+
 from pydantic import (
     EmailStr
 )
@@ -50,7 +55,15 @@ class ContentRef(ModelConfigMixin):
 class ContentDynaInOutInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def to_dynamo(self) -> dict:
+    def get_entity_type(self) -> str:
+        pass
+
+    @abc.abstractmethod
+    def get_key(self) -> dict:
+        pass
+
+    @abc.abstractmethod
+    def to_dynamo(self) -> Union[dict, List[dict]]:
         raise NotImplementedError
 
     @classmethod
@@ -62,6 +75,14 @@ class ContentDynaInOutInterface(metaclass=abc.ABCMeta):
 class ContentDynaUpdateInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def to_dynamo_update(self) -> dict:
+    def get_entity_type(self) -> str:
+        pass
+
+    @abc.abstractmethod
+    def get_key(self) -> dict:
+        pass
+
+    @abc.abstractmethod
+    def to_dynamo_update(self):
         raise NotImplementedError
 
