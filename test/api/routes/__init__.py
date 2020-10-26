@@ -1,14 +1,19 @@
 
 NAMESPACE = "com.kamestery.devdata:##:africa"
-CONTENT_ID = "com.kamestery.devdata:##:africa:##:some-content"
-CHILD_ID = "com.kamestery.devdata:##:africa:##:some-child-content"
-OTHER_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-other-child-content"
+
+DOCUMENT_CONTENT_ID = "com.kamestery.devdata:##:africa:##:some-document-content"
+DOCUMENT_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-document-child-content"
+DOCUMENT_OTHER_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-other-document-child-content"
+
+DOCSTREAM_CONTENT_ID = "com.kamestery.devdata:##:africa:##:some-docstream-content"
+DOCSTREAM_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-docstream-child-content"
+DOCSTREAM_OTHER_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-other-docstream-child-content"
 
 DOCUMENT_DATA = {
     "createdAt": "2020-10-23T18:30:42.415Z",
     "updatedAt": "2020-10-23T18:30:42.415Z",
     "namespace": NAMESPACE,
-    "contentId": CONTENT_ID,
+    "contentId": DOCUMENT_CONTENT_ID,
     "userId": "lb@lambert.kmt",
     "tags": [
         "dev-tag1",
@@ -25,9 +30,9 @@ DOCUMENT_DATA = {
         {
             "createdAt": "2020-10-23T18:30:42.415Z",
             "updatedAt": "2020-10-23T18:30:42.415Z",
-            "contentId": "com.kamestery.devdata:##:africa:##:some-content",
+            "contentId": DOCUMENT_CONTENT_ID,
             "score": 4,
-            "mediaId": "com.kamestery.devdata:##:africa:##:some-child-content",
+            "mediaId": DOCUMENT_CHILD_ID,
             "userId": "lb@lambert.kmt",
             "tags": [
                 "dev-tag1",
@@ -45,7 +50,7 @@ DOCUMENT_UPDATE_DATA = {
     "createdAt": "2020-10-23T18:30:42.415Z",
     "updatedAt": "2020-10-23T18:30:42.415Z",
     "namespace": NAMESPACE,
-    "contentId": CONTENT_ID,
+    "contentId": DOCUMENT_CONTENT_ID,
     "userId": "lb@lambert.kmt",
     "tags": [
         "dev-tag1",
@@ -62,9 +67,9 @@ DOCUMENT_UPDATE_DATA = {
         {
             "createdAt": "2020-10-23T18:30:42.415Z",
             "updatedAt": "2020-10-23T18:30:42.415Z",
-            "contentId": "com.kamestery.devdata:##:africa:##:some-content",
+            "contentId": DOCUMENT_CONTENT_ID,
             "score": 4,
-            "mediaId": "com.kamestery.devdata:##:africa:##:some-child-content",
+            "mediaId": DOCUMENT_CHILD_ID,
             "userId": "lb@lambert.kmt",
             "tags": [
                 "dev-tag1",
@@ -78,12 +83,66 @@ DOCUMENT_UPDATE_DATA = {
 }
 
 
+DOCSTREAM_DATA = {
+  "createdAt": "2020-10-26T01:33:23.676Z",
+  "updatedAt": "2020-10-26T01:33:23.676Z",
+  "namespace": NAMESPACE,
+  "contentId": DOCSTREAM_CONTENT_ID,
+  "userId": "lb@lambert.kmt",
+  "score": 4,
+  "version": 4,
+  "itemStream": [
+    {
+      "createdAt": "2020-10-26T01:33:23.676Z",
+      "updatedAt": "2020-10-26T01:33:23.676Z",
+      "contentId": DOCSTREAM_CONTENT_ID,
+      "score": 4,
+      "mediaId": DOCSTREAM_CHILD_ID,
+      "userId": "lb@lambert.kmt",
+      "tags": [
+        "dev-tag1",
+        "dev-tag2",
+        "dev-tag3",
+        "dev-tag4"
+      ],
+      "fileUrl": "https://location.of.media.file"
+    },
+    {
+      "createdAt": "2020-10-26T01:33:23.676Z",
+      "updatedAt": "2020-10-26T01:33:23.676Z",
+      "contentId": DOCSTREAM_CONTENT_ID,
+      "textblockId": DOCSTREAM_OTHER_CHILD_ID,
+      "userId": "lb@lambert.kmt",
+      "tags": [
+        "dev-tag1",
+        "dev-tag2",
+        "dev-tag3",
+        "dev-tag4"
+      ],
+      "score": 4,
+      "body": "Vivamus quis nibh metus. Maecenas maximus nunc in quam tristique bibendum. Phasellus semper semper finibus. Curabitur sit amet sodales felis, ac egestas mauris. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean efficitur, odio vulputate rutrum vulputate, ipsum nulla tincidunt lectus, quis aliquet ante felis id lorem. Aliquam id tempor magna, nec luctus lacus. Quisque ullamcorper purus vel lectus porttitor aliquam. Maecenas quis varius velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Pellentesque dapibus ligula non justo interdum, eu rutrum est laoreet. Nulla volutpat nisi nec nisi auctor sagittis. In et blandit eros. Vivamus auctor enim augue, at pulvinar mi venenatis id.",
+      "author": "Lambert Dagobert <lb@lambert.kmt>"
+    }
+  ]
+}
+
+
 def validate_document(res_doc: dict):
-    assert res_doc["namespace"] == DOCUMENT_DATA["namespace"]
-    assert res_doc["contentId"] == DOCUMENT_DATA["contentId"]
-    assert res_doc["userId"] == DOCUMENT_DATA["userId"]
-    assert res_doc["media"][0]["contentId"] == DOCUMENT_DATA["media"][0]["contentId"]
-    assert res_doc["media"][0]["mediaId"] == DOCUMENT_DATA["media"][0]["mediaId"]
+    assert res_doc['namespace'] == DOCUMENT_DATA['namespace']
+    assert res_doc['contentId'] == DOCUMENT_DATA['contentId']
+    assert res_doc['userId'] == DOCUMENT_DATA['userId']
+    assert res_doc['media'][0]['contentId'] == DOCUMENT_DATA['media'][0]['contentId']
+    assert res_doc['media'][0]['mediaId'] == DOCUMENT_DATA['media'][0]['mediaId']
+
+
+def validate_document_stream(res_doc: dict):
+    assert res_doc['namespace'] == DOCSTREAM_DATA['namespace']
+    assert res_doc['contentId'] == DOCSTREAM_DATA['contentId']
+    assert res_doc['userId'] == DOCSTREAM_DATA['userId']
+    assert res_doc['itemStream'][0]['contentId'] == DOCUMENT_DATA['itemStream'][0]['contentId']
+    assert res_doc['itemStream'][0]['textblockId'] == DOCUMENT_DATA['itemStream'][0]['textblockId']
+    assert res_doc['itemStream'][1]['contentId'] == DOCSTREAM_DATA['itemStream'][1]['contentId']
+    assert res_doc['itemStream'][1]['mediaId'] == DOCSTREAM_DATA['itemStream'][1]['mediaId']
 
 
 def dicts_match(d1: dict, d2: dict, path="") -> bool:

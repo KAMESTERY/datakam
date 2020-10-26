@@ -23,7 +23,7 @@ docstream_api = APIRouter()
 @docstream_api.post(
     "/docstream",
     status_code=201,
-    response_model=List[ContentWriteResponse],
+    response_model=ContentWriteResponse,
     responses={
         409: {"model": Message,
               "description": """
@@ -41,6 +41,20 @@ async def create_document_stream(ds: DocStream) -> ContentWriteResponse:
         status_code=409,
         content={"message": "Conflict"}
     )
+
+
+@docstream_api.get(
+    "/docstream/{ns}",
+    response_model=List[DocStream],
+    description="Get Document Streams by Topic",
+    operation_id="DocumentStreams_GET_by_Topic",
+    tags=[READERS]
+)
+async def get_document_streams_by_topic(ns: str) -> List[DocStream]:
+    resp = await content_svc.get_document_streams_by_topic(
+        ns=ns
+    )
+    return resp
 
 
 @docstream_api.get(
@@ -91,7 +105,7 @@ async def patch_document_stream(
 
 
 @docstream_api.put(
-    "/docstream/{ns}/{content_id}",
+    "/docstream/{ns}/{content_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}
@@ -117,7 +131,7 @@ async def update_document_stream(
 
 
 @docstream_api.delete(
-    "/docstream/{ns}/{content_id}",
+    "/docstream/{ns}/{content_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}

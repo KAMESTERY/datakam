@@ -131,6 +131,8 @@ async def get_documents_by_topic(
         tbl_name=CONTENT_TBL,
         partition_name=NAMESPACE,
         partition_value=ns,
+        entity_name=ENTITY_TYPE,
+        entity_value=DOCUMENT_ENTITY,
     )
 
     logger.debug(f"Query Document by Topic Response: {response}")
@@ -139,9 +141,9 @@ async def get_documents_by_topic(
         docs = [Document.from_dynamo(item) for item in response]
         for doc in docs:
             media_responses = await dynamodb_svc.query_by_partition(
-                CONTENT_TBL,
-                NAMESPACE,
-                doc.document_id
+                tbl_name=CONTENT_TBL,
+                partition_name=NAMESPACE,
+                partition_value=doc.document_id,
             )
             doc.media = []
             for media_resp in media_responses:
@@ -151,6 +153,42 @@ async def get_documents_by_topic(
 
         logger.debug(f"Retrieved Documents: {docs}")
         return docs
+    else:
+        return []
+
+
+async def get_document_streams_by_topic(
+        ns: str
+) -> List[DocStream]:
+    response = await dynamodb_svc.query_by_partition(
+        tbl_name=CONTENT_TBL,
+        partition_name=NAMESPACE,
+        partition_value=ns,
+        entity_name=ENTITY_TYPE,
+        entity_value=DOCSTREAM_ENTITY,
+    )
+
+    logger.debug(f"Query Document Stream by Topic Response: {response}")
+
+    if response:
+        dss = [DocStream.from_dynamo(item) for item in response]
+        for ds in dss:
+            item_stream_responses = await dynamodb_svc.query_by_partition(
+                tbl_name=CONTENT_TBL,
+                partition_name=NAMESPACE,
+                partition_value=ds.content_id,
+            )
+            ds.item_stream = []
+            for item_stream_resp in item_stream_responses:
+                if item_stream_resp[ENTITY_TYPE] == MEDIA_ENTITY:
+                    item_stream = Media.from_dynamo(item_stream_resp)
+                    ds.item_stream.append(item_stream)
+                if item_stream_resp[ENTITY_TYPE] == TEXTBLOCK_ENTITY:
+                    item_stream = TextBlock.from_dynamo(item_stream_resp)
+                    ds.item_stream.append(item_stream)
+
+        logger.debug(f"Retrieved Document Streams: {dss}")
+        return dss
     else:
         return []
 

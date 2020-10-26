@@ -142,6 +142,8 @@ async def query_by_partition(
         tbl_name: str,
         partition_name: str,
         partition_value: str,
+        entity_name: str = None,
+        entity_value: str = None,
 ):
 
     dynamodb = get_dynamodb_resource()
@@ -151,11 +153,16 @@ async def query_by_partition(
 
         loop = asyncio.get_event_loop()
 
+        if entity_name and entity_value:
+            kce = Key(partition_name).eq(partition_value) & Key(entity_name).eq(entity_value)
+        else:
+            kce = Key(partition_name).eq(partition_value)
+
         response = await loop.run_in_executor(
             None,
             lambda: table.query(
                 **dict(
-                    KeyConditionExpression=Key(partition_name).eq(partition_value),
+                    KeyConditionExpression=kce,
                     ScanIndexForward=False # true = ascending, false = descending
                 )
             )
