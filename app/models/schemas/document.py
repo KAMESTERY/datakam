@@ -50,7 +50,9 @@ class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
     def get_entity_type(self) -> str:
         return DOCUMENT_ENTITY
 
-    def to_dynamo_update(self) -> dict:
+    def to_dynamo_update(self) -> List[dict]:
+        list_of_dyn_update_dicts = [itms.to_dynamo_update() for itms in self.media]
+
         dyn_update_dict = dict()
 
         if self.user_id: dyn_update_dict[USERID] = self.user_id
@@ -67,4 +69,6 @@ class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
         if self.niveau: dyn_update_dict[NIVEAU] = self.niveau
         dyn_update_dict[UPDATEDAT] = convert_json_to_realworld(datetime.now())
 
-        return dyn_update_dict
+        list_of_dyn_update_dicts.append(dyn_update_dict)
+
+        return list_of_dyn_update_dicts

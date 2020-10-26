@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import List, Union
 
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
@@ -17,11 +17,12 @@ from app.models.schemas.content import (
 from app.models.schemas.document import DocumentUpdateIn
 from app.services.dal import content_svc
 
-router = APIRouter()
+document_api = APIRouter()
 
 
-@router.post(
+@document_api.post(
     "/document",
+    status_code=201,
     response_model=ContentWriteResponse,
     responses={
         409: {"model": Message,
@@ -30,7 +31,8 @@ router = APIRouter()
               with the current state of the target resource
               """}
     },
-    name="Create a Document",
+    description="Create a Document",
+    operation_id="Document_POST",
     tags=[PROVISIONERS]
 )
 async def create_document(doc: Document) -> ContentWriteResponse:
@@ -41,13 +43,28 @@ async def create_document(doc: Document) -> ContentWriteResponse:
     )
 
 
-@router.get(
-    "/document/{ns}/{content_id}",
+@document_api.get(
+    "/document/{ns}",
+    response_model=List[Document],
+    description="Get Documents by Topic",
+    operation_id="Documents_GET_by_Topic",
+    tags=[READERS]
+)
+async def get_documents_by_topic(ns: str) -> List[Document]:
+    resp = await content_svc.get_documents_by_topic(
+        ns=ns
+    )
+    return resp
+
+
+@document_api.get(
+    "/document/{ns}/{content_id}/",
     response_model=Document,
     responses={
         404: {"model": Message, "description": "The item was not found"}
     },
-    name="Retrieve Document",
+    description="Retrieve Document",
+    operation_id="Document_GET",
     tags=[READERS]
 )
 async def retrieve_document(ns: str, content_id: str) -> Document:
@@ -61,26 +78,14 @@ async def retrieve_document(ns: str, content_id: str) -> Document:
     )
 
 
-@router.get(
-    "/document/{ns}",
-    response_model=List[Document],
-    name="Get Documents by Topic",
-    tags=[READERS]
-)
-async def get_documents_by_topic(ns: str) -> List[Document]:
-    resp = await content_svc.get_documents_by_topic(
-        ns=ns
-    )
-    return resp
-
-
-@router.patch(
-    "/document/{ns}/{content_id}",
+@document_api.patch(
+    "/document/{ns}/{content_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}
     },
-    name="Patch Document",
+    description="Patch Document",
+    operation_id="Document_PATCH",
     tags=[ADMIN]
 )
 async def patch_document(
@@ -99,13 +104,14 @@ async def patch_document(
     )
 
 
-@router.put(
-    "/document/{ns}/{content_id}",
+@document_api.put(
+    "/document/{ns}/{content_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}
     },
-    name="Update Document",
+    description="Update Document",
+    operation_id="Document_UPDATE",
     tags=[ADMIN]
 )
 async def update_document(
@@ -124,13 +130,14 @@ async def update_document(
     )
 
 
-@router.delete(
-    "/document/{ns}/{content_id}",
+@document_api.delete(
+    "/document/{ns}/{content_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}
     },
-    name="Delete Document",
+    description="Delete Document",
+    operation_id="Document_DELETE",
     tags=[PROVISIONERS]
 )
 async def delete_document(ns: str, content_id: str) -> ContentWriteResponse:

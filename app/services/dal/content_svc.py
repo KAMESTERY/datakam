@@ -22,9 +22,7 @@ from app.models.schemas.content import ContentWriteResponse
 from app.services.dal import dynamodb_svc
 
 
-async def create_content(
-        content: ContentDynaInOutInterface
-) -> Union[ContentWriteResponse, List[ContentWriteResponse]]:
+async def create_content(content: ContentDynaInOutInterface) -> ContentWriteResponse:
     key = content.get_key()
     logger.debug(f"Content Key: {key}")
 
@@ -32,38 +30,25 @@ async def create_content(
     if existing_doc: return None
 
     new_content = content.to_dynamo()
-    entity_type = content.get_entity_type()
 
-    if entity_type == DOCUMENT_ENTITY:
-        response = await dynamodb_svc.put_item(
-            tbl_name=CONTENT_TBL,
-            item=new_content,
-        )
-        logger.debug(f"Create Response: {response}")
-        return ContentWriteResponse(
-            message="Content was created.",
-            namespace=key[NAMESPACE],
-            content_id=key[CONTENTID]
-        )
-    elif entity_type == DOCSTREAM_ENTITY:
+    if isinstance(new_content, list):
         responses = await dynamodb_svc.batch_put_item(
             tbl_name=CONTENT_TBL,
             items=new_content,
         )
         logger.debug(f"Create Responses: {responses}")
-        return [
-            ContentWriteResponse(
-                message="Content was created.",
-                namespace=ns,
-                content_id=content_id
-            )
-            for item in new_content if (
-                ns := item[NAMESPACE],
-                content_id := item[CONTENTID]
-            )
-        ]
     else:
-        return None
+        response = await dynamodb_svc.put_item(
+            tbl_name=CONTENT_TBL,
+            item=new_content,
+        )
+        logger.debug(f"Create Response: {response}")
+
+    return ContentWriteResponse(
+        message="Content was created.",
+        namespace=key[NAMESPACE],
+        content_id=key[CONTENTID]
+    )
 
 
 async def get_document(
@@ -83,6 +68,19 @@ async def get_document(
     if response:
         doc = Document.from_dynamo(response)
         logger.debug(f"Retrieved Document: {doc}")
+
+        media_responses = await dynamodb_svc.query_by_partition(
+            CONTENT_TBL,
+            NAMESPACE,
+            content_id
+        )
+
+        doc.media = []
+        for media_resp in media_responses:
+            if media_resp[ENTITY_TYPE] == MEDIA_ENTITY:
+                media = Media.from_dynamo(media_resp)
+                doc.media.append(media)
+
         return doc
     else:
         return None
@@ -139,6 +137,18 @@ async def get_documents_by_topic(
 
     if response:
         docs = [Document.from_dynamo(item) for item in response]
+        for doc in docs:
+            media_responses = await dynamodb_svc.query_by_partition(
+                CONTENT_TBL,
+                NAMESPACE,
+                doc.document_id
+            )
+            doc.media = []
+            for media_resp in media_responses:
+                if media_resp[ENTITY_TYPE] == MEDIA_ENTITY:
+                    media = Media.from_dynamo(media_resp)
+                    doc.media.append(media)
+
         logger.debug(f"Retrieved Documents: {docs}")
         return docs
     else:
@@ -159,15 +169,17 @@ async def delete_content(
     if existing_doc is None: return None
 
     if existing_doc[ENTITY_TYPE] == DOCUMENT_ENTITY:
-        response = await dynamodb_svc.delete_item(
+        doc = await get_document(ns=ns, content_id=content_id)
+        keys = [itms.get_key() for itms in doc.media]
+        keys.append(key)
+        responses = await dynamodb_svc.batch_delete_item(
             tbl_name=CONTENT_TBL,
-            key=key,
+            keys=keys,
         )
-        logger.debug(f"Delete Response: {response}")
+        logger.debug(f"Delete Responses: {responses}")
 
     elif existing_doc[ENTITY_TYPE] == DOCSTREAM_ENTITY:
         ds = await get_document_stream(ns=ns, content_id=content_id)
-
         keys = [itms.get_key() for itms in ds.item_stream]
         keys.append(key)
         responses = await dynamodb_svc.batch_delete_item(
@@ -189,7 +201,7 @@ async def update_content(
         ns: str,
         content_id: str,
         content: ContentDynaUpdateInterface
-) -> Union[ContentWriteResponse,List[ContentWriteResponse]]:
+) -> ContentWriteResponse:
     key = dict()
     key[NAMESPACE] = ns
     key[CONTENTID] = content_id
@@ -200,38 +212,29 @@ async def update_content(
     new_content = content.to_dynamo_update()
     entity_type = content.get_entity_type()
 
-    if entity_type == DOCUMENT_ENTITY:
+    if isinstance(new_content, list):
+        tasks = []
+        for item in new_content:
+            task = dynamodb_svc.update_item(
+                tbl_name=CONTENT_TBL,
+                key=item.get_key(),
+                new_item=item,
+            )
+            tasks.append(task)
+        responses = await asyncio.wait(tasks)
+        logger.debug(f"Create Responses: {responses}")
+    else:
         response = await dynamodb_svc.update_item(
             tbl_name=CONTENT_TBL,
             key=key,
             new_item=new_content,
         )
         logger.debug(f"Update Response: {response}")
-        return ContentWriteResponse(
-            message="Content was updated.",
-            namespace=ns,
-            content_id=content_id
-        )
-    elif entity_type == DOCSTREAM_ENTITY:
-        tasks = []
-        for item in new_content:
-            task = dynamodb_svc.update_item(
-                tbl_name=CONTENT_TBL,
-                key=item.get_key(),
-                new_item=new_content,
-            )
-            tasks.append(task)
-        responses = await asyncio.wait(tasks)
-        logger.debug(f"Create Responses: {responses}")
-        return [
-            ContentWriteResponse(
-                message="Content was updated.",
-                namespace=item[NAMESPACE],
-                content_id=item[CONTENTID]
-            )
-            for item in new_content
-        ]
-    else:
-        return None
+
+    return ContentWriteResponse(
+        message="Content was updated.",
+        namespace=ns,
+        content_id=content_id
+    )
 
 

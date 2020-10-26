@@ -24,6 +24,11 @@ pylint = "*"
 httpx = "*"
 loguru = "*"
 graphene-pydantic = "*"
+pytest = "*"
+tox = "*"
+tox-pipenv = "*"
+flake8 = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.8"

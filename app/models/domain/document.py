@@ -78,7 +78,9 @@ class Document(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
 
         return key
 
-    def to_dynamo(self) -> dict:
+    def to_dynamo(self) -> List[dict]:
+        list_of_dyn_dicts = [itms.to_dynamo() for itms in self.media]
+
         dyn_dict = dict()
 
         dyn_dict[ENTITY_TYPE] = DOCUMENT_ENTITY
@@ -99,7 +101,9 @@ class Document(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
         dyn_dict[CREATEDAT] = convert_json_to_realworld(self.created_at)
         dyn_dict[UPDATEDAT] = convert_json_to_realworld(self.updated_at)
 
-        return dyn_dict
+        list_of_dyn_dicts.append(dyn_dict)
+
+        return list_of_dyn_dicts
 
     @classmethod
     def from_dynamo(cls, item: dict) -> 'Document':

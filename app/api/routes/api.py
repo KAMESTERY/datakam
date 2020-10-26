@@ -9,12 +9,12 @@ from app.api.routes import (
 router = APIRouter()
 
 router.include_router(
-    document.router,
+    document.document_api,
     prefix="/content"
 )
 
 router.include_router(
-    docstream.router,
+    docstream.docstream_api,
     prefix="/content"
 )
 
