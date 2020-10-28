@@ -139,10 +139,10 @@ def validate_document_stream(res_doc: dict):
     assert res_doc['namespace'] == DOCSTREAM_DATA['namespace']
     assert res_doc['contentId'] == DOCSTREAM_DATA['contentId']
     assert res_doc['userId'] == DOCSTREAM_DATA['userId']
-    assert res_doc['itemStream'][0]['contentId'] == DOCUMENT_DATA['itemStream'][0]['contentId']
-    assert res_doc['itemStream'][0]['textblockId'] == DOCUMENT_DATA['itemStream'][0]['textblockId']
-    assert res_doc['itemStream'][1]['contentId'] == DOCSTREAM_DATA['itemStream'][1]['contentId']
-    assert res_doc['itemStream'][1]['mediaId'] == DOCSTREAM_DATA['itemStream'][1]['mediaId']
+    assert res_doc['itemStream'][1]['contentId'] == DOCSTREAM_DATA['itemStream'][0]['contentId']
+    assert res_doc['itemStream'][1]['mediaId'] == DOCSTREAM_DATA['itemStream'][0]['mediaId']
+    assert res_doc['itemStream'][0]['contentId'] == DOCSTREAM_DATA['itemStream'][1]['contentId']
+    assert res_doc['itemStream'][0]['textblockId'] == DOCSTREAM_DATA['itemStream'][1]['textblockId']
 
 
 def dicts_match(d1: dict, d2: dict, path="") -> bool:

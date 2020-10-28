@@ -7,7 +7,11 @@ from typing import (
 )
 
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import (
+    And,
+    Attr,
+    Key
+)
 
 from botocore.exceptions import ClientError
 from loguru import logger
@@ -142,8 +146,6 @@ async def query_by_partition(
         tbl_name: str,
         partition_name: str,
         partition_value: str,
-        entity_name: str = None,
-        entity_value: str = None,
 ):
 
     dynamodb = get_dynamodb_resource()
@@ -153,20 +155,18 @@ async def query_by_partition(
 
         loop = asyncio.get_event_loop()
 
-        if entity_name and entity_value:
-            kce = Key(partition_name).eq(partition_value) & Key(entity_name).eq(entity_value)
-        else:
-            kce = Key(partition_name).eq(partition_value)
-
         response = await loop.run_in_executor(
             None,
             lambda: table.query(
                 **dict(
-                    KeyConditionExpression=kce,
+                    # IndexName="UserIDIndex",
+                    KeyConditionExpression=Key(partition_name).eq(partition_value),
                     ScanIndexForward=False # true = ascending, false = descending
                 )
             )
         )
+
+        logger.info(f"Query Results: {response}")
 
         return response.get('Items', [])
 

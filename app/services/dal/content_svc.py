@@ -131,8 +131,6 @@ async def get_documents_by_topic(
         tbl_name=CONTENT_TBL,
         partition_name=NAMESPACE,
         partition_value=ns,
-        entity_name=ENTITY_TYPE,
-        entity_value=DOCUMENT_ENTITY,
     )
 
     logger.debug(f"Query Document by Topic Response: {response}")
@@ -164,8 +162,6 @@ async def get_document_streams_by_topic(
         tbl_name=CONTENT_TBL,
         partition_name=NAMESPACE,
         partition_value=ns,
-        entity_name=ENTITY_TYPE,
-        entity_value=DOCSTREAM_ENTITY,
     )
 
     logger.debug(f"Query Document Stream by Topic Response: {response}")
