@@ -29,6 +29,10 @@ tox = "*"
 tox-pipenv = "*"
 flake8 = "*"
 coverage = "*"
+cryptography = "*"
+python-jose = "*"
+bcrypt = "*"
+passlib = "*"
 
 [requires]
 python_version = "3.8"

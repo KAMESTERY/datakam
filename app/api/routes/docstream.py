@@ -1,7 +1,7 @@
 
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from starlette.responses import JSONResponse
 
 from app.api.routes import (
@@ -50,7 +50,9 @@ async def create_document_stream(ds: DocStream) -> ContentWriteResponse:
     operation_id="DocumentStreams_GET_by_Topic",
     tags=[READERS]
 )
-async def get_document_streams_by_topic(ns: str) -> List[DocStream]:
+async def get_document_streams_by_topic(
+        ns: str = Path(..., title="Namespace")
+) -> List[DocStream]:
     resp = await content_svc.get_document_streams_by_topic(
         ns=ns
     )
@@ -67,7 +69,10 @@ async def get_document_streams_by_topic(ns: str) -> List[DocStream]:
     operation_id="DocumentStream_GET",
     tags=[READERS]
 )
-async def retrieve_document_stream(ns: str, content_id: str) -> DocStream:
+async def retrieve_document_stream(
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
+) -> DocStream:
     resp = await content_svc.get_document_stream(
         ns=ns,
         content_id=content_id
@@ -89,9 +94,9 @@ async def retrieve_document_stream(ns: str, content_id: str) -> DocStream:
     tags=[ADMIN]
 )
 async def patch_document_stream(
-        ns: str,
-        content_id: str,
-        doc: DocStreamUpdateIn
+        doc: DocStreamUpdateIn,
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
@@ -115,9 +120,9 @@ async def patch_document_stream(
     tags=[ADMIN]
 )
 async def update_document_stream(
-        ns: str,
-        content_id: str,
-        doc: DocStreamUpdateIn
+        doc: DocStreamUpdateIn,
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
@@ -140,7 +145,10 @@ async def update_document_stream(
     operation_id="DocumentStream_DELETE",
     tags=[PROVISIONERS]
 )
-async def delete_document_stream(ns: str, content_id: str) -> ContentWriteResponse:
+async def delete_document_stream(
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
+) -> ContentWriteResponse:
     resp = await content_svc.delete_content(
         ns=ns,
         content_id=content_id

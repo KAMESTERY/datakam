@@ -1,7 +1,7 @@
 
 from typing import List, Union
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Path, Body
 from starlette.responses import JSONResponse
 
 from app.api.routes import (
@@ -50,7 +50,9 @@ async def create_document(doc: Document) -> ContentWriteResponse:
     operation_id="Documents_GET_by_Topic",
     tags=[READERS]
 )
-async def get_documents_by_topic(ns: str) -> List[Document]:
+async def get_documents_by_topic(
+        ns: str = Path(..., title="Namespace")
+) -> List[Document]:
     resp = await content_svc.get_documents_by_topic(
         ns=ns
     )
@@ -67,7 +69,10 @@ async def get_documents_by_topic(ns: str) -> List[Document]:
     operation_id="Document_GET",
     tags=[READERS]
 )
-async def retrieve_document(ns: str, content_id: str) -> Document:
+async def retrieve_document(
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
+) -> Document:
     resp = await content_svc.get_document(
         ns=ns,
         content_id=content_id
@@ -89,9 +94,9 @@ async def retrieve_document(ns: str, content_id: str) -> Document:
     tags=[ADMIN]
 )
 async def patch_document(
-        ns: str,
-        content_id: str,
-        doc: DocumentUpdateIn
+        doc: DocumentUpdateIn,
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
@@ -115,9 +120,9 @@ async def patch_document(
     tags=[ADMIN]
 )
 async def update_document(
-        ns: str,
-        content_id: str,
-        doc: DocumentUpdateIn
+        doc: DocumentUpdateIn,
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
         ns=ns,
@@ -140,7 +145,10 @@ async def update_document(
     operation_id="Document_DELETE",
     tags=[PROVISIONERS]
 )
-async def delete_document(ns: str, content_id: str) -> ContentWriteResponse:
+async def delete_document(
+        ns: str = Path(..., title="Namespace"),
+        content_id: str = Path(..., title="Content ID")
+) -> ContentWriteResponse:
     resp = await content_svc.delete_content(
         ns=ns,
         content_id=content_id
