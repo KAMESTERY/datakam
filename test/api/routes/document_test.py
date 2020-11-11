@@ -45,26 +45,26 @@ def test_get_documents_by_topic():
     # assert dicts_match(res_doc, DOCUMENT_DATA)
     validate_document(res_doc)
 
-# def test_update_document():
-#     response = client.put(
-#         quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"),
-#         json=DOCUMENT_UPDATE_DATA
-#     )
-#     assert response.status_code == 200
-#     assert response.json()  == {
-#         "namespace": NAMESPACE,
-#         "contentId": DOCUMENT_CONTENT_ID,
-#         "message": "Content was updated."
-#     }
-#
-#
-# def test_retrieve_updated_document():
-#     response = client.get(quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"))
-#     assert response.status_code == 200
-#     res_doc = response.json()
-#     assert res_doc.body == "UPDATE UPDATE UPDATE UPDATE"
-#
-#
+def test_update_document():
+    response = client.put(
+        quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"),
+        json=DOCUMENT_UPDATE_DATA
+    )
+    assert response.status_code == 200
+    assert response.json()  == {
+        "namespace": NAMESPACE,
+        "contentId": DOCUMENT_CONTENT_ID,
+        "message": "Content was updated."
+    }
+
+
+def test_retrieve_updated_document():
+    response = client.get(quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"))
+    assert response.status_code == 200
+    res_doc = response.json()
+    assert res_doc.body == "UPDATE UPDATE UPDATE UPDATE"
+
+
 # def test_patch_document_media():
 #     DOCUMENT_PATCH_DATA = dict(
 #         media=[

@@ -77,7 +77,7 @@ async def put_all_items(table, items: List[dict]):
             )
             tasks.append(task)
 
-    responses = await asyncio.wait(tasks, loop=loop)
+    responses = await asyncio.wait(tasks)
 
     return responses
 
@@ -166,7 +166,7 @@ async def query_by_partition(
             )
         )
 
-        logger.info(f"Query Results: {response}")
+        logger.debug(f"Query Results: {response}")
 
         return response.get('Items', [])
 
@@ -235,7 +235,7 @@ async def delete_all_items(table, keys: List[dict]):
             )
             tasks.append(task)
 
-    responses = await asyncio.wait(tasks, loop=loop)
+    responses = await asyncio.wait(tasks)
 
     return responses
 
