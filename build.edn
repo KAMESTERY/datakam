@@ -1,0 +1,11 @@
+
+{:main datakam.core
+ :target :nodejs
+ :source-paths ["src"]
+ :output-to "app.js"
+ :output-dir "build"
+ :compiler-options {:optimizations :simple
+                    :infer-externs :all
+                    :output-feature-set :es7
+                    :fn-invoke-direct true}
+ }

@@ -1,0 +1,53 @@
+# Project related
+
+# Java related
+pom.xml
+pom.xml.asc
+*jar
+*.class
+
+# Leiningen
+classes/
+lib/
+checkouts/
+target/
+.lein-*
+repl-port
+.nrepl-port
+.repl
+
+# Deps dot edn
+.cpcache/
+
+# Temp Files
+*.orig
+*~
+.*.swp
+.*.swo
+*.tmp
+*.bak
+
+# OS X
+.DS_Store
+
+# Logging
+*.log
+/logs/
+
+# Builds
+out/
+build/
+
+# Project
+.idea
+*.iml
+*.der
+*.pem
+
+node_modules
+.shadow-cljs
+native/.idea
+native/cmake-build-debug
+native/target
+native/index.node
+native/artifacts.json

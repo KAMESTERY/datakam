@@ -1,0 +1,5 @@
+{
+ :timeout 8000
+ :secret "strictly-confidential"
+ :port 8080
+ }

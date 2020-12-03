@@ -1,5 +1,6 @@
 (ns datakam.aws.dynamodb
-  (:require [cljs.core.async :refer [go chan put! <!]]
+  (:require [cljs.nodejs :as nodejs]
+            [cljs.core.async :refer [go chan put! <!]]
             [cljs.core.async.interop :refer-macros [<p!]]
             [taoensso.timbre :as log]
             ["aws-sdk" :as aws]))
