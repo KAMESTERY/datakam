@@ -39,6 +39,12 @@ class MediaUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInter
     position: int = None
     file_url: HttpUrl = None
 
+    def get_key(self) -> dict:
+        key = dict()
+
+        key[NAMESPACE] = self.namespace
+        key[CONTENTID] = self.content_id
+
     def get_entity_type(self) -> str:
         return MEDIA_ENTITY
 
@@ -46,8 +52,8 @@ class MediaUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInter
         dyn_update_dict = dict()
 
         if self.parentdocument_id: dyn_update_dict[NAMESPACE] = self.parentdocument_id
-        if self.type: dyn_update_dict[TYPE] = self.type
         if self.media_id: dyn_update_dict[CONTENTID] = self.media_id
+        if self.type: dyn_update_dict[TYPE] = self.type
         if self.user_id: dyn_update_dict[USERID] = self.user_id
         if self.tags: dyn_update_dict[TAGS] = self.tags
         if self.score: dyn_update_dict[SCORE] = self.score

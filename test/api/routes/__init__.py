@@ -12,8 +12,8 @@ DOCSTREAM_OTHER_CHILD_ID = "com.kamestery.devdata:##:africa:##:some-other-docstr
 DOCUMENT_DATA = {
     "createdAt": "2020-10-23T18:30:42.415Z",
     "updatedAt": "2020-10-23T18:30:42.415Z",
-    "namespace": NAMESPACE,
-    "contentId": DOCUMENT_CONTENT_ID,
+    "topic": NAMESPACE,
+    "documentId": DOCUMENT_CONTENT_ID,
     "userId": "lb@lambert.kmt",
     "tags": [
         "dev-tag1",
@@ -49,8 +49,8 @@ DOCUMENT_DATA = {
 DOCUMENT_UPDATE_DATA = {
     "createdAt": "2020-10-23T18:30:42.415Z",
     "updatedAt": "2020-10-23T18:30:42.415Z",
-    "namespace": NAMESPACE,
-    "contentId": DOCUMENT_CONTENT_ID,
+    "topic": NAMESPACE,
+    "documentId": DOCUMENT_CONTENT_ID,
     "userId": "lb@lambert.kmt",
     "tags": [
         "dev-tag1",
@@ -128,8 +128,8 @@ DOCSTREAM_DATA = {
 
 
 def validate_document(res_doc: dict):
-    assert res_doc['namespace'] == DOCUMENT_DATA['namespace']
-    assert res_doc['contentId'] == DOCUMENT_DATA['contentId']
+    assert res_doc['topic'] == DOCUMENT_DATA['topic']
+    assert res_doc['documentId'] == DOCUMENT_DATA['documentId']
     assert res_doc['userId'] == DOCUMENT_DATA['userId']
     assert res_doc['media'][0]['contentId'] == DOCUMENT_DATA['media'][0]['contentId']
     assert res_doc['media'][0]['mediaId'] == DOCUMENT_DATA['media'][0]['mediaId']

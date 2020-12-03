@@ -29,6 +29,10 @@ document_api = APIRouter()
               "description": """
               The request could not be completed due to a conflict\n
               with the current state of the target resource
+              """},
+        422: {"model": Message,
+              "description": """
+              Unprocessable Entity
               """}
     },
     description="Create a Document",
@@ -44,23 +48,23 @@ async def create_document(doc: Document) -> ContentWriteResponse:
 
 
 @document_api.get(
-    "/document/{ns}",
+    "/document/{topic}",
     response_model=List[Document],
     description="Get Documents by Topic",
     operation_id="Documents_GET_by_Topic",
     tags=[READERS]
 )
 async def get_documents_by_topic(
-        ns: str = Path(..., title="Namespace")
+        topic: str = Path(..., title="Topic")
 ) -> List[Document]:
     resp = await content_svc.get_documents_by_topic(
-        ns=ns
+        ns=topic
     )
     return resp
 
 
 @document_api.get(
-    "/document/{ns}/{content_id}/",
+    "/document/{topic}/{document_id}/",
     response_model=Document,
     responses={
         404: {"model": Message, "description": "The item was not found"}
@@ -70,12 +74,12 @@ async def get_documents_by_topic(
     tags=[READERS]
 )
 async def retrieve_document(
-        ns: str = Path(..., title="Namespace"),
-        content_id: str = Path(..., title="Content ID")
+        topic: str = Path(..., title="Topic"),
+        document_id: str = Path(..., title="Document ID")
 ) -> Document:
     resp = await content_svc.get_document(
-        ns=ns,
-        content_id=content_id
+        ns=topic,
+        content_id=document_id
     )
     return resp if resp else JSONResponse(
         status_code=404,
@@ -84,10 +88,14 @@ async def retrieve_document(
 
 
 @document_api.patch(
-    "/document/{ns}/{content_id}/",
+    "/document/{topic}/{document_id}/",
     response_model=ContentWriteResponse,
     responses={
-        404: {"model": Message, "description": "The item was not found"}
+        404: {"model": Message, "description": "The item was not found"},
+        422: {"model": Message,
+              "description": """
+              Unprocessable Entity
+              """}
     },
     description="Patch Document",
     operation_id="Document_PATCH",
@@ -95,12 +103,12 @@ async def retrieve_document(
 )
 async def patch_document(
         doc: DocumentUpdateIn,
-        ns: str = Path(..., title="Namespace"),
-        content_id: str = Path(..., title="Content ID")
+        topic: str = Path(..., title="Topic"),
+        document_id: str = Path(..., title="Document ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
-        ns=ns,
-        content_id=content_id,
+        ns=topic,
+        content_id=document_id,
         content=doc
     )
     return resp if resp else JSONResponse(
@@ -110,10 +118,14 @@ async def patch_document(
 
 
 @document_api.put(
-    "/document/{ns}/{content_id}/",
+    "/document/{topic}/{document_id}/",
     response_model=ContentWriteResponse,
     responses={
-        404: {"model": Message, "description": "The item was not found"}
+        404: {"model": Message, "description": "The item was not found"},
+        422: {"model": Message,
+              "description": """
+              Unprocessable Entity
+              """}
     },
     description="Update Document",
     operation_id="Document_UPDATE",
@@ -121,12 +133,12 @@ async def patch_document(
 )
 async def update_document(
         doc: DocumentUpdateIn,
-        ns: str = Path(..., title="Namespace"),
-        content_id: str = Path(..., title="Content ID")
+        topic: str = Path(..., title="Topic"),
+        document_id: str = Path(..., title="Document ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.update_content(
-        ns=ns,
-        content_id=content_id,
+        ns=topic,
+        content_id=document_id,
         content=doc
     )
     return resp if resp else JSONResponse(
@@ -136,7 +148,7 @@ async def update_document(
 
 
 @document_api.delete(
-    "/document/{ns}/{content_id}/",
+    "/document/{topic}/{document_id}/",
     response_model=ContentWriteResponse,
     responses={
         404: {"model": Message, "description": "The item was not found"}
@@ -146,12 +158,12 @@ async def update_document(
     tags=[PROVISIONERS]
 )
 async def delete_document(
-        ns: str = Path(..., title="Namespace"),
-        content_id: str = Path(..., title="Content ID")
+        topic: str = Path(..., title="Topic"),
+        document_id: str = Path(..., title="Document ID")
 ) -> ContentWriteResponse:
     resp = await content_svc.delete_content(
-        ns=ns,
-        content_id=content_id
+        ns=topic,
+        content_id=document_id
     )
     return resp if resp else JSONResponse(
         status_code=404,

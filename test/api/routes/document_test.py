@@ -51,7 +51,7 @@ def test_update_document():
         json=DOCUMENT_UPDATE_DATA
     )
     assert response.status_code == 200
-    assert response.json()  == {
+    assert response.json() == {
         "namespace": NAMESPACE,
         "contentId": DOCUMENT_CONTENT_ID,
         "message": "Content was updated."
@@ -62,7 +62,8 @@ def test_retrieve_updated_document():
     response = client.get(quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"))
     assert response.status_code == 200
     res_doc = response.json()
-    assert res_doc.body == "UPDATE UPDATE UPDATE UPDATE"
+    print(f"res_doc: {res_doc}")
+    assert res_doc.get('body') == "UPDATE UPDATE UPDATE UPDATE"
 
 
 # def test_patch_document_media():

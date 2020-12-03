@@ -30,6 +30,12 @@ from app.models.schemas.textblock import TextBlockUpdateIn
 class DocStreamUpdateIn(Content, ContentDynaUpdateInterface):
     item_stream: List[Union[MediaUpdateIn,TextBlockUpdateIn]] = []
 
+    def get_key(self) -> dict:
+        key = dict()
+
+        key[NAMESPACE] = self.namespace
+        key[CONTENTID] = self.content_id
+
     def get_entity_type(self):
         return DOCSTREAM_ENTITY
 

@@ -15,8 +15,8 @@ from app.models.common import (
     convert_string_to_datetime
 )
 from app.models.domain import (
-    EXAMPLE_NAMESPACE,
-    EXAMPLE_CONTENT_ID,
+    EXAMPLE_TOPIC,
+    EXAMPLE_DOCUMENT_ID,
     EXAMPLE_EMAIL,
     EXAMPLE_TAGS,
     EXAMPLE_NUMBER,
@@ -51,15 +51,15 @@ NIVEAU = "Niveau"
 
 
 class Document(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
-    topic: str = EXAMPLE_NAMESPACE
-    document_id: str = EXAMPLE_CONTENT_ID
+    topic: str = EXAMPLE_TOPIC
+    document_id: str = EXAMPLE_DOCUMENT_ID
     user_id: EmailStr = EXAMPLE_EMAIL
     tags: List[str] = EXAMPLE_TAGS
     score: int = EXAMPLE_NUMBER
     version: int = EXAMPLE_NUMBER
     slug: str = EXAMPLE_CONTENT_SLUG
     title: str = EXAMPLE_CONTENT_TITLE
-    identifier: str = EXAMPLE_CONTENT_ID
+    identifier: str = EXAMPLE_DOCUMENT_ID
     body: str = EXAMPLE_CONTENT_TEXT
     publish: bool = EXAMPLE_BOOL
     filtre_visuel: int = EXAMPLE_NUMBER

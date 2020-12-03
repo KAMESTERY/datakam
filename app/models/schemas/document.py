@@ -18,6 +18,8 @@ from app.models.domain.content import (
     ContentDynaUpdateInterface, DOCUMENT_ENTITY
 )
 from app.models.domain.document import (
+    NAMESPACE,
+    CONTENTID,
     SLUG,
     TITLE,
     IDENTIFIER,
@@ -28,6 +30,7 @@ from app.models.domain.document import (
     NIVEAU
 )
 from app.models.domain.media import Media
+from app.models.schemas.media import MediaUpdateIn
 
 
 class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
@@ -47,14 +50,22 @@ class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
     niveau: Optional[int] = None
     media: Optional[List[Media]] = None
 
+    def get_key(self) -> dict:
+        key = dict()
+
+        key[NAMESPACE] = self.topic
+        key[CONTENTID] = self.document_id
+
     def get_entity_type(self) -> str:
         return DOCUMENT_ENTITY
 
     def to_dynamo_update(self) -> List[dict]:
-        list_of_dyn_update_dicts = [itms.to_dynamo_update() for itms in self.media]
+        list_of_dyn_update_dicts = [itm.to_dynamo_update() for itm in self.media]
 
         dyn_update_dict = dict()
 
+        if self.topic: dyn_update_dict[NAMESPACE] = self.topic
+        if self.document_id: dyn_update_dict[CONTENTID] = self.document_id
         if self.user_id: dyn_update_dict[USERID] = self.user_id
         if self.tags: dyn_update_dict[TAGS] = self.tags
         if self.score: dyn_update_dict[SCORE] = self.score

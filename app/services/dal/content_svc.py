@@ -200,7 +200,7 @@ async def delete_content(
     logger.debug(f"Content Key: {key}")
 
     existing_doc = await dynamodb_svc.get_item(CONTENT_TBL, key)
-    if existing_doc is None: return None
+    if not existing_doc: return None
 
     if existing_doc[ENTITY_TYPE] == DOCUMENT_ENTITY:
         doc = await get_document(ns=ns, content_id=content_id)
@@ -241,7 +241,7 @@ async def update_content(
     key[CONTENTID] = content_id
 
     existing_doc = await dynamodb_svc.get_item(tbl_name=CONTENT_TBL, key=key)
-    if existing_doc: return None
+    if not existing_doc: return None
 
     new_content = content.to_dynamo_update()
     entity_type = content.get_entity_type()
@@ -249,9 +249,12 @@ async def update_content(
     if isinstance(new_content, list):
         tasks = []
         for item in new_content:
+            item_key = {k: item.get(k, None) for k in [NAMESPACE, CONTENTID]}
+            item.pop(NAMESPACE, None)
+            item.pop(CONTENTID, None)
             task = dynamodb_svc.update_item(
                 tbl_name=CONTENT_TBL,
-                key=item.get_key(),
+                key=item_key,
                 new_item=item,
             )
             tasks.append(task)

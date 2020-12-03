@@ -8,6 +8,8 @@ from pydantic import (
     NameEmail
 )
 
+EXAMPLE_TOPIC: str = Field(..., example="com.kamestery.devdata:##:africa")
+EXAMPLE_DOCUMENT_ID: str = Field(..., example="com.kamestery.devdata:##:africa:##:some-content")
 EXAMPLE_NAMESPACE: str = Field(..., example="com.kamestery.devdata:##:africa")
 EXAMPLE_CONTENT_ID: str = Field(..., example="com.kamestery.devdata:##:africa:##:some-content")
 EXAMPLE_CONTENT_SLUG: str = Field(..., example="some-content")

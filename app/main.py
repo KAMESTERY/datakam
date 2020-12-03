@@ -39,7 +39,6 @@ def run(debug=True):
         host='0.0.0.0',
         port=int(os.environ.get("PORT", 1717)),
         workers=cpu_count(),
-        # worker_class="uvicorn.workers.UvicornWorker",
         loop="uvloop",
         reload=True,
         debug=debug
