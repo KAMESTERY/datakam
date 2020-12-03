@@ -4,8 +4,13 @@
  :source-paths ["src"]
  :output-to "app.js"
  :output-dir "build"
- :compiler-options {:optimizations :simple
+ :compiler-options {:optimizations :advanced
                     :infer-externs :all
                     :output-feature-set :es7
+                    :dump-core true
+                    :stable-names true
+                    :optimize-constants true
+                    :parallel-build true
+                    :static-fns true
                     :fn-invoke-direct true}
  }
