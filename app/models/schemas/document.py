@@ -29,13 +29,12 @@ from app.models.domain.document import (
     LANGUE,
     NIVEAU
 )
-from app.models.domain.media import Media
 from app.models.schemas.media import MediaUpdateIn
 
 
 class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
-    topic: Optional[str] = None
-    document_id: Optional[str] = None
+    topic: str = None
+    document_id: str = None
     user_id: Optional[EmailStr] = None
     tags: List[str] = None
     score: Optional[int] = None
@@ -48,7 +47,7 @@ class DocumentUpdateIn(ModelConfigMixin, ContentDynaUpdateInterface):
     filtre_visuel: Optional[int] = None
     langue: Optional[int] = None
     niveau: Optional[int] = None
-    media: Optional[List[Media]] = None
+    media: Optional[List[MediaUpdateIn]] = None
 
     def get_key(self) -> dict:
         key = dict()

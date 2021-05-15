@@ -256,6 +256,7 @@ async def update_item(tbl_name: str, key: dict, new_item: dict):
                     Key=key,
                     UpdateExpression=get_update_expression(new_item),
                     ExpressionAttributeValues=get_expression_attribute_values(new_item),
+                    Action="PUT",
                     ReturnValues="UPDATED_NEW"
                 )
             )

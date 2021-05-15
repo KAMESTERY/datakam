@@ -250,8 +250,8 @@ async def update_content(
         tasks = []
         for item in new_content:
             item_key = {k: item.get(k, None) for k in [NAMESPACE, CONTENTID]}
-            item.pop(NAMESPACE, None)
-            item.pop(CONTENTID, None)
+            # item.pop(NAMESPACE, None)
+            # item.pop(CONTENTID, None)
             task = dynamodb_svc.update_item(
                 tbl_name=CONTENT_TBL,
                 key=item_key,

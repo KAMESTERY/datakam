@@ -1,0 +1,703 @@
+{
+	"info": {
+		"_postman_id": "7209dc7f-103f-4240-9ac8-059905b66fb3",
+		"name": "DKM (LOCAL)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DKM - Create Document",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2cde565-915b-4b1e-9a3a-c9d663d4784d",
+						"exec": [
+							"pm.test(\"DKM - Create Document\", () => {",
+							"    pm.response.to.have.status(201);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Content was created.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n  \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n  \"topic\": \"com.kamestery.devdata:##:africa\",\r\n  \"documentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n  \"userId\": \"lb@lambert.kmt\",\r\n  \"tags\": [\r\n    \"dev-tag1\",\r\n    \"dev-tag2\",\r\n    \"dev-tag3\",\r\n    \"dev-tag4\"\r\n  ],\r\n  \"score\": 4,\r\n  \"slug\": \"some-content\",\r\n  \"title\": \"Some Content\",\r\n  \"body\": \"Vivamus quis nibh metus. Maecenas maximus nunc in quam tristique bibendum. Phasellus semper semper finibus. Curabitur sit amet sodales felis, ac egestas mauris. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean efficitur, odio vulputate rutrum vulputate, ipsum nulla tincidunt lectus, quis aliquet ante felis id lorem. Aliquam id tempor magna, nec luctus lacus. Quisque ullamcorper purus vel lectus porttitor aliquam. Maecenas quis varius velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Pellentesque dapibus ligula non justo interdum, eu rutrum est laoreet. Nulla volutpat nisi nec nisi auctor sagittis. In et blandit eros. Vivamus auctor enim augue, at pulvinar mi venenatis id.\",\r\n  \"publish\": true,\r\n  \"media\": [\r\n    {\r\n      \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n      \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n      \"contentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n      \"score\": 4,\r\n      \"mediaId\": \"com.kamestery.devdata:##:africa:##:some-child-content\",\r\n      \"userId\": \"lb@lambert.kmt\",\r\n      \"tags\": [\r\n        \"dev-tag1\",\r\n        \"dev-tag2\",\r\n        \"dev-tag3\",\r\n        \"dev-tag4\"\r\n      ],\r\n      \"fileUrl\": \"https://location.of.media.file\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Create Document (AlreadyExists)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d4efed-b5cd-4c3e-bbe4-fa9e79f4d1ae",
+						"exec": [
+							"pm.test(\"DKM - Create Document (AlreadyExists)\", () => {",
+							"    pm.response.to.have.status(409);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Conflict\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n  \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n  \"topic\": \"com.kamestery.devdata:##:africa\",\r\n  \"documentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n  \"userId\": \"lb@lambert.kmt\",\r\n  \"tags\": [\r\n    \"dev-tag1\",\r\n    \"dev-tag2\",\r\n    \"dev-tag3\",\r\n    \"dev-tag4\"\r\n  ],\r\n  \"score\": 4,\r\n  \"slug\": \"some-content\",\r\n  \"title\": \"Some Content\",\r\n  \"body\": \"Vivamus quis nibh metus. Maecenas maximus nunc in quam tristique bibendum. Phasellus semper semper finibus. Curabitur sit amet sodales felis, ac egestas mauris. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean efficitur, odio vulputate rutrum vulputate, ipsum nulla tincidunt lectus, quis aliquet ante felis id lorem. Aliquam id tempor magna, nec luctus lacus. Quisque ullamcorper purus vel lectus porttitor aliquam. Maecenas quis varius velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Pellentesque dapibus ligula non justo interdum, eu rutrum est laoreet. Nulla volutpat nisi nec nisi auctor sagittis. In et blandit eros. Vivamus auctor enim augue, at pulvinar mi venenatis id.\",\r\n  \"publish\": true,\r\n  \"media\": [\r\n    {\r\n      \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n      \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n      \"contentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n      \"score\": 4,\r\n      \"mediaId\": \"com.kamestery.devdata:##:africa:##:some-child-content\",\r\n      \"userId\": \"lb@lambert.kmt\",\r\n      \"tags\": [\r\n        \"dev-tag1\",\r\n        \"dev-tag2\",\r\n        \"dev-tag3\",\r\n        \"dev-tag4\"\r\n      ],\r\n      \"fileUrl\": \"https://location.of.media.file\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Create Document (BAD)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0e7aab49-10c3-4957-b509-7d97a6627e01",
+						"exec": [
+							"pm.test(\"DKM - Create Document (BAD)\", () => {",
+							"    pm.response.to.have.status(400);",
+							"    pm.expect(pm.response.json().error.code).to.eql(\"INVALID_ARGUMENT\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n  \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n  \"topic\": \"com.kamestery.devdata:##:africa\",\r\n  \"documentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n  \"userId\": \"lb@lambert.kmt\",\r\n  \"tags\": [\r\n    \"dev-tag1\",\r\n    \"dev-tag2\",\r\n    \"dev-tag3\",\r\n    \"dev-tag4\"\r\n  ],\r\n  \"score\": 4,\r\n  \"slug\": \"some-content\",\r\n  \"title\": \"Some Content\",\r\n  \"body\": \"Vivamus quis nibh metus. Maecenas maximus nunc in quam tristique bibendum. Phasellus semper semper finibus. Curabitur sit amet sodales felis, ac egestas mauris. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean efficitur, odio vulputate rutrum vulputate, ipsum nulla tincidunt lectus, quis aliquet ante felis id lorem. Aliquam id tempor magna, nec luctus lacus. Quisque ullamcorper purus vel lectus porttitor aliquam. Maecenas quis varius velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Pellentesque dapibus ligula non justo interdum, eu rutrum est laoreet. Nulla volutpat nisi nec nisi auctor sagittis. In et blandit eros. Vivamus auctor enim augue, at pulvinar mi venenatis id.\",\r\n  \"publish\": true,\r\n  \"media\": [\r\n    {\r\n      \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n      \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n      \"contentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n      \"score\": 4,\r\n      \"mediaId\": \"com.kamestery.devdata:##:africa:##:some-child-content\",\r\n      \"userId\": \"lb@lambert.kmt\",\r\n      \"tags\": [\r\n        \"dev-tag1\",\r\n        \"dev-tag2\",\r\n        \"dev-tag3\",\r\n        \"dev-tag4\"\r\n      ],\r\n      \"fileUrl\": \"https://location.of.media.file\"\r\n    }\r\n  ]\r\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IMSTel - Create Instance (Unparseable)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f5af7ce1-ec0e-4be5-ab74-244f1dd1e0d5",
+						"exec": [
+							"pm.test(\"DKM - Create Document (Unparseable)\", () => {",
+							"    pm.response.to.have.status(415);",
+							"    pm.expect(pm.response.json().error.code).to.eql(\"INVALID_ARGUMENT\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"telusAccessIndependentServiceInstanceRefId\": \"302221999997573-telusIMSTelephonyServiceInstance\",\r\n    \"telusServiceProvider\": \"telus\",\r\n    \"telusServicePolicy\": [\r\n        \"no-tnc-usr-acpt\",\r\n        \"no-usr-def-n911-addr\"\r\n    ],\r\n    \"telusServiceInstanceStatus\": \"active\",\r\n    \"telusSourceSystem\": \"kb\",\r\n    \"telusServiceInstanceChargingMethod\": \"offline\",\r\n    \"telusEventNotificationPolicy\": [\r\n        \"ent-gw-notify-on-create\",\r\n        \"ent-gw-notify-on-update\",\r\n        \"ent-gw-notify-on-delete\"\r\n    ],\r\n    \"preferredLanguage\": \"en-CA\",\r\n    \"telusIMPU\": \"sip:+16472138562@ims.mnc221.mcc302.3gppnetwork.org\",\r\n    \"telusIMPI\": \"302221999997573@ims.mnc221.mcc302.3gppnetwork.org\"\r\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Replace Document",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad2adc70-356c-4ef7-bcc7-f8bb842315a3",
+						"exec": [
+							"pm.test(\"DKM - Replace Document\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Content was updated.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n  \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n  \"topic\": \"com.kamestery.devdata:##:africa\",\r\n  \"documentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n  \"userId\": \"lb@lambert.kmt\",\r\n  \"tags\": [\r\n    \"dev-tag1\",\r\n    \"dev-tag2\",\r\n    \"dev-tag3\",\r\n    \"dev-tag4\"\r\n  ],\r\n  \"score\": 4,\r\n  \"slug\": \"some-content\",\r\n  \"title\": \"Some Content\",\r\n  \"body\": \"UPDATE UPDATE UPDATE UPDATE\",\r\n  \"publish\": true,\r\n  \"media\": [\r\n    {\r\n      \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n      \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n      \"contentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n      \"score\": 4,\r\n      \"mediaId\": \"com.kamestery.devdata:##:africa:##:some-child-content\",\r\n      \"userId\": \"lb@lambert.kmt\",\r\n      \"tags\": [\r\n        \"dev-tag1\",\r\n        \"dev-tag2\",\r\n        \"dev-tag3\",\r\n        \"dev-tag4\"\r\n      ],\r\n      \"fileUrl\": \"https://location.of.media.file\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica/com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content/",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica",
+						"com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Replace Document (NonExistent)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a35ff83-67e7-45fe-a366-d7c03c085766",
+						"exec": [
+							"pm.test(\"DKM - Replace Document (NonExistent)\", () => {",
+							"    pm.response.to.have.status(404);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Item not found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n  \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n  \"topic\": \"com.kamestery.devdata:##:africa\",\r\n  \"documentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n  \"userId\": \"lb@lambert.kmt\",\r\n  \"tags\": [\r\n    \"dev-tag1\",\r\n    \"dev-tag2\",\r\n    \"dev-tag3\",\r\n    \"dev-tag4\"\r\n  ],\r\n  \"score\": 4,\r\n  \"slug\": \"some-content\",\r\n  \"title\": \"Some Content\",\r\n  \"body\": \"UPDATE UPDATE UPDATE UPDATE\",\r\n  \"publish\": true,\r\n  \"media\": [\r\n    {\r\n      \"createdAt\": \"2020-12-01T23:15:16.110145\",\r\n      \"updatedAt\": \"2020-12-01T23:15:16.110148\",\r\n      \"contentId\": \"com.kamestery.devdata:##:africa:##:some-content\",\r\n      \"score\": 4,\r\n      \"mediaId\": \"com.kamestery.devdata:##:africa:##:some-child-content\",\r\n      \"userId\": \"lb@lambert.kmt\",\r\n      \"tags\": [\r\n        \"dev-tag1\",\r\n        \"dev-tag2\",\r\n        \"dev-tag3\",\r\n        \"dev-tag4\"\r\n      ],\r\n      \"fileUrl\": \"https://location.of.media.file\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica/com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content-nonexistent/",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica",
+						"com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content-nonexistent",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Fetch Document",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e43eba62-ff07-4a5e-8b0d-13eb88ba2ffa",
+						"exec": [
+							"pm.test(\"DKM - Fetch Document\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(pm.response.json().topic).to.eql(\"com.kamestery.devdata:##:africa\");",
+							"    pm.expect(pm.response.json().documentId).to.eql(\"com.kamestery.devdata:##:africa:##:some-content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF8"
+					}
+				],
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica/com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content/",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica",
+						"com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Fetch Document (NonExistent)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "88e9a123-d073-4179-ae55-cb380ed96b10",
+						"exec": [
+							"pm.test(\"DKM - Fetch Non Existent Document\", () => {",
+							"    pm.response.to.have.status(404);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Item not found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF8"
+					}
+				],
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica/com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content-NonExistent/",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica",
+						"com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content-NonExistent",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DKM - Fetch Documents",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fdf85ec0-42bf-4c6c-ae23-1febc0ec4095",
+						"exec": [
+							"pm.test(\"DKM - Fetch Documents\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(pm.response.json()[0].topic).to.eql(\"com.kamestery.devdata:##:africa\");",
+							"    pm.expect(pm.response.json()[0].documentId).to.eql(\"com.kamestery.devdata:##:africa:##:some-content\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF8"
+					}
+				],
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IMSTel - Delete Document",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "28878f34-bb1f-41a6-a20d-575b97b78384",
+						"exec": [
+							"pm.test(\"Delete IMSTel Instance\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(pm.response.json().message).to.eql(\"Content was deleted.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{dkm_jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.telus.api.aisir-si-ims-tel-v2+json; charset=utf-8"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c2VudGFjYTpzZW50YWNh"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF8"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					},
+					"options": {
+						"file": {}
+					}
+				},
+				"url": {
+					"raw": "http://{{DKMAPIHOST}}/content/document/com.kamestery.devdata%3A%23%23%3Aafrica/com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content/",
+					"protocol": "http",
+					"host": [
+						"{{DKMAPIHOST}}"
+					],
+					"path": [
+						"content",
+						"document",
+						"com.kamestery.devdata%3A%23%23%3Aafrica",
+						"com.kamestery.devdata%3A%23%23%3Aafrica%3A%23%23%3Asome-content",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "feae7462-97a3-4c7a-89a4-02f957625674",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c187e560-840b-49f2-9df7-9c3416269b41",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "5525dfdc-e5da-4505-81e7-26ba917e8875",
+			"key": "dkm_jwt_token",
+			"value": "eyJ0eXAiOiJKV1QiLCJraWQiOiJ0ZXN0dXNlciIsImlzcyI6IkJBU0ggSldUIEdlbmVyYXRvciIsImFsZyI6IkhTMjU2IiwiaWF0IjoxNjA0NTE5MjE2LCJleHAiOjE2MDQ1MTkyM..."
+		},
+		{
+			"id": "4aad72ac-4b15-4d6d-87ee-13ede0627cd3",
+			"key": "DKMAPIHOST",
+			"value": "127.0.0.1:1717"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -13,7 +13,7 @@ from app.models.common import (
     convert_string_to_datetime
 )
 from app.models.domain import (
-    EXAMPLE_CONTENT_ID,
+    EXAMPLE_PARENT_CONTENT_ID,
     EXAMPLE_EMAIL,
     EXAMPLE_TAGS,
     EXAMPLE_CHILD_ID,
@@ -21,9 +21,7 @@ from app.models.domain import (
     EXAMPLE_MEDIA_URL,
 )
 from app.models.domain.content import (
-    Content,
-    ContentDynaInOutInterface,
-    ContentDynaUpdateInterface
+    ContentDynaInOutInterface
 )
 from app.models.domain.content import (
     ENTITY_TYPE,
@@ -43,8 +41,8 @@ from app.models.domain.content import (
 FILEURL = "FileUrl"
 
 
-class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface, ContentDynaUpdateInterface):
-    parentdocument_id: str = EXAMPLE_CONTENT_ID
+class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface):
+    parent_content_id: str = EXAMPLE_PARENT_CONTENT_ID
     type: int = EXAMPLE_NUMBER
     media_id: str = EXAMPLE_CHILD_ID
     user_id: EmailStr = EXAMPLE_EMAIL
@@ -60,7 +58,7 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface, Con
     def get_key(self):
         key = dict()
 
-        key[NAMESPACE] = self.parentdocument_id
+        key[NAMESPACE] = self.parent_content_id
         key[CONTENTID] = self.media_id
 
         return key
@@ -69,23 +67,7 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface, Con
         dyn_dict = dict()
 
         dyn_dict[ENTITY_TYPE] = MEDIA_ENTITY
-        dyn_dict[NAMESPACE] = self.parentdocument_id
-        dyn_dict[TYPE] = self.type
-        dyn_dict[CONTENTID] = self.media_id
-        dyn_dict[USERID] = self.user_id
-        dyn_dict[TAGS] = self.tags
-        dyn_dict[SCORE] = self.score
-        dyn_dict[VERSION] = self.version
-        dyn_dict[POSITION] = self.position
-        dyn_dict[FILEURL] = self.file_url
-        dyn_dict[CREATEDAT] = convert_json_to_realworld(self.created_at)
-        dyn_dict[UPDATEDAT] = convert_json_to_realworld(self.updated_at)
-
-        return dyn_dict
-
-    def to_dynamo_update(self) -> dict:
-        dyn_dict = dict()
-
+        dyn_dict[NAMESPACE] = self.parent_content_id
         dyn_dict[TYPE] = self.type
         dyn_dict[CONTENTID] = self.media_id
         dyn_dict[USERID] = self.user_id
@@ -103,7 +85,7 @@ class Media(DateTimeModelMixin, ModelConfigMixin, ContentDynaInOutInterface, Con
     def from_dynamo(cls, item: dict) -> 'TextBlock':
 
         tb = cls(
-            parentdocument_id=item[NAMESPACE],
+            parent_content_id=item[NAMESPACE],
             type=item[TYPE],
             media_id=item[CONTENTID],
             user_id=item[USERID],

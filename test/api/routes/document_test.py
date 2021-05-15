@@ -66,32 +66,36 @@ def test_retrieve_updated_document():
     assert res_doc.get('body') == "UPDATE UPDATE UPDATE UPDATE"
 
 
-# def test_patch_document_media():
-#     DOCUMENT_PATCH_DATA = dict(
-#         media=[
-#             dict(
-#                 fileUrl="https://location.of.another.media.file"
-#             )
-#         ]
-#     )
-#
-#     response = client.patch(
-#         quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"),
-#         json=DOCUMENT_PATCH_DATA
-#     )
-#     assert response.status_code == 200
-#     assert response.json()  == {
-#         "namespace": NAMESPACE,
-#         "contentId": DOCUMENT_CONTENT_ID,
-#         "message": "Content was updated."
-#     }
-#
-#
-# def test_retrieve_patched_document():
-#     response = client.get(quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"))
-#     assert response.status_code == 200
-#     res_doc = response.json()
-#     assert res_doc.media[0].fileUrl == "https://location.of.another.media.file"
+def test_patch_document_media():
+    DOCUMENT_PATCH_DATA = dict(
+        topic=NAMESPACE,
+        documentId=DOCUMENT_CONTENT_ID,
+        media=[
+            dict(
+                parentContentId=DOCUMENT_CONTENT_ID,
+                mediaId="com.kamestery.devdata:##:africa:##:some-child-content",
+                fileUrl="https://location.of.another.media.file"
+            )
+        ]
+    )
+
+    response = client.patch(
+        quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"),
+        json=DOCUMENT_PATCH_DATA
+    )
+    assert response.status_code == 200
+    assert response.json()  == {
+        "namespace": NAMESPACE,
+        "contentId": DOCUMENT_CONTENT_ID,
+        "message": "Content was updated."
+    }
+
+
+def test_retrieve_patched_document():
+    response = client.get(quote(f"/content/document/{NAMESPACE}/{DOCUMENT_CONTENT_ID}/"))
+    assert response.status_code == 200
+    res_doc = response.json()
+    assert res_doc["media"][0]["fileUrl"] == "https://location.of.another.media.file"
 
 
 def test_delete_document():

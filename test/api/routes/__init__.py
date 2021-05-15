@@ -30,7 +30,7 @@ DOCUMENT_DATA = {
         {
             "createdAt": "2020-10-23T18:30:42.415Z",
             "updatedAt": "2020-10-23T18:30:42.415Z",
-            "contentId": DOCUMENT_CONTENT_ID,
+            "parentContentId": DOCUMENT_CONTENT_ID,
             "score": 4,
             "mediaId": DOCUMENT_CHILD_ID,
             "userId": "lb@lambert.kmt",
@@ -67,7 +67,7 @@ DOCUMENT_UPDATE_DATA = {
         {
             "createdAt": "2020-10-23T18:30:42.415Z",
             "updatedAt": "2020-10-23T18:30:42.415Z",
-            "contentId": DOCUMENT_CONTENT_ID,
+            "parentContentId": DOCUMENT_CONTENT_ID,
             "score": 4,
             "mediaId": DOCUMENT_CHILD_ID,
             "userId": "lb@lambert.kmt",
@@ -95,7 +95,7 @@ DOCSTREAM_DATA = {
     {
       "createdAt": "2020-10-26T01:33:23.676Z",
       "updatedAt": "2020-10-26T01:33:23.676Z",
-      "contentId": DOCSTREAM_CONTENT_ID,
+      "parentContentId": DOCSTREAM_CONTENT_ID,
       "score": 4,
       "mediaId": DOCSTREAM_CHILD_ID,
       "userId": "lb@lambert.kmt",
@@ -110,7 +110,7 @@ DOCSTREAM_DATA = {
     {
       "createdAt": "2020-10-26T01:33:23.676Z",
       "updatedAt": "2020-10-26T01:33:23.676Z",
-      "contentId": DOCSTREAM_CONTENT_ID,
+      "parentContentId": DOCSTREAM_CONTENT_ID,
       "textblockId": DOCSTREAM_OTHER_CHILD_ID,
       "userId": "lb@lambert.kmt",
       "tags": [
@@ -131,7 +131,7 @@ def validate_document(res_doc: dict):
     assert res_doc['topic'] == DOCUMENT_DATA['topic']
     assert res_doc['documentId'] == DOCUMENT_DATA['documentId']
     assert res_doc['userId'] == DOCUMENT_DATA['userId']
-    assert res_doc['media'][0]['contentId'] == DOCUMENT_DATA['media'][0]['contentId']
+    assert res_doc['media'][0]['parentContentId'] == DOCUMENT_DATA['media'][0]['parentContentId']
     assert res_doc['media'][0]['mediaId'] == DOCUMENT_DATA['media'][0]['mediaId']
 
 
@@ -141,7 +141,7 @@ def validate_document_stream(res_doc: dict):
     assert res_doc['userId'] == DOCSTREAM_DATA['userId']
     assert res_doc['itemStream'][1]['contentId'] == DOCSTREAM_DATA['itemStream'][0]['contentId']
     assert res_doc['itemStream'][1]['mediaId'] == DOCSTREAM_DATA['itemStream'][0]['mediaId']
-    assert res_doc['itemStream'][0]['contentId'] == DOCSTREAM_DATA['itemStream'][1]['contentId']
+    assert res_doc['itemStream'][0]['parentContentId'] == DOCSTREAM_DATA['itemStream'][1]['parentContentId']
     assert res_doc['itemStream'][0]['textblockId'] == DOCSTREAM_DATA['itemStream'][1]['textblockId']
 
 

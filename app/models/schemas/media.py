@@ -1,6 +1,9 @@
 
 from datetime import datetime
-from typing import List
+from typing import (
+    List,
+    Optional
+)
 
 from pydantic import (
     EmailStr,
@@ -29,15 +32,15 @@ FILEURL = "FileUrl"
 
 
 class MediaUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInterface):
-    parentdocument_id: str = None
-    type: int = None
+    parent_content_id: str = None
+    type: Optional[int] = None
     media_id: str = None
-    user_id: EmailStr = None
-    tags: List[str] = None
-    score: int = None
-    version: int = None
-    position: int = None
-    file_url: HttpUrl = None
+    user_id: Optional[EmailStr] = None
+    tags: Optional[List[str]] = None
+    score: Optional[int] = None
+    version: Optional[int] = None
+    position: Optional[int] = None
+    file_url: Optional[HttpUrl] = None
 
     def get_key(self) -> dict:
         key = dict()
@@ -51,7 +54,7 @@ class MediaUpdateIn(DateTimeModelMixin, ModelConfigMixin, ContentDynaUpdateInter
     def to_dynamo_update(self) -> dict:
         dyn_update_dict = dict()
 
-        if self.parentdocument_id: dyn_update_dict[NAMESPACE] = self.parentdocument_id
+        if self.parent_content_id: dyn_update_dict[NAMESPACE] = self.parent_content_id
         if self.media_id: dyn_update_dict[CONTENTID] = self.media_id
         if self.type: dyn_update_dict[TYPE] = self.type
         if self.user_id: dyn_update_dict[USERID] = self.user_id

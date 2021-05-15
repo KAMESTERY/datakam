@@ -166,3 +166,6 @@ nb-configuration.xml
 # patch
 *.orig
 *.rej
+
+# project
+node_modules

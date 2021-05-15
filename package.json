@@ -1,0 +1,29 @@
+{
+  "name": "datakam",
+  "version": "1.0.0",
+  "description": "Datakam API",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "newman run ./test/postman/DKM_LOCAL.postman_collection.json -r cli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KAMESTERY/datakam.git"
+  },
+  "keywords": [
+    "OpenAPI",
+    "DynamoDB"
+  ],
+  "author": "outcastgeek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KAMESTERY/datakam/issues"
+  },
+  "homepage": "https://github.com/KAMESTERY/datakam#readme",
+  "devDependencies": {
+    "newman": "^5.2.1"
+  },
+  "dependencies": {}
+}
