@@ -2,12 +2,8 @@
   (:require-macros [fast-twitch.macros :as m])
   (:require [cljs.nodejs :as nodejs]
             [mount.core :as mount]
-            [taoensso.timbre :as log]
-            [fast-twitch.sugar :as ft]
-            [fast-twitch.web-api :as web]
             [fast-twitch.server]
-            [datakam.dispatch :refer [handle]]
-            [datakam.routing :refer [routing-data]]
+            [datakam.handlers.core :refer [routes]]
             ["morgan" :as logger]
             ["xhr2" :as xhr2]
             ["body-parser" :as body-parser]
@@ -16,11 +12,6 @@
 (nodejs/enable-util-print!)
 
 (set! js/XMLHttpRequest xhr2)
-
-(def routes
-  (web/routes
-    routing-data
-    handle))
 
 (defn middlewares []
   (let []

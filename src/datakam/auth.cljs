@@ -73,5 +73,6 @@
   (def claims {:UserID "sf@sdgf.fg" :Role 9874})
   (def token (jwt-encode claims))
   (log/debug token)
-  (jwt-decode token))
+  (jwt-decode token)
+  ,)
 

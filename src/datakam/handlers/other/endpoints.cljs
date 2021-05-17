@@ -1,4 +1,4 @@
-(ns datakam.endpoints
+(ns datakam.handlers.other.endpoints
   (:require-macros [cljs.core.async.macros :refer [alt! go]]
                    [fast-twitch.macros :as m])
   (:require [cljs-http.client :as http]
@@ -19,7 +19,7 @@
     (timeout t)))
 
 (defn home [req]
-  (web/send "DataKam is Up!"))
+  (web/send "Other DataKam is Up!"))
 
 (defn gql [req]
   (go

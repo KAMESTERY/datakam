@@ -3,38 +3,58 @@
   "test"]
 
  :deps
- {org.clojure/clojurescript {:mvn/version "1.10.758"}
-  org.clojure/core.async {:mvn/version "1.3.610"}
+ {org.clojure/clojure            {:mvn/version "1.10.3"}
+  org.clojure/clojurescript {:mvn/version "1.10.844"}
+  org.clojure/core.async {:mvn/version "1.3.618"}
   ;; outcastgeek/fast-twitch    {:git/url "https://github.com/outcastgeek/fast-twitch"
   ;;                             :sha     "0d489237a536879c86d5f8251a9a1f6d031e3dd5"}
   ;;outcastgeek/fast-twitch {:local/root "/path/to/fast-twitch"}
-  ;outcastgeek/fast-twitch {:local/root "/Users/chiefkemist/projects_workspace/fast-twitch"}
   OUTCASTGEEK-TECH/fast-twitch    {:git/url "https://github.com/OUTCASTGEEK-TECH/fast-twitch"
-                                   :sha     "ce3555329aa1cad31e3df81d048cdc63a1e8b9a2"}
+                                   :sha     "d27b431cfb0c996c3734af959df4ae13ceb3f31d"}
   kamestery/contractskam         {:git/url "https://github.com/kamestery/contractskam"
                                   :sha     "a532761c407abe6c23a421155062335e57c37c7e"}
   ;;kamestery/contractskam {:local/root "/path/to/contractskam"}
-  ;;kamestery/contractskam {:local/root "/Users/chiefkemist/projects_workspace/contractskam"}
-  cljs-ajax/cljs-ajax                  {:mvn/version "0.8.0"}
+  cljs-ajax/cljs-ajax                  {:mvn/version "0.8.3"}
   cljs-http/cljs-http                  {:mvn/version "0.1.46"}
-  org.clojure/core.match               {:mvn/version "1.0.0"}
-  mount/mount                          {:mvn/version "0.1.16"}
-  camel-snake-kebab/camel-snake-kebab  {:mvn/version "0.4.1"}
-  com.rpl/specter                      {:mvn/version "1.1.3"}
-  com.taoensso/timbre                  {:mvn/version "4.10.0"}
-  com.cognitect/transit-cljs           {:mvn/version "0.8.256"}
-  tick/tick                            {:mvn/version "0.4.26-alpha"}}
+  org.clojure/core.match     {:mvn/version "1.0.0"}
+  mount/mount                      {:mvn/version "0.1.16"}
+  camel-snake-kebab/camel-snake-kebab          {:mvn/version "0.4.2"}
+  com.rpl/specter            {:mvn/version "1.1.3"}
+  com.taoensso/timbre        {:mvn/version "5.1.2"}
+  com.cognitect/transit-cljs {:mvn/version "0.8.269"}
+  tick/tick                       {:mvn/version "0.4.31-alpha"}
+  thheller/shadow-cljs       {:mvn/version "2.13.0"}}
 
  :aliases
- {:ancient {:main-opts  ["-m" "deps-ancient.deps-ancient"]
-            :extra-deps {deps-ancient {:mvn/version "0.0.5"}}}
+ {;; clj -M:ancient
+  :ancient {:main-opts  ["-m" "deps-ancient.deps-ancient"]
+            :extra-deps {deps-ancient/deps-ancient {:mvn/version "0.0.5"}}}
+  ;; clojure -M:repl/rebel-cljs
+  :repl/rebel-cljs
+           {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0-SNAPSHOT"}
+                         cider/cider-nrepl          {:mvn/version "0.27.0-SNAPSHOT"}
+                         cider/piggieback           {:mvn/version "0.5.2"}
+                         com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
+            :main-opts  ["-m" "nrepl.cmdline"
+                         "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"
+                         "-i"
+                         "-f" "rebel-readline.cljs.main/-main"]}
+  ;; clojure -M:repl/rebel-nrepl
+  :repl/rebel-nrepl
+           {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0-SNAPSHOT"}
+                         cider/cider-nrepl          {:mvn/version "0.27.0-SNAPSHOT"}
+                         com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
+            :main-opts  ["-m" "nrepl.cmdline"
+                         "--middleware" "[cider.nrepl/cider-middleware]"
+                         "-i"
+                         "-f" "rebel-readline.main/-main"]}
   :dev
   {:extra-deps
-   {cider/cider-nrepl {:mvn/version "0.25.5"}}}
+   {cider/cider-nrepl {:mvn/version "0.27.0-SNAPSHOT"}}}
   :prod
   {:extra-deps
-   {cider/cider-nrepl {:mvn/version "0.25.5"}}}
+   {cider/cider-nrepl {:mvn/version "0.27.0-SNAPSHOT"}}}
   :zprint
   {:extra-deps
-   {zprint/zprint {:mvn/version "1.0.2"}}
+   {zprint/zprint {:mvn/version "1.1.2"}}
    :main-opts ["-m" "zprint.main"]}}}
